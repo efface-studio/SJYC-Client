@@ -1,6 +1,6 @@
 import { hoursOn } from '@/config/center';
 import { daysUntil, maskName } from '@/lib/format';
-import { can } from './permissions';
+import { assignableRoles, can, canManageUser, PERMISSIONS, primaryRole } from './permissions';
 import { computeRecruitStatus } from './program';
 import {
   clubFormSchema,
@@ -48,6 +48,28 @@ describe('권한(RBAC)', () => {
   });
   it('정지된 관리자는 아무 권한도 없다', () => {
     expect(can({ roles: ['admin'], status: 'suspended' }, 'admin.access')).toBe(false);
+  });
+  it('개발자는 모든 권한을 가진 최상위 역할이고, 개발자 도구는 개발자만 쓴다', () => {
+    const developer = { roles: ['developer' as const], status: 'active' as const };
+    const admin = { roles: ['admin' as const], status: 'active' as const };
+    for (const p of PERMISSIONS) expect(can(developer, p)).toBe(true);
+    expect(can(admin, 'developer.access')).toBe(false);
+    expect(can(admin, 'member.manage')).toBe(true);
+  });
+  it('개발자 역할은 개발자만 부여하고, 개발자 계정은 개발자만 변경한다', () => {
+    const developer = { roles: ['developer' as const], status: 'active' as const };
+    const admin = { roles: ['admin' as const], status: 'active' as const };
+    const staff = { roles: ['staff' as const], status: 'active' as const };
+    expect(assignableRoles(admin)).not.toContain('developer');
+    expect(assignableRoles(developer)).toContain('developer');
+    expect(assignableRoles(staff)).toEqual([]);
+    expect(canManageUser(admin, { roles: ['developer'] })).toBe(false);
+    expect(canManageUser(admin, { roles: ['staff'] })).toBe(true);
+    expect(canManageUser(developer, { roles: ['developer'] })).toBe(true);
+  });
+  it('대표 역할은 가장 높은 역할', () => {
+    expect(primaryRole({ roles: ['member', 'developer', 'staff'] })).toBe('developer');
+    expect(primaryRole({ roles: ['member'] })).toBe('member');
   });
 });
 

@@ -61,20 +61,20 @@
 
 ## 관리자 (모두 서버 권한 검사 필수)
 
-| 메서드    | 경로                                                                                          | 권한                        |
-| --------- | --------------------------------------------------------------------------------------------- | --------------------------- |
-| GET       | `/admin/dashboard?periodDays=`                                                                | admin.access                |
-| CRUD      | `/admin/notices`                                                                              | notice.write                |
-| CRUD      | `/admin/programs` (신청 이력이 있으면 삭제 불가 → 비공개 전환)                                | program.write               |
-| GET       | `/admin/applications`, `/admin/applications/{id}`                                             | application.decide          |
-| POST      | `/admin/applications/decisions` `{ ids, decision, reason }` → `{ succeeded, failed[] }`       | application.decide          |
-| GET/PATCH | `/admin/members`, `/admin/members/{id}` `{ roles?, status? }` (본인 변경 불가)                | member.read / member.manage |
-| CRUD      | `/admin/clubs`, GET `/admin/club-applications`, POST `/admin/club-applications/{id}/decision` | club.manage                 |
-| GET/PUT   | `/admin/spaces`, GET `/admin/reservations`, POST `/admin/reservations/{id}/decision`          | space.manage                |
-| GET/PUT   | `/admin/inquiries`, `/admin/inquiries/{id}/answer`                                            | inquiry.answer              |
-| CRUD      | `/admin/faqs`                                                                                 | inquiry.answer              |
-| GET/PUT   | `/admin/policies`, `/admin/policies/{key}` `{ body, effectiveAt }`                            | policy.manage               |
-| GET       | `/admin/audit-events`                                                                         | audit.read                  |
+| 메서드    | 경로                                                                                                                                           | 권한                        |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| GET       | `/admin/dashboard?periodDays=`                                                                                                                 | admin.access                |
+| CRUD      | `/admin/notices`                                                                                                                               | notice.write                |
+| CRUD      | `/admin/programs` (신청 이력이 있으면 삭제 불가 → 비공개 전환)                                                                                 | program.write               |
+| GET       | `/admin/applications`, `/admin/applications/{id}`                                                                                              | application.decide          |
+| POST      | `/admin/applications/decisions` `{ ids, decision, reason }` → `{ succeeded, failed[] }`                                                        | application.decide          |
+| GET/PATCH | `/admin/members`, `/admin/members/{id}` `{ roles?, status? }` (본인 변경 불가, `developer` 역할 부여·개발자 계정 변경은 developer.access 필요) | member.read / member.manage |
+| CRUD      | `/admin/clubs`, GET `/admin/club-applications`, POST `/admin/club-applications/{id}/decision`                                                  | club.manage                 |
+| GET/PUT   | `/admin/spaces`, GET `/admin/reservations`, POST `/admin/reservations/{id}/decision`                                                           | space.manage                |
+| GET/PUT   | `/admin/inquiries`, `/admin/inquiries/{id}/answer`                                                                                             | inquiry.answer              |
+| CRUD      | `/admin/faqs`                                                                                                                                  | inquiry.answer              |
+| GET/PUT   | `/admin/policies`, `/admin/policies/{key}` `{ body, effectiveAt }`                                                                             | policy.manage               |
+| GET       | `/admin/audit-events`                                                                                                                          | audit.read                  |
 
 모든 관리자 변경은 서버가 감사 이벤트(`actor, action, target, summary, at`)를 남긴다. 개인정보 원문은 summary 에 넣지 않는다.
 

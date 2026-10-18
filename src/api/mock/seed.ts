@@ -32,6 +32,7 @@ export const DEMO_ACCOUNTS = [
   { email: 'leader@demo.test', label: '동아리 대표 회원' },
   { email: 'staff@demo.test', label: '센터 직원' },
   { email: 'admin@demo.test', label: '최고 관리자' },
+  { email: 'developer@demo.test', label: '개발자' },
 ] as const;
 
 export interface MockMembership {
@@ -42,7 +43,7 @@ export interface MockMembership {
 }
 
 export interface MockDb {
-  version: 5;
+  version: 6;
   notifications: Notification[];
   media: MediaItem[];
   spaces: Space[];
@@ -104,6 +105,7 @@ export function createSeed(now = new Date()): MockDb {
     user('u-leader', 'leader@demo.test', '이데모', ['member'], { birthYear: 2008 }),
     user('u-staff', 'staff@demo.test', '박직원', ['staff'], { birthYear: 1990 }),
     user('u-admin', 'admin@demo.test', '최관리', ['admin'], { birthYear: 1985 }),
+    user('u-developer', 'developer@demo.test', '강개발', ['developer'], { birthYear: 1993 }),
     user('u-5', 'sample5@demo.test', '정예시', ['member'], { birthYear: 2010 }),
     user('u-6', 'sample6@demo.test', '한테스트', ['member'], { birthYear: 2007 }),
     user('u-7', 'sample7@demo.test', '오가상', ['member'], { status: 'suspended' }),
@@ -705,7 +707,7 @@ export function createSeed(now = new Date()): MockDb {
   ];
 
   return {
-    version: 5,
+    version: 6,
     notifications,
     media: RESEARCH_MEDIA,
     spaces,

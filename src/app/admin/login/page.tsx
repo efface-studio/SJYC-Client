@@ -18,8 +18,8 @@ import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { SESSION_KEY, useLogout, useSession } from '@/features/auth/session';
 import { safeRedirect } from '@/lib/safe-redirect';
 
-const ADMIN_DEMO = DEMO_ACCOUNTS.filter(
-  (a) => a.email === 'staff@demo.test' || a.email === 'admin@demo.test',
+const ADMIN_DEMO = DEMO_ACCOUNTS.filter((a) =>
+  ['staff@demo.test', 'admin@demo.test', 'developer@demo.test'].includes(a.email),
 );
 
 /** next 는 /admin 하위 경로만 허용한다 (/admin/login 자체 제외) */
