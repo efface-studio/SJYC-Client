@@ -9,7 +9,7 @@ import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/mock/seed';
 import { Button, buttonClass } from '@/components/ui/button';
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA } from '@/config/env';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { PENDING_VERIFY_KEY, SESSION_KEY, useSession } from '@/features/auth/session';
@@ -132,7 +132,7 @@ function LoginForm() {
         </Link>
       </div>
 
-      {IS_MOCK && (
+      {DEMO_DATA && (
         <div className="mt-6 rounded-md border border-dashed border-warning-800/40 bg-warning-50 p-3">
           <p className="text-sm font-bold text-warning-800">개발용 데모 계정으로 입력</p>
           <div className="mt-2 grid grid-cols-2 gap-2">

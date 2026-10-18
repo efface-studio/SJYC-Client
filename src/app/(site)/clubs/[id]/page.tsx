@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { REFERENCE_COLLECTED_AT } from '@/api/mock/research';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA } from '@/config/env';
 import { CLUB_APPLICATION_STATUS } from '@/domain/labels';
 import { clubApplySchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import type { Club, ClubRole } from '@/domain/types';
@@ -317,7 +317,7 @@ export default function ClubDetailPage() {
               title={club.data.name}
               description={club.data.summary}
             />
-            {IS_MOCK &&
+            {DEMO_DATA &&
               (club.data.sourceUrls.length === 0 ? (
                 <Callout tone="warning" className="mb-4">
                   개발용 샘플 동아리입니다.
@@ -342,7 +342,7 @@ export default function ClubDetailPage() {
               <dd>{club.data.meetingInfo}</dd>
               <dt className="font-semibold text-ink-600">인원</dt>
               <dd>
-                {club.data.memberCount}명{IS_MOCK && <span className="text-ink-600"> (데모)</span>}
+                {club.data.memberCount}명{DEMO_DATA && <span className="text-ink-600"> (데모)</span>}
               </dd>
             </dl>
             <p className="mt-6 text-base leading-relaxed whitespace-pre-line text-ink-700">

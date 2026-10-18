@@ -7,7 +7,7 @@ import { api } from '@/api';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA } from '@/config/env';
 
 export default function ClubsPage() {
   const clubs = useQuery({ queryKey: ['clubs'], queryFn: () => api.clubs.list() });
@@ -55,7 +55,7 @@ export default function ClubsPage() {
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <UsersRound aria-hidden className="size-4" />
-                    {c.memberCount}명{IS_MOCK && ' (데모)'}
+                    {c.memberCount}명{DEMO_DATA && ' (데모)'}
                   </span>
                 </p>
               </Link>
