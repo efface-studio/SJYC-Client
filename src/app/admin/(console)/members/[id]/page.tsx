@@ -13,21 +13,16 @@ import { SelectField } from '@/components/ui/field';
 import { Callout } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { OAUTH_PROVIDER_LABEL, USER_STATUS } from '@/domain/labels';
-import { can, ROLE_LABEL } from '@/domain/permissions';
+import { assignableRoles, can, canManageUser, primaryRole, ROLE_LABEL } from '@/domain/permissions';
 import type { Role, User, UserStatus } from '@/domain/types';
 import { useSession } from '@/features/auth/session';
 import { formatDate } from '@/lib/format';
 
-const ROLES: Role[] = ['member', 'staff', 'admin'];
 const EDITABLE_STATUS: UserStatus[] = ['active', 'suspended'];
 
 interface Patch {
   roles: Role[];
   status: UserStatus;
-}
-
-function primaryRole(u: User): Role {
-  return u.roles.includes('admin') ? 'admin' : u.roles.includes('staff') ? 'staff' : 'member';
 }
 
 function describe(u: User, p: Patch): string[] {
@@ -39,8 +34,8 @@ function describe(u: User, p: Patch): string[] {
   return changes;
 }
 
-/** 역할·상태 변경 — 최고 관리자(member.manage)만, 자기 자신은 불가 (서버도 거부) */
-function ManageForm({ user }: { user: User }) {
+/** 역할·상태 변경 — 최고 관리자(member.manage)만, 자기 자신은 불가. 개발자 역할·계정은 개발자만 (서버도 거부) */
+function ManageForm({ user, roles }: { user: User; roles: Role[] }) {
   const qc = useQueryClient();
   const toast = useToast();
   const [pending, setPending] = useState<Patch | null>(null);
@@ -66,7 +61,7 @@ function ManageForm({ user }: { user: User }) {
       onSubmit={(e) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
-        const role = ROLES.find((r) => r === fd.get('role')) ?? primaryRole(user);
+        const role = roles.find((r) => r === fd.get('role')) ?? primaryRole(user);
         const status = EDITABLE_STATUS.find((s) => s === fd.get('status')) ?? user.status;
         const next = { roles: [role], status };
         if (describe(user, next).length === 0) {
@@ -82,7 +77,7 @@ function ManageForm({ user }: { user: User }) {
           label="역할"
           name="role"
           defaultValue={primaryRole(user)}
-          options={ROLES.map((r) => ({ value: r, label: ROLE_LABEL[r] }))}
+          options={roles.map((r) => ({ value: r, label: ROLE_LABEL[r] }))}
         />
         <SelectField
           label="상태"
@@ -160,8 +155,12 @@ function MemberDetail() {
               <Callout tone="info" className="mt-8 max-w-2xl">
                 자기 자신의 역할·상태는 변경할 수 없습니다. 다른 최고 관리자에게 요청해 주세요.
               </Callout>
+            ) : !canManageUser(me, u) ? (
+              <Callout tone="info" className="mt-8 max-w-2xl">
+                개발자 계정의 역할·상태는 개발자만 변경할 수 있습니다.
+              </Callout>
             ) : (
-              <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} />
+              <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
             ))}
         </>
       )}

@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/toast';
 import { DemoBanner } from '@/components/dev-panel';
 import { Logo } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
-import { can, ROLE_LABEL, type Permission } from '@/domain/permissions';
+import { can, primaryRole, ROLE_LABEL, type Permission } from '@/domain/permissions';
 import type { User } from '@/domain/types';
 import { useLogout, useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
@@ -65,9 +65,7 @@ function activeItem(pathname: string): NavItem | undefined {
 }
 
 function roleLabel(user: User): string {
-  if (user.roles.includes('admin')) return ROLE_LABEL.admin;
-  if (user.roles.includes('staff')) return ROLE_LABEL.staff;
-  return ROLE_LABEL.member;
+  return ROLE_LABEL[primaryRole(user)];
 }
 
 function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; onNavigate?: () => void }) {
