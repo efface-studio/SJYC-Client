@@ -3,14 +3,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { RotateCw } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { APPLICATION_STATUS, PUBLISH_STATUS } from '@/domain/labels';
-import { can, type Permission } from '@/domain/permissions';
+import { can, managesAnyClub, type Permission } from '@/domain/permissions';
 import type { DashboardSummary } from '@/domain/types';
 import { useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
@@ -209,6 +210,13 @@ function Dashboard() {
 }
 
 export default function AdminDashboardPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const managerOnly = !!session && !can(session.user, 'admin.access') && managesAnyClub(session.user);
+  useEffect(() => {
+    if (managerOnly) router.replace('/admin/my-clubs');
+  }, [managerOnly, router]);
+  if (managerOnly) return null;
   return (
     <AdminPage title="대시보드" permission="admin.access">
       <Dashboard />

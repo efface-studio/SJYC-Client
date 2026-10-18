@@ -301,6 +301,21 @@ export const clubFormSchema = z.object({
   sourceUrls: z.array(httpsUrl).max(10, { error: '출처는 10개까지 등록할 수 있습니다.' }).optional(),
 });
 
+export const clubIntroSchema = z.object({
+  summary: z.string().trim().min(5, { error: '한 줄 소개를 5자 이상 입력해 주세요.' }).max(120),
+  description: z.string().trim().min(10, { error: '소개를 10자 이상 입력해 주세요.' }).max(5000),
+  meetingInfo: z.string().trim().min(2, { error: '모임 일정을 입력해 주세요.' }).max(100),
+  recruiting: z.union([z.boolean(), optionalChecked]),
+});
+
+export const clubPostSchema = z.object({
+  kind: z.enum(['notice', 'schedule', 'activity'], { error: '분류를 선택해 주세요.' }),
+  title: z.string().trim().min(2, { error: '제목을 2자 이상 입력해 주세요.' }).max(100),
+  body: z.string().trim().min(2, { error: '내용을 입력해 주세요.' }).max(2000),
+});
+
+export const managerEmailSchema = z.object({ email });
+
 export const attendanceSessionSchema = z.object({
   date: dateOnly,
   title: z
@@ -335,6 +350,8 @@ export type FaqFormInput = z.infer<typeof faqFormSchema>;
 export type PolicyFormInput = z.infer<typeof policyFormSchema>;
 export type SpaceFormInput = z.infer<typeof spaceFormSchema>;
 export type AttendanceSessionInput = z.infer<typeof attendanceSessionSchema>;
+export type ClubIntroInput = z.infer<typeof clubIntroSchema>;
+export type ClubPostInput = z.infer<typeof clubPostSchema>;
 export type CheckInInput = z.infer<typeof checkInSchema>;
 
 export type FieldErrors = Record<string, string>;

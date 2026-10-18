@@ -12,6 +12,7 @@ import { formatPickerDate } from '@/components/ui/date-picker';
 import { ConfirmDialog } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { sessionCounts } from '@/domain/attendance';
+import { canManageAttendance } from '@/domain/permissions';
 import { ATTENDANCE_STATUS, ATTENDANCE_TARGET_LABEL } from '@/domain/labels';
 import type { AttendanceMark, AttendanceSession } from '@/domain/types';
 import { formatDateTime } from '@/lib/format';
@@ -252,7 +253,7 @@ export default function AdminAttendanceDetailPage() {
   return (
     <AdminPage
       title="출석부"
-      permission="attendance.manage"
+      permission={canManageAttendance}
       breadcrumbs={[{ label: '출석', href: '/admin/attendance' }, { label: '출석부' }]}
     >
       <SessionDetail id={id} />

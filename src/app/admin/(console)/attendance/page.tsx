@@ -16,6 +16,7 @@ import { Select } from '@/components/ui/select';
 import { EmptyState } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { attendanceTargetKey, sessionCounts } from '@/domain/attendance';
+import { canManageAttendance } from '@/domain/permissions';
 import { ATTENDANCE_STATUS, ATTENDANCE_TARGET_LABEL } from '@/domain/labels';
 import { attendanceSessionSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import type { AttendanceSession, AttendanceTarget, AttendanceTargetSummary } from '@/domain/types';
@@ -252,7 +253,7 @@ export default function AdminAttendancePage() {
   return (
     <AdminPage
       title="출석"
-      permission="attendance.manage"
+      permission={canManageAttendance}
       description="동아리 모임·프로그램 회차별 출석부를 만들고 체크합니다. 출석 코드를 열면 회원이 직접 출석할 수 있습니다."
     >
       <AttendanceIndex />

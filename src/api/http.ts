@@ -125,6 +125,22 @@ export const httpClient: ApiClient = {
     attendance: () => request('GET', '/me/attendance'),
     checkIn: (input) => request('POST', '/me/attendance/check-in', { body: input }),
   },
+  manage: {
+    clubs: () => request('GET', '/manage/clubs'),
+    roster: (clubId) => request('GET', `/manage/clubs/${enc(clubId)}/members`),
+    setMemberRole: (clubId, userId, role) =>
+      request('PATCH', `/manage/clubs/${enc(clubId)}/members/${enc(userId)}`, { body: { role } }),
+    removeMember: (clubId, userId) =>
+      request('DELETE', `/manage/clubs/${enc(clubId)}/members/${enc(userId)}`),
+    applications: (clubId) => request('GET', `/manage/clubs/${enc(clubId)}/applications`),
+    decideApplication: (clubId, id, decision, reason) =>
+      request('POST', `/manage/clubs/${enc(clubId)}/applications/${enc(id)}/decision`, {
+        body: { decision, reason },
+      }),
+    updateIntro: (clubId, input) => request('PATCH', `/manage/clubs/${enc(clubId)}/intro`, { body: input }),
+    createPost: (clubId, input) => request('POST', `/manage/clubs/${enc(clubId)}/posts`, { body: input }),
+    removePost: (clubId, postId) => request('DELETE', `/manage/clubs/${enc(clubId)}/posts/${enc(postId)}`),
+  },
   attendance: {
     targets: () => request('GET', '/attendance/targets'),
     sessions: (t) =>
@@ -207,6 +223,11 @@ export const httpClient: ApiClient = {
       applications: (query) => request('GET', '/admin/club-applications', { query: { ...query } }),
       decideApplication: (id, decision, reason) =>
         request('POST', `/admin/club-applications/${enc(id)}/decision`, { body: { decision, reason } }),
+      managers: (clubId) => request('GET', `/admin/clubs/${enc(clubId)}/managers`),
+      assignManager: (clubId, email) =>
+        request('POST', `/admin/clubs/${enc(clubId)}/managers`, { body: { email } }),
+      removeManager: (clubId, userId) =>
+        request('DELETE', `/admin/clubs/${enc(clubId)}/managers/${enc(userId)}`),
     },
     spaces: {
       list: () => request('GET', '/admin/spaces'),

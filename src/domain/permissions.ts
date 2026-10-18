@@ -89,6 +89,30 @@ export function assignableRoles(actor: Actor): Role[] {
   return ROLE_ORDER.filter((r) => r !== 'developer' || can(actor, 'developer.access')).reverse();
 }
 
+type ClubActor = (Pick<User, 'roles' | 'status'> & { managedClubIds?: string[] }) | null | undefined;
+
+/** 동아리 운영 — 센터 직원 이상(club.manage)은 모든 동아리, 담당자로 지정된 회원은 그 동아리만 */
+export function canManageClub(user: ClubActor, clubId: string): boolean {
+  if (!user || user.status !== 'active') return false;
+  return can(user, 'club.manage') || (user.managedClubIds ?? []).includes(clubId);
+}
+
+/** 담당 동아리가 하나라도 있는지 (센터 직원 이상 포함) */
+export function managesAnyClub(user: ClubActor): boolean {
+  if (!user || user.status !== 'active') return false;
+  return can(user, 'club.manage') || (user.managedClubIds ?? []).length > 0;
+}
+
+/** 출석부를 다룰 수 있는지 — 센터 직원 이상 또는 동아리 담당자(서버가 대상별로 다시 검사) */
+export function canManageAttendance(user: ClubActor): boolean {
+  return can(user, 'attendance.manage') || managesAnyClub(user);
+}
+
+/** 관리자 화면에 들어올 수 있는지 — 운영자 또는 동아리 담당자(담당 메뉴만 보인다) */
+export function canEnterConsole(user: ClubActor): boolean {
+  return can(user, 'admin.access') || managesAnyClub(user);
+}
+
 /** 대상 회원의 역할·상태를 바꿀 수 있는지 — 개발자 계정은 개발자만 바꾼다 */
 export function canManageUser(actor: Actor, target: Pick<User, 'roles'>): boolean {
   if (!can(actor, 'member.manage')) return false;

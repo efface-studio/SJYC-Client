@@ -288,3 +288,77 @@ describe('출석체크', () => {
     await expectCode(api.me.checkIn({ code }), 'VALIDATION');
   });
 });
+
+describe('동아리 담당자', () => {
+  it('직원이 이메일로 담당자를 지정하면 그 동아리만 관리한다', async () => {
+    await login('staff@demo.test');
+    const m = await api.admin.clubs.assignManager('cl-simile', 'sample5@demo.test');
+    expect(m).toMatchObject({ userId: 'u-5', clubId: 'cl-simile' });
+    await expectCode(api.admin.clubs.assignManager('cl-simile', 'sample5@demo.test'), 'CONFLICT');
+    await expectCode(api.admin.clubs.assignManager('cl-simile', 'nobody@demo.test'), 'VALIDATION');
+    expect((await api.admin.clubs.managers('cl-simile')).map((x) => x.userId)).toEqual(['u-5']);
+    await api.auth.logout();
+
+    const s = await login('sample5@demo.test');
+    expect(s.user.managedClubIds).toEqual(['cl-simile']);
+    expect((await api.manage.clubs()).map((c) => c.id)).toEqual(['cl-simile']);
+    const roster = await api.manage.roster('cl-simile');
+    expect(roster.find((r) => r.userId === 'u-6')).toMatchObject({ name: '한테스트', role: 'leader' });
+    await expectCode(api.manage.roster('cl-frame'), 'FORBIDDEN');
+    expect((await api.attendance.targets()).map((t) => t.id)).toEqual(['cl-simile']);
+    await api.attendance.create({ type: 'club', id: 'cl-simile' }, { date: todayKst(), title: '모임' });
+    await expectCode(api.attendance.sessions({ type: 'club', id: 'cl-frame' }), 'FORBIDDEN');
+    await expectCode(api.attendance.sessions({ type: 'program', id: 'p-6' }), 'FORBIDDEN');
+    await expectCode(api.admin.dashboard(7), 'FORBIDDEN');
+  });
+
+  it('담당자는 가입 승인·역할 변경·제외·소개·소식을 관리한다', async () => {
+    await login('leader@demo.test'); // 시드: cl-frame 담당자
+    const club = await api.manage.updateIntro('cl-frame', {
+      summary: '영상으로 기록하는 미디어 동아리',
+      description: '매주 모여 영상을 기획·촬영·편집합니다.',
+      meetingInfo: '매주 토요일 오후 2시',
+      recruiting: true,
+    });
+    expect(club).toMatchObject({ meetingInfo: '매주 토요일 오후 2시', recruiting: true });
+    await api.auth.logout();
+
+    await login('sample6@demo.test');
+    const app = await api.clubs.apply('cl-frame', {
+      motivation: '영상 편집을 배우고 싶어서 지원합니다.',
+      agreePrivacy: 'on',
+    });
+    await api.auth.logout();
+
+    await login('leader@demo.test');
+    expect((await api.manage.applications('cl-frame')).some((a) => a.id === app.id)).toBe(true);
+    await api.manage.decideApplication('cl-frame', app.id, 'approved', null);
+    expect((await api.manage.roster('cl-frame')).some((r) => r.userId === 'u-6')).toBe(true);
+    await api.manage.setMemberRole('cl-frame', 'u-6', 'leader');
+    await api.manage.removeMember('cl-frame', 'u-5');
+    expect((await api.manage.roster('cl-frame')).map((r) => r.userId)).not.toContain('u-5');
+
+    const post = await api.manage.createPost('cl-frame', {
+      kind: 'notice',
+      title: '다음 모임 안내',
+      body: '토요일 2시',
+    });
+    expect((await api.clubs.posts('cl-frame')).some((p) => p.id === post.id)).toBe(true);
+    await api.manage.removePost('cl-frame', post.id);
+    expect((await api.clubs.posts('cl-frame')).some((p) => p.id === post.id)).toBe(false);
+  });
+
+  it('일반 회원은 담당자 지정·동아리 운영을 할 수 없고, 해제되면 권한이 사라진다', async () => {
+    await login('member@demo.test');
+    await expectCode(api.admin.clubs.assignManager('cl-frame', 'sample5@demo.test'), 'FORBIDDEN');
+    await expectCode(api.manage.roster('cl-frame'), 'FORBIDDEN');
+    await api.auth.logout();
+
+    await login('staff@demo.test');
+    await api.admin.clubs.removeManager('cl-frame', 'u-leader');
+    await api.auth.logout();
+    const s = await login('leader@demo.test');
+    expect(s.user.managedClubIds).toEqual([]);
+    await expectCode(api.manage.roster('cl-frame'), 'FORBIDDEN');
+  });
+});

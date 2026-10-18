@@ -172,7 +172,11 @@ test('정책 문서는 한 페이지에서 목차와 스크롤이 연동된다',
   );
 });
 
-async function adminLoginAs(page: Page, label: '센터 직원' | '최고 관리자' | '개발자', next: string) {
+async function adminLoginAs(
+  page: Page,
+  label: '동아리 담당자' | '센터 직원' | '최고 관리자' | '개발자',
+  next: string,
+) {
   await page.goto(`/admin/login?next=${encodeURIComponent(next)}`);
   await page.getByRole('button', { name: label, exact: true }).click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
@@ -214,4 +218,24 @@ test('출석: 직원이 출석부를 만들고 코드를 열면 회원이 코드
   await page.getByLabel('출석 코드 입력').fill(code);
   await page.getByRole('button', { name: '출석하기' }).click();
   await expect(page.getByText(/정기 모임 출석이 확인되었습니다/)).toBeVisible();
+});
+
+test('동아리 담당자는 담당 동아리만 운영하고 직원은 담당자를 지정한다', async ({ page }) => {
+  await adminLoginAs(page, '동아리 담당자', '/admin/my-clubs');
+  await expect(page.getByRole('link', { name: /미디어동아리 FRAME/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /시밀레/ })).toHaveCount(0);
+  await page.getByRole('link', { name: /미디어동아리 FRAME/ }).click();
+  await expect(page.getByRole('tab', { name: '회원', selected: true })).toBeVisible();
+  await expect(page.getByText('member@demo.test')).toBeVisible();
+  await page.getByRole('tab', { name: '출석' }).click();
+  await page.getByRole('link', { name: /출석부 열기/ }).click();
+  await expect(page.getByRole('button', { name: '출석 대상' })).toHaveText(/FRAME/);
+  await page.goto('/admin');
+  await expect(page).toHaveURL(/\/admin\/my-clubs$/);
+
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '센터 직원', '/admin/clubs/cl-simile');
+  await page.getByLabel('담당자로 지정할 회원 이메일').fill('sample5@demo.test');
+  await page.getByRole('button', { name: '담당자 지정' }).click();
+  await expect(page.getByText('sample5@demo.test ·')).toBeVisible();
 });

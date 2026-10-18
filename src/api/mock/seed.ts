@@ -31,7 +31,7 @@ export const DEMO_PASSWORD = 'demo1234!';
 
 export const DEMO_ACCOUNTS = [
   { email: 'member@demo.test', label: '일반 회원' },
-  { email: 'leader@demo.test', label: '동아리 대표 회원' },
+  { email: 'leader@demo.test', label: '동아리 담당자' },
   { email: 'staff@demo.test', label: '센터 직원' },
   { email: 'admin@demo.test', label: '최고 관리자' },
   { email: 'developer@demo.test', label: '개발자' },
@@ -45,7 +45,7 @@ export interface MockMembership {
 }
 
 export interface MockDb {
-  version: 7;
+  version: 8;
   notifications: Notification[];
   media: MediaItem[];
   spaces: Space[];
@@ -54,7 +54,9 @@ export interface MockDb {
   faqs: Faq[];
   policies: PolicyDoc[];
   seq: number;
-  users: (User & { password: string })[];
+  /** managedClubIds 는 clubManagers 에서 계산해 내려준다 */
+  users: (Omit<User, 'managedClubIds'> & { password: string })[];
+  clubManagers: { clubId: string; userId: string; assignedAt: string }[];
   categories: ProgramCategory[];
   programs: Program[];
   applications: ProgramApplication[];
@@ -89,7 +91,7 @@ export function createSeed(now = new Date()): MockDb {
     name: string,
     roles: User['roles'],
     extra: Partial<User> = {},
-  ): User & { password: string } => ({
+  ): MockDb['users'][number] => ({
     id,
     email,
     name,
@@ -300,7 +302,7 @@ export function createSeed(now = new Date()): MockDb {
     id: string,
     seq: number,
     p: Program,
-    u: User,
+    u: MockDb['users'][number],
     status: ProgramApplication['status'],
     createdDaysAgo: number,
   ): ProgramApplication => {
@@ -759,7 +761,8 @@ export function createSeed(now = new Date()): MockDb {
   ];
 
   return {
-    version: 7,
+    version: 8,
+    clubManagers: [{ clubId: 'cl-frame', userId: 'u-leader', assignedAt: at(-60) }],
     notifications,
     media: RESEARCH_MEDIA,
     spaces,

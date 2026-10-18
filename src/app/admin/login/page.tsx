@@ -13,13 +13,13 @@ import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
 import { IS_MOCK } from '@/config/env';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
-import { can } from '@/domain/permissions';
+import { canEnterConsole } from '@/domain/permissions';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { SESSION_KEY, useLogout, useSession } from '@/features/auth/session';
 import { safeRedirect } from '@/lib/safe-redirect';
 
 const ADMIN_DEMO = DEMO_ACCOUNTS.filter((a) =>
-  ['staff@demo.test', 'admin@demo.test', 'developer@demo.test'].includes(a.email),
+  ['leader@demo.test', 'staff@demo.test', 'admin@demo.test', 'developer@demo.test'].includes(a.email),
 );
 
 /** next 는 /admin 하위 경로만 허용한다 (/admin/login 자체 제외) */
@@ -47,7 +47,7 @@ function AdminLoginForm() {
     mutationFn: api.auth.login,
     onSuccess: (s) => {
       // 역할 판단은 서버가 돌려준 세션만 근거로 한다 (URL 값은 신뢰하지 않음)
-      if (!can(s.user, 'admin.access')) {
+      if (!canEnterConsole(s.user)) {
         setFormError('관리자 권한이 없는 계정입니다.');
         logout.mutate();
         return;
@@ -61,7 +61,7 @@ function AdminLoginForm() {
     },
   });
 
-  if (session && can(session.user, 'admin.access') && !login.isPending && !login.isSuccess) {
+  if (session && canEnterConsole(session.user) && !login.isPending && !login.isSuccess) {
     return (
       <Callout tone="info" title="이미 로그인되어 있습니다">
         <Link href={adminRedirect(next)} className="font-semibold underline">
@@ -80,7 +80,7 @@ function AdminLoginForm() {
           {OAUTH_ERROR_MESSAGE[errorCode]}
         </Callout>
       )}
-      {session && !can(session.user, 'admin.access') && (
+      {session && !canEnterConsole(session.user) && (
         <Callout tone="info" className="mb-5">
           현재 관리자 권한이 없는 계정으로 로그인되어 있습니다. 관리자 계정으로 다시 로그인해 주세요.
         </Callout>

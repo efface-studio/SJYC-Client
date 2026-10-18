@@ -28,6 +28,8 @@ export interface User {
   providers: OAuthProvider[];
   consents: ConsentRecord[];
   createdAt: string;
+  /** 담당자로 지정된 동아리 ID — 서버가 계산해 내려준다 (센터 직원 이상은 모든 동아리를 관리하므로 비어 있어도 된다) */
+  managedClubIds: string[];
 }
 
 export interface Session {
@@ -165,6 +167,27 @@ export interface ClubMember {
   displayName: string;
   role: ClubRole;
   joinedAt: string;
+}
+
+/** 동아리별 담당자 — 센터 직원이 회원을 지정하며, 그 동아리의 운영(회원·가입·출석·소식·소개)을 맡는다 */
+export interface ClubManager {
+  clubId: string;
+  userId: string;
+  name: string;
+  email: string;
+  assignedAt: string;
+}
+
+/** 담당자·직원이 보는 동아리 회원 명단 (연락처 포함 — 운영 목적 외 사용 금지) */
+export interface ClubRosterEntry {
+  userId: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: ClubRole;
+  joinedAt: string;
+  /** 0–100, 출석 기록이 없으면 null */
+  attendanceRate: number | null;
 }
 
 export interface ClubPost {
@@ -336,7 +359,8 @@ export interface Faq {
 
 /* ---------- 알림 ---------- */
 
-export type NotificationKind = 'application' | 'reservation' | 'club_application' | 'inquiry' | 'notice';
+export type NotificationKind =
+  'application' | 'reservation' | 'club_application' | 'club_manager' | 'inquiry' | 'notice';
 
 /** 서버가 처리 결과(승인·반려·답변 등)를 본인에게 알리는 항목. 읽지 않은 수는 readAt === null 로 센다. */
 export interface Notification {

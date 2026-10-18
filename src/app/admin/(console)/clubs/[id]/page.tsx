@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { api, errorMessage } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
 import { ClubForm } from '@/components/admin/club-form';
+import { ClubManagers } from '@/components/admin/club-managers';
 import { serverFieldErrors } from '@/components/admin/form-utils';
 import { QueryState } from '@/components/admin/query-state';
 import { useToast } from '@/components/ui/toast';
@@ -36,6 +37,7 @@ function EditClub() {
       {(c) => (
         <>
           <p className="mb-5 text-sm text-ink-600 tabular-nums">현재 회원 {c.memberCount}명</p>
+          <ClubManagers clubId={c.id} clubName={c.name} />
           <ClubForm
             key={JSON.stringify(c)}
             initial={c}

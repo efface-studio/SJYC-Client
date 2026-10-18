@@ -78,7 +78,22 @@
 
 모든 관리자 변경은 서버가 감사 이벤트(`actor, action, target, summary, at`)를 남긴다. 개인정보 원문은 summary 에 넣지 않는다.
 
-### 출석 (`attendance.manage`, 서버가 대상별 권한 재검사)
+### 동아리 운영 (club.manage 또는 그 동아리 담당자 — 서버가 동아리별로 검사)
+
+- 세션 사용자에 `managedClubIds`(담당 동아리 ID)를 내려준다. 담당자가 있으면 관리자 화면에는 동아리 운영·출석 메뉴만 보인다.
+- 담당자 지정(club.manage): GET/POST `/admin/clubs/{id}/managers` `{ email }`(가입된 활동 회원만, 중복 CONFLICT), DELETE `/admin/clubs/{id}/managers/{userId}`. 지정 시 본인에게 `club_manager` 알림.
+
+| 메서드       | 경로                                                                           | 비고                          |
+| ------------ | ------------------------------------------------------------------------------ | ----------------------------- |
+| GET          | `/manage/clubs`                                                                | 담당 동아리(직원 이상은 전체) |
+| GET          | `/manage/clubs/{id}/members`                                                   | 연락처 포함 명단 + 출석률     |
+| PATCH/DELETE | `/manage/clubs/{id}/members/{userId}` `{ role }`                               | 대표·동아리원 변경 / 제외     |
+| GET          | `/manage/clubs/{id}/applications`                                              | 대기 먼저                     |
+| POST         | `/manage/clubs/{id}/applications/{appId}/decision` `{ decision, reason }`      | 반려는 사유 필수              |
+| PATCH        | `/manage/clubs/{id}/intro` `{ summary, description, meetingInfo, recruiting }` | 사진·활동·출처는 직원 전용    |
+| POST/DELETE  | `/manage/clubs/{id}/posts` `{ kind, title, body }`                             | 동아리 소식                   |
+
+### 출석 (`attendance.manage` 또는 동아리 담당자 — 서버가 대상별 권한 재검사)
 
 | 메서드     | 경로                                                                                   | 비고                                                                                                  |
 | ---------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
