@@ -41,6 +41,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { href: '/admin/clubs', label: '동아리', permission: 'club.manage' },
       { href: '/admin/clubs/applications', label: '가입 신청', permission: 'club.manage' },
+      { href: '/admin/attendance', label: '출석', permission: 'attendance.manage' },
       { href: '/admin/inquiries', label: '문의', permission: 'inquiry.answer' },
       { href: '/admin/faqs', label: 'FAQ', permission: 'inquiry.answer' },
     ],
