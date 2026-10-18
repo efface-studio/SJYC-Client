@@ -10,3 +10,5 @@ mobile/.expo
 mobile/android
 mobile/ios
 mobile/dist
+# 외부에서 가져온 스킬 원문 — 원본 그대로 둔다
+.claude/skills

@@ -69,7 +69,7 @@ export default function InquiryPage() {
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="1:1 문의"
-          breadcrumbs={[{ label: '질문 · 문의', href: '/qna' }, { label: '문의 내용' }]}
+          breadcrumbs={[{ label: '질문·문의', href: '/qna' }, { label: '문의 내용' }]}
         />
         <RequireAuth>
           <InquiryDetail />

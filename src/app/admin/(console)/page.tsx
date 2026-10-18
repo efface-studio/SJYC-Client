@@ -63,12 +63,6 @@ const KPIS: Kpi[] = [
     href: '/admin/inquiries?status=open',
     permission: 'inquiry.answer',
   },
-  {
-    label: '게시 공지',
-    value: (d) => d.noticesPublished,
-    href: '/admin/notices?status=published',
-    permission: 'notice.write',
-  },
 ];
 
 function Dashboard() {
@@ -123,7 +117,7 @@ function Dashboard() {
               <h2 id="kpi-title" className="sr-only">
                 운영 현황
               </h2>
-              <dl className="grid grid-cols-2 border-t border-l border-line bg-surface sm:grid-cols-3 xl:grid-cols-4">
+              <dl className="grid grid-cols-2 border-t border-l border-line bg-surface sm:grid-cols-3">
                 {KPIS.map((k) => (
                   <div key={k.label} className="flex flex-col border-r border-b border-line px-4 py-3">
                     <dt className="text-sm text-ink-600">

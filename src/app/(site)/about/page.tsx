@@ -96,7 +96,7 @@ export default function AboutPage() {
           <p className="mt-3 text-[15px]">
             센터 행사 사진과 영상은{' '}
             <Link href="/gallery" className="font-semibold text-brand-700 underline">
-              센터 소식 · 갤러리
+              센터 소식·갤러리
             </Link>
             에서 볼 수 있습니다.
           </p>
@@ -157,7 +157,7 @@ export default function AboutPage() {
               href="/qna"
               className="flex min-h-12 items-center justify-center rounded-md border border-line-strong font-semibold hover:bg-surface-muted"
             >
-              자주 묻는 질문 · 1:1 문의
+              자주 묻는 질문·1:1 문의
             </Link>
           </div>
         </Section>

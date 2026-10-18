@@ -142,10 +142,10 @@ function MyInquiries() {
 export default function QnaPage() {
   return (
     <div className="container-page py-6 md:py-10">
-      <title>질문 · 문의 | 중구청소년센터</title>
+      <title>질문·문의 | 중구청소년센터</title>
       <div className="mx-auto max-w-3xl">
         <PageHeader
-          title="질문 · 문의"
+          title="질문·문의"
           description={`급한 문의는 대표번호 ${CENTER.telDisplay}로 전화해 주세요.`}
         />
         <section aria-labelledby="faq-title" className="border-t-2 border-ink-900 pt-3">

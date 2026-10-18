@@ -30,25 +30,25 @@ interface FooterLink {
 
 const GROUPS: { title: string; links: FooterLink[] }[] = [
   {
-    title: 'Service',
+    title: '서비스',
     links: [
       { href: '/programs', label: '프로그램 신청' },
       { href: '/spaces', label: '공간 예약' },
       { href: '/clubs', label: '동아리' },
       { href: '/notices', label: '공지사항' },
-      { href: '/gallery', label: '센터 소식 · 갤러리' },
+      { href: '/gallery', label: '센터 소식·갤러리' },
     ],
   },
   {
-    title: 'Center',
+    title: '센터',
     links: [
       { href: '/about', label: '센터 소개' },
       { href: '/about#location', label: '오시는 길' },
-      { href: '/qna', label: '질문 · 문의' },
+      { href: '/qna', label: '질문·문의' },
     ],
   },
   {
-    title: 'Policy',
+    title: '정책·약관',
     links: POLICY_NAV.map((p) => ({
       href: `/policies/${p.key}`,
       label: p.title,
@@ -56,7 +56,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     })),
   },
   {
-    title: 'Channel',
+    title: '공식 채널',
     links: OFFICIAL_CHANNELS.map((c) => ({
       href: c.url,
       label: c.label,
@@ -110,9 +110,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
             <nav aria-label="푸터 메뉴" className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
               {GROUPS.map((g) => (
                 <div key={g.title}>
-                  <h2 className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-ink-600 uppercase">
-                    {g.title}
-                  </h2>
+                  <h2 className="mb-4 text-sm font-bold text-ink-900">{g.title}</h2>
                   <ul className="space-y-2">
                     {g.links.map((l) => (
                       <li key={l.href}>
