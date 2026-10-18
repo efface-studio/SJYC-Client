@@ -124,6 +124,18 @@ export default function MyPage() {
         </span>
         <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-600" />
       </Link>
+      {(session?.user.managedClubIds.length ?? 0) > 0 && (
+        <Link
+          href="/admin/my-clubs"
+          className="-mt-3 mb-6 flex items-center gap-3 border-b border-line py-3 hover:bg-surface-muted"
+        >
+          <span className="flex-1 text-[15px] font-semibold">
+            담당 동아리 운영
+            <span className="ml-2 font-normal text-ink-600">회원·가입 신청·출석·소식 관리</span>
+          </span>
+          <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-600" />
+        </Link>
+      )}
 
       <section aria-labelledby="apps-title">
         <h2 id="apps-title" className="mb-2 text-lg font-bold">
