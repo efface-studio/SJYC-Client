@@ -7,7 +7,7 @@ import { mockDev } from '@/api/mock/client';
 import { REFERENCE_COLLECTED_AT } from '@/api/mock/research';
 import { DEMO_ACCOUNTS } from '@/api/mock/seed';
 import type { Scenario } from '@/api/mock/store';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA, IS_MOCK } from '@/config/env';
 import { Button } from './ui/button';
 import { Radio } from './ui/choice';
 import { Modal } from './ui/dialog';
@@ -22,7 +22,7 @@ export const SCENARIOS: { value: Scenario; label: string; hint: string }[] = [
 const noopSubscribe = () => () => undefined;
 
 /**
- * mock 모드 표시 띠 + 개발 도구. 실제 서버(http 모드)에서는 렌더링되지 않는다.
+ * 데모 표시 띠 + 개발 도구(mock 모드만). 시연 서버(http + DEMO_DATA)는 띠만, 실제 운영 서버에서는 렌더링되지 않는다.
  * "데모 데이터"임을 항상 화면에 노출해 실제 서비스로 오인하지 않게 한다.
  */
 export function DemoBanner({ tone = 'site' }: { tone?: 'site' | 'admin' }) {
@@ -37,7 +37,23 @@ export function DemoBanner({ tone = 'site' }: { tone?: 'site' | 'admin' }) {
   const scenario = override ?? stored;
   const qc = useQueryClient();
 
-  if (!IS_MOCK) return null;
+  if (!IS_MOCK) {
+    if (!DEMO_DATA) return null;
+    return (
+      <div
+        className={
+          tone === 'admin'
+            ? 'bg-ink-900 text-[13px] text-white'
+            : 'border-b border-warning-800/20 bg-warning-50 text-[13px] text-warning-800'
+        }
+      >
+        <p className="container-page py-2 font-semibold">
+          시연 서버 · 프로그램·공지·신청·회원은 샘플, 동아리 소개·갤러리는 공식 채널 참고 정보(
+          {REFERENCE_COLLECTED_AT} 수집)
+        </p>
+      </div>
+    );
+  }
 
   const apply = (s: Scenario) => {
     mockDev.setScenario(s);
