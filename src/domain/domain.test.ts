@@ -1,4 +1,5 @@
 import { hoursOn } from '@/config/center';
+import { attendanceRate, memberStats, sessionCounts } from './attendance';
 import { daysUntil, maskName } from '@/lib/format';
 import { assignableRoles, can, canManageUser, PERMISSIONS, primaryRole } from './permissions';
 import { computeRecruitStatus } from './program';
@@ -12,6 +13,7 @@ import {
   signupSchema,
 } from './schemas';
 import { buildSlots, firstReservableDate, reservationWindowError, weekdayOf } from './space';
+import type { AttendanceSession, AttendanceStatus } from './types';
 
 const form = (values: Record<string, string>) => {
   const fd = new FormData();
@@ -224,6 +226,68 @@ describe('동아리 폼 스키마', () => {
       target: null,
       photos: [{ date: null }],
       activities: [{ url: null }],
+    });
+  });
+});
+
+describe('출석 통계', () => {
+  const session = (id: string, marks: [string, AttendanceStatus | null][]): AttendanceSession => ({
+    id,
+    targetType: 'club',
+    targetId: 'cl-1',
+    targetName: '동아리',
+    date: '2026-10-01',
+    title: id,
+    checkInCode: null,
+    checkInClosesAt: null,
+    createdAt: '2026-10-01T00:00:00.000Z',
+    createdBy: '담당자',
+    records: marks.map(([userId, status]) => ({
+      userId,
+      name: userId === 'a' ? '가나' : '다라',
+      status,
+      checkedAt: null,
+      method: null,
+      note: null,
+    })),
+  });
+
+  it('출석률은 (출석+지각) / 체크된 회차이며 공결은 분모에서 뺀다', () => {
+    expect(attendanceRate({ present: 2, late: 1, absent: 1, excused: 3 })).toBe(75);
+    expect(attendanceRate({ present: 0, late: 0, absent: 0, excused: 2 })).toBeNull();
+  });
+
+  it('회원별로 누적하고 체크하지 않은 회차는 세지 않는다', () => {
+    const stats = memberStats([
+      session('s1', [
+        ['a', 'present'],
+        ['b', 'absent'],
+      ]),
+      session('s2', [
+        ['a', 'late'],
+        ['b', null],
+      ]),
+    ]);
+    expect(stats).toEqual([
+      { userId: 'a', name: '가나', present: 1, late: 1, absent: 0, excused: 0, rate: 100 },
+      { userId: 'b', name: '다라', present: 0, late: 0, absent: 1, excused: 0, rate: 0 },
+    ]);
+  });
+
+  it('회차 집계는 미체크 인원을 따로 센다', () => {
+    expect(
+      sessionCounts(
+        session('s', [
+          ['a', 'present'],
+          ['b', null],
+        ]),
+      ),
+    ).toEqual({
+      present: 1,
+      late: 0,
+      absent: 0,
+      excused: 0,
+      unchecked: 1,
     });
   });
 });
