@@ -1,0 +1,12 @@
+.next
+node_modules
+pnpm-lock.yaml
+coverage
+playwright-report
+test-results
+public
+mobile/node_modules
+mobile/.expo
+mobile/android
+mobile/ios
+mobile/dist
