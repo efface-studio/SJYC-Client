@@ -3,7 +3,7 @@
  * 서버가 해야 할 검증(세션, 권한, 중복 신청, 정원, 취소 기한)을 같은 규칙으로 흉내 내지만
  * 브라우저 안에서만 동작하므로 보안 경계가 아니다. 실제 운영에는 http adapter 를 쓴다.
  */
-import { can, type Permission } from '@/domain/permissions';
+import { assignableRoles, can, canManageUser, type Permission } from '@/domain/permissions';
 import { computeRecruitStatus } from '@/domain/program';
 import { buildSlots, overlaps, reservationWindowError } from '@/domain/space';
 import type {
@@ -951,8 +951,15 @@ export const mockClient: ApiClient = {
             });
           }
           const u = findOr404(db.users, id);
+          if (!canManageUser(actor, u)) {
+            throw new ApiError('FORBIDDEN', '개발자 계정은 개발자만 변경할 수 있습니다.');
+          }
           if (patch.roles) {
             if (patch.roles.length === 0) throw new ApiError('VALIDATION', '역할을 1개 이상 지정해 주세요.');
+            const allowed = assignableRoles(actor);
+            if (patch.roles.some((r) => !allowed.includes(r))) {
+              throw new ApiError('FORBIDDEN', '부여할 수 없는 역할입니다.');
+            }
             u.roles = patch.roles;
           }
           if (patch.status) u.status = patch.status;

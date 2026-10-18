@@ -78,6 +78,17 @@ describe('mock adapter — 서버 규칙 재현', () => {
     await expectCode(api.admin.members.update('u-admin', { roles: ['member'] }), 'CONFLICT');
   });
 
+  it('관리자는 개발자 역할을 부여하거나 개발자 계정을 바꿀 수 없고, 개발자는 할 수 있다', async () => {
+    await login('admin@demo.test');
+    await expectCode(api.admin.members.update('u-5', { roles: ['developer'] }), 'FORBIDDEN');
+    await expectCode(api.admin.members.update('u-developer', { status: 'suspended' }), 'FORBIDDEN');
+    await api.auth.logout();
+    await login('developer@demo.test');
+    const promoted = await api.admin.members.update('u-5', { roles: ['developer'] });
+    expect(promoted.roles).toEqual(['developer']);
+    await expect(api.admin.audit.list({})).resolves.toBeTruthy();
+  });
+
   it('공간 예약: 겹치는 시간은 거부하고 다른 사람 문의는 보이지 않는다', async () => {
     await login('member@demo.test');
     const date = firstReservableDate(todayKst());
