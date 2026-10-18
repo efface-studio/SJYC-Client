@@ -23,9 +23,9 @@ export const SITE_NAV = [
 ] as const;
 
 const MORE = [
-  { href: '/gallery', label: '센터 소식 · 갤러리' },
+  { href: '/gallery', label: '센터 소식·갤러리' },
   { href: '/programs/calendar', label: '프로그램 일정 달력' },
-  { href: '/qna', label: '자주 묻는 질문 · 1:1 문의' },
+  { href: '/qna', label: '자주 묻는 질문·1:1 문의' },
   { href: '/policies/terms', label: '이용약관' },
   { href: '/policies/privacy', label: '개인정보처리방침' },
 ] as const;
@@ -97,7 +97,7 @@ export function SiteHeader() {
     });
 
   return (
-    <header className="sticky top-0 z-30 border-t-[3px] border-b border-t-brand-500 border-b-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+    <header className="sticky top-0 z-30 border-t-[3px] border-b border-t-brand-500 border-b-line bg-surface">
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
         <Logo />
 

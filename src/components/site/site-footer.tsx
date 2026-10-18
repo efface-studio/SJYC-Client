@@ -36,7 +36,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
       { href: '/spaces', label: '공간 예약' },
       { href: '/clubs', label: '동아리' },
       { href: '/notices', label: '공지사항' },
-      { href: '/gallery', label: '센터 소식 · 갤러리' },
+      { href: '/gallery', label: '센터 소식·갤러리' },
     ],
   },
   {
@@ -44,7 +44,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     links: [
       { href: '/about', label: '센터 소개' },
       { href: '/about#location', label: '오시는 길' },
-      { href: '/qna', label: '질문 · 문의' },
+      { href: '/qna', label: '질문·문의' },
     ],
   },
   {
@@ -110,9 +110,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
             <nav aria-label="푸터 메뉴" className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
               {GROUPS.map((g) => (
                 <div key={g.title}>
-                  <h2 className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-ink-600 uppercase">
-                    {g.title}
-                  </h2>
+                  <h2 className="mb-4 text-sm font-bold text-ink-900">{g.title}</h2>
                   <ul className="space-y-2">
                     {g.links.map((l) => (
                       <li key={l.href}>

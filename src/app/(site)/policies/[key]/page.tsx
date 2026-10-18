@@ -248,10 +248,7 @@ export default function PolicyPage() {
       <title>{`${activeTitle} | 중구청소년센터`}</title>
       <PageHeader title="정책 및 약관" description="중구청소년센터 온라인 서비스 이용에 관한 문서입니다." />
 
-      <nav
-        aria-label="정책 문서 목차"
-        className="sticky top-[60px] z-20 -mx-4 mb-6 bg-surface/95 backdrop-blur md:hidden"
-      >
+      <nav aria-label="정책 문서 목차" className="sticky top-[60px] z-20 -mx-4 mb-6 bg-surface md:hidden">
         <PolicyToc active={active} onSelect={select} orientation="horizontal" />
       </nav>
 
