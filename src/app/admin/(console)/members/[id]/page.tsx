@@ -78,25 +78,21 @@ function ManageForm({ user }: { user: User }) {
     >
       <h2 className="mb-4 text-base font-bold">권한·상태 변경</h2>
       <div className="grid gap-5 sm:grid-cols-2">
-        <SelectField label="역할" name="role" defaultValue={primaryRole(user)}>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {ROLE_LABEL[r]}
-            </option>
-          ))}
-        </SelectField>
+        <SelectField
+          label="역할"
+          name="role"
+          defaultValue={primaryRole(user)}
+          options={ROLES.map((r) => ({ value: r, label: ROLE_LABEL[r] }))}
+        />
         <SelectField
           label="상태"
           name="status"
           defaultValue={user.status}
           disabled={user.status === 'withdrawn'}
-        >
-          {(user.status === 'withdrawn' ? (['withdrawn'] as UserStatus[]) : EDITABLE_STATUS).map((s) => (
-            <option key={s} value={s}>
-              {USER_STATUS[s].text}
-            </option>
-          ))}
-        </SelectField>
+          options={(user.status === 'withdrawn' ? (['withdrawn'] as UserStatus[]) : EDITABLE_STATUS).map(
+            (s) => ({ value: s, label: USER_STATUS[s].text }),
+          )}
+        />
       </div>
       <Button type="submit" className="mt-5" disabled={update.isPending}>
         변경 내용 확인

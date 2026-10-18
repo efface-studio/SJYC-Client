@@ -11,7 +11,7 @@ import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/dialog';
-import { FormError, TextAreaField, TextField } from '@/components/ui/field';
+import { DateField, FormError, TextAreaField } from '@/components/ui/field';
 import { EmptyState } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { POLICY_TITLE } from '@/domain/labels';
@@ -60,10 +60,9 @@ function PolicyEditor({ doc }: { doc: PolicyDoc }) {
       <h2 id="editor-title" className="mb-4 border-b border-ink-900 pb-2 text-base font-bold">
         {POLICY_TITLE[doc.key]} 개정
       </h2>
-      <TextField
+      <DateField
         label="시행일"
         name="effectiveAt"
-        type="date"
         required
         defaultValue={doc.effectiveAt ? toDateInput(doc.effectiveAt) : todayKst()}
         error={errors.effectiveAt}

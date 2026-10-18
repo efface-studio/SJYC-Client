@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { api, errorMessage } from '@/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckboxField, TextAreaField, TextField } from '@/components/ui/field';
+import { CheckboxField, NumberField, TextAreaField } from '@/components/ui/field';
 import { EmptyState } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { parseForm, spaceFormSchema, type FieldErrors, type SpaceFormInput } from '@/domain/schemas';
@@ -67,11 +67,9 @@ function SpaceForm({ space }: { space: Space }) {
           defaultValue={space.description}
           error={errors.description}
         />
-        <TextField
+        <NumberField
           label="수용 인원"
           name="capacity"
-          type="number"
-          inputMode="numeric"
           min={1}
           max={1000}
           required

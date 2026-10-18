@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FormError, SelectField, TextAreaField, TextField } from '@/components/ui/field';
+import {
+  DateField,
+  FormError,
+  NumberField,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from '@/components/ui/field';
 import { PUBLISH_STATUS } from '@/domain/labels';
 import { parseForm, programFormSchema, type FieldErrors, type ProgramFormInput } from '@/domain/schemas';
 import type { Program } from '@/domain/types';
@@ -83,37 +90,25 @@ export function ProgramForm({
             defaultValue={initial?.categoryId ?? ''}
             key={categories.data ? 'loaded' : 'loading'}
             disabled={!categories.data}
+            placeholder={categories.data ? '분류 선택' : '불러오는 중…'}
+            options={groups.flatMap((g) =>
+              (categories.data ?? [])
+                .filter((c) => c.group === g)
+                .map((c) => ({ value: c.id, label: c.name, group: g })),
+            )}
             error={
               shown.categoryId ??
               (categories.isError ? '분류 목록을 불러오지 못했습니다. 새로고침해 주세요.' : undefined)
             }
-          >
-            <option value="">{categories.data ? '분류 선택' : '불러오는 중…'}</option>
-            {groups.map((g) => (
-              <optgroup key={g} label={g}>
-                {categories.data
-                  ?.filter((c) => c.group === g)
-                  .map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-              </optgroup>
-            ))}
-          </SelectField>
+          />
           <SelectField
             label="게시 상태"
             name="status"
             required
             defaultValue={initial?.status ?? 'draft'}
             error={shown.status}
-          >
-            {Object.entries(PUBLISH_STATUS).map(([v, l]) => (
-              <option key={v} value={v}>
-                {l.text}
-              </option>
-            ))}
-          </SelectField>
+            options={Object.entries(PUBLISH_STATUS).map(([value, l]) => ({ value, label: l.text }))}
+          />
         </div>
         <TextField
           label="한 줄 요약"
@@ -141,11 +136,9 @@ export function ProgramForm({
             error={shown.place}
           />
         </div>
-        <TextField
+        <NumberField
           label="정원"
           name="capacity"
-          type="number"
-          inputMode="numeric"
           min={1}
           max={1000}
           required
@@ -159,11 +152,10 @@ export function ProgramForm({
       <Fieldset legend="일정">
         <div className="grid gap-5 sm:grid-cols-2">
           {DATE_FIELDS.map((f) => (
-            <TextField
+            <DateField
               key={f.name}
               label={f.label}
               name={f.name}
-              type="date"
               required
               defaultValue={initial ? toDateInput(initial[f.name]) : undefined}
               error={shown[f.name]}
