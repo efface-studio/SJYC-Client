@@ -3,6 +3,9 @@
 import { SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState, type ReactNode } from 'react';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Select } from '@/components/ui/select';
+import { SearchInput } from '@/components/ui/search-input';
 import { cn } from '@/lib/cn';
 import { useListParams } from './list-params';
 
@@ -37,18 +40,14 @@ export function FilterSelect({ label, param, options }: { label: string; param: 
       <label htmlFor={id} className="mb-1 block text-sm font-semibold text-ink-700">
         {label}
       </label>
-      <select
+      <Select
         id={id}
+        title={label}
+        size="md"
         value={get(param)}
-        onChange={(e) => set({ [param]: e.target.value })}
-        className={cn(inputClass, 'pr-8')}
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+        onValueChange={(v) => set({ [param]: v })}
+        options={options}
+      />
     </div>
   );
 }
@@ -62,14 +61,13 @@ export function FilterDate({ label, param }: { label: string; param: string }) {
       <label htmlFor={id} className="mb-1 block text-sm font-semibold text-ink-700">
         {label}
       </label>
-      <input
+      <DatePicker
         id={id}
-        type="date"
+        title={label}
+        size="md"
+        clearable
         value={get(param)}
-        onChange={(e) =>
-          set({ [param]: /^\d{4}-\d{2}-\d{2}$/.test(e.target.value) ? e.target.value : undefined })
-        }
-        className={inputClass}
+        onValueChange={(v) => set({ [param]: v || undefined })}
       />
     </div>
   );
@@ -106,11 +104,10 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
             {searchLabel}
           </label>
           <div className="flex gap-2">
-            <input
+            <SearchInput
               id={searchId}
               key={q}
               name="q"
-              type="search"
               defaultValue={q}
               placeholder={placeholder}
               enterKeyHint="search"
