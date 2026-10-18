@@ -16,6 +16,8 @@ export const PERMISSIONS = [
   'inquiry.answer',
   'policy.manage',
   'audit.read',
+  /** 개발자 도구(환경·요청 로그·캐시·mock 데이터) — 개발자만 */
+  'developer.access',
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -32,7 +34,9 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'space.manage',
     'inquiry.answer',
   ],
-  admin: PERMISSIONS,
+  admin: PERMISSIONS.filter((p) => p !== 'developer.access'),
+  /** 최상위 역할 — 모든 권한 */
+  developer: PERMISSIONS,
 };
 
 export function can(
@@ -47,4 +51,27 @@ export const ROLE_LABEL: Record<Role, string> = {
   member: '회원',
   staff: '센터 직원',
   admin: '최고 관리자',
+  developer: '개발자',
 };
+
+/** 높은 역할부터 */
+export const ROLE_ORDER: readonly Role[] = ['developer', 'admin', 'staff', 'member'];
+
+/** 화면에 대표로 보여줄 가장 높은 역할 */
+export function primaryRole(user: Pick<User, 'roles'>): Role {
+  return ROLE_ORDER.find((r) => user.roles.includes(r)) ?? 'member';
+}
+
+type Actor = Pick<User, 'roles' | 'status'> | null | undefined;
+
+/** 이 사용자가 다른 회원에게 부여할 수 있는 역할 — 개발자 역할은 개발자만 부여한다 */
+export function assignableRoles(actor: Actor): Role[] {
+  if (!can(actor, 'member.manage')) return [];
+  return ROLE_ORDER.filter((r) => r !== 'developer' || can(actor, 'developer.access')).reverse();
+}
+
+/** 대상 회원의 역할·상태를 바꿀 수 있는지 — 개발자 계정은 개발자만 바꾼다 */
+export function canManageUser(actor: Actor, target: Pick<User, 'roles'>): boolean {
+  if (!can(actor, 'member.manage')) return false;
+  return !target.roles.includes('developer') || can(actor, 'developer.access');
+}

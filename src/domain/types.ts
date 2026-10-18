@@ -4,7 +4,8 @@
  * 웹 전용 API(DOM 등)에 의존하지 않아 모바일 앱에서도 재사용할 수 있다.
  */
 
-export type Role = 'member' | 'staff' | 'admin';
+/** 높은 순: developer(개발자, 최상위) > admin(최고 관리자) > staff(센터 직원) > member(회원) */
+export type Role = 'member' | 'staff' | 'admin' | 'developer';
 export type OAuthProvider = 'kakao' | 'naver' | 'apple' | 'google';
 export type UserStatus = 'active' | 'suspended' | 'withdrawn';
 
