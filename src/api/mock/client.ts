@@ -24,6 +24,8 @@ import { ApiError } from '../errors';
 import type { MockDb } from './seed';
 import {
   expireSession,
+  exportDb,
+  importDb,
   loadDb,
   readScenario,
   readSession,
@@ -1280,6 +1282,8 @@ export const mockDev = {
   setScenario: (s: Scenario) => writeScenario(s),
   expireSession,
   reset: resetDb,
+  exportDb,
+  importDb,
   /** 비밀번호 재설정 메일 대신 화면에 링크를 보여 주기 위한 값 */
   lastResetToken: () => lastResetToken?.token ?? null,
   verifyEmail: (email: string) => {

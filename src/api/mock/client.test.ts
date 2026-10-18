@@ -200,3 +200,23 @@ describe('mock adapter — 서버 규칙 재현', () => {
     expect(updated.photos).toHaveLength(1);
   });
 });
+
+describe('mock 데이터 내보내기·가져오기 (개발자 도구)', () => {
+  it('내보낸 JSON 을 다시 가져오면 같은 상태가 된다', async () => {
+    await login('admin@demo.test');
+    await api.admin.members.update('u-5', { status: 'suspended' });
+    const dump = mockDev.exportDb();
+    mockDev.reset();
+    expect((await login('admin@demo.test')).user.id).toBe('u-admin');
+    expect((await api.admin.members.get('u-5')).status).toBe('active');
+    mockDev.importDb(dump);
+    expect((await api.admin.members.get('u-5')).status).toBe('suspended');
+  });
+
+  it('형식이 다른 JSON 은 거부하고 기존 데이터를 유지한다', async () => {
+    await login('admin@demo.test');
+    expect(() => mockDev.importDb('{"version":1}')).toThrow();
+    expect(() => mockDev.importDb('not json')).toThrow();
+    await expect(api.admin.members.get('u-5')).resolves.toBeTruthy();
+  });
+});

@@ -61,6 +61,26 @@ export function saveDb(db: MockDb): void {
   storage()?.setItem(DB_KEY, JSON.stringify(db));
 }
 
+/** 개발자 도구: 현재 mock 데이터를 JSON 으로 내보낸다 */
+export function exportDb(): string {
+  return JSON.stringify(loadDb(), null, 2);
+}
+
+/** 개발자 도구: 내보낸 JSON 을 불러온다. 버전·구조가 다르면 거부하고 기존 데이터를 유지한다. */
+export function importDb(json: string): void {
+  const parsed: unknown = JSON.parse(json);
+  const fresh = createSeed();
+  const ok =
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    (parsed as { version?: unknown }).version === fresh.version &&
+    Object.entries(fresh).every(
+      ([k, v]) => Array.isArray(v) === Array.isArray((parsed as Record<string, unknown>)[k]),
+    );
+  if (!ok) throw new Error(`mock 데이터 형식이 맞지 않습니다 (버전 ${fresh.version} 이 필요합니다).`);
+  saveDb(parsed as MockDb);
+}
+
 export function resetDb(): void {
   memoryDb = null;
   storage()?.removeItem(DB_KEY);
