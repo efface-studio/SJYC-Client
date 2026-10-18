@@ -22,6 +22,21 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
+export const PERMISSION_LABEL: Record<Permission, string> = {
+  'admin.access': '관리자 화면 접근',
+  'notice.write': '공지 작성·수정',
+  'program.write': '프로그램 등록·수정',
+  'application.decide': '프로그램 신청 승인·반려',
+  'member.read': '회원 조회',
+  'member.manage': '회원 역할·상태 변경',
+  'club.manage': '동아리 관리',
+  'space.manage': '공간 예약 관리',
+  'inquiry.answer': '문의 답변·FAQ',
+  'policy.manage': '정책 문서 관리',
+  'audit.read': '감사 로그 조회',
+  'developer.access': '개발자 도구',
+};
+
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   member: [],
   staff: [

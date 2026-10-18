@@ -171,3 +171,24 @@ test('정책 문서는 한 페이지에서 목차와 스크롤이 연동된다',
     'location',
   );
 });
+
+async function adminLoginAs(page: Page, label: '센터 직원' | '최고 관리자' | '개발자', next: string) {
+  await page.goto(`/admin/login?next=${encodeURIComponent(next)}`);
+  await page.getByRole('button', { name: label, exact: true }).click();
+  await page.getByRole('button', { name: '관리자 로그인' }).click();
+  await page.waitForURL((url) => url.pathname === next);
+}
+
+test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => {
+  await adminLoginAs(page, '최고 관리자', '/admin/developer');
+  await expect(page.getByText('접근 권한이 없습니다')).toBeVisible();
+
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '개발자', '/admin/developer');
+  await expect(page.getByRole('heading', { level: 1, name: '개발자 도구' })).toBeVisible();
+  await page.getByRole('tab', { name: 'API 요청' }).click();
+  await expect(page).toHaveURL(/tab=requests/);
+  await expect(page.getByRole('cell', { name: 'auth.me' }).first()).toBeVisible();
+  await page.getByRole('tab', { name: '세션·권한' }).click();
+  await expect(page.getByRole('table', { name: '역할별 권한' })).toBeVisible();
+});

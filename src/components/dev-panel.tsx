@@ -12,7 +12,7 @@ import { Button } from './ui/button';
 import { Radio } from './ui/choice';
 import { Modal } from './ui/dialog';
 
-const SCENARIOS: { value: Scenario; label: string; hint: string }[] = [
+export const SCENARIOS: { value: Scenario; label: string; hint: string }[] = [
   { value: 'normal', label: '정상', hint: '데모 데이터로 동작' },
   { value: 'slow', label: '느린 응답', hint: '로딩 상태 확인 (1.5초 지연)' },
   { value: 'empty', label: '빈 데이터', hint: '목록이 비어 있는 상태 확인' },

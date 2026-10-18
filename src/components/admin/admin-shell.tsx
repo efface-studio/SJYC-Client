@@ -53,6 +53,10 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { href: '/admin/audit', label: '감사 로그', permission: 'audit.read' },
     ],
   },
+  {
+    group: '개발',
+    items: [{ href: '/admin/developer', label: '개발자 도구', permission: 'developer.access' }],
+  },
 ];
 
 const ALL_ITEMS = NAV.flatMap((g) => g.items);
