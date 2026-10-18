@@ -1,0 +1,191 @@
+import { addDays, firstReservableDate } from '@/domain/space';
+import { todayKst } from '@/lib/format';
+import { ApiError } from '../errors';
+import { mockClient as api, mockDev } from './client';
+import { clubFormSchema, parseValues } from '@/domain/schemas';
+import { DEMO_PASSWORD, createSeed } from './seed';
+
+const login = (email: string) => api.auth.login({ email, password: DEMO_PASSWORD });
+
+async function expectCode(p: Promise<unknown>, code: ApiError['code'], reason?: string) {
+  const err = await p.then(
+    () => null,
+    (e: unknown) => e,
+  );
+  expect(err).toBeInstanceOf(ApiError);
+  expect((err as ApiError).code).toBe(code);
+  if (reason) expect((err as ApiError).reason).toBe(reason);
+}
+
+beforeEach(() => {
+  sessionStorage.clear();
+  mockDev.reset();
+});
+
+describe('mock adapter — 서버 규칙 재현', () => {
+  it('잘못된 비밀번호는 원인을 특정하지 않는 오류로 거부한다', async () => {
+    await expectCode(api.auth.login({ email: 'member@demo.test', password: 'wrong' }), 'VALIDATION');
+  });
+
+  it('로그인하지 않으면 신청할 수 없다', async () => {
+    await expectCode(
+      api.programs.apply('p-1', { phone: '01012345678', note: '', agreePrivacy: 'on' }),
+      'UNAUTHENTICATED',
+    );
+  });
+
+  it('일반 회원은 관리자 API 를 호출할 수 없다', async () => {
+    await login('member@demo.test');
+    await expectCode(api.admin.dashboard(7), 'FORBIDDEN');
+  });
+
+  it('중복 신청과 정원 초과를 막는다', async () => {
+    await login('member@demo.test');
+    await expectCode(
+      api.programs.apply('p-1', { phone: '01012345678', note: '', agreePrivacy: 'on' }),
+      'CONFLICT',
+      'DUPLICATE',
+    );
+    await expectCode(
+      api.programs.apply('p-2', { phone: '01012345678', note: '', agreePrivacy: 'on' }),
+      'CONFLICT',
+      'CAPACITY_FULL',
+    );
+    const created = await api.programs.apply('p-3', { phone: '01012345678', note: '', agreePrivacy: 'on' });
+    expect(created.status).toBe('submitted');
+    expect(created.receiptNo).toMatch(/^DEV-/);
+  });
+
+  it('세션이 만료되면 me() 는 null', async () => {
+    await login('member@demo.test');
+    mockDev.expireSession();
+    expect(await api.auth.me()).toBeNull();
+  });
+
+  it('일괄 승인: 이미 처리된 건은 실패 목록으로 돌려준다', async () => {
+    await login('staff@demo.test');
+    const first = await api.admin.applications.decide(['a-3', 'a-2'], 'approved', null);
+    expect(first.succeeded).toEqual(['a-3']);
+    expect(first.failed.map((f) => f.id)).toEqual(['a-2']);
+    await expectCode(api.admin.applications.decide(['a-4'], 'rejected', ' '), 'VALIDATION');
+  });
+
+  it('직원은 회원 역할을 바꿀 수 없고, 관리자는 자기 자신을 바꿀 수 없다', async () => {
+    await login('staff@demo.test');
+    await expectCode(api.admin.members.update('u-5', { status: 'suspended' }), 'FORBIDDEN');
+    await api.auth.logout();
+    await login('admin@demo.test');
+    await expectCode(api.admin.members.update('u-admin', { roles: ['member'] }), 'CONFLICT');
+  });
+
+  it('공간 예약: 겹치는 시간은 거부하고 다른 사람 문의는 보이지 않는다', async () => {
+    await login('member@demo.test');
+    const date = firstReservableDate(todayKst());
+    await api.spaces.reserve('s-media', {
+      date,
+      startTime: '10:00',
+      endTime: '12:00',
+      headcount: 3,
+      phone: '01012345678',
+      purpose: '영상 편집 모임',
+      agreePrivacy: 'on',
+    });
+    await expectCode(
+      api.spaces.reserve('s-media', {
+        date,
+        startTime: '11:00',
+        endTime: '13:00',
+        headcount: 3,
+        phone: '01012345678',
+        purpose: '영상 편집 모임',
+        agreePrivacy: 'on',
+      }),
+      'CONFLICT',
+    );
+    await expectCode(
+      api.spaces.reserve('s-media', {
+        date: addDays(todayKst(), 60),
+        startTime: '10:00',
+        endTime: '11:00',
+        headcount: 1,
+        phone: '01012345678',
+        purpose: '먼 미래 예약',
+        agreePrivacy: 'on',
+      }),
+      'VALIDATION',
+    );
+    await expectCode(api.me.inquiry('q-2'), 'NOT_FOUND');
+  });
+
+  it('직원이 신청·예약·가입·문의를 처리하면 본인에게만 알림이 생긴다', async () => {
+    await login('staff@demo.test');
+    await api.admin.applications.decide(['a-1'], 'rejected', '정원 조정');
+    await api.admin.spaces.decideReservation('r-2', 'approved', null);
+    await api.admin.clubs.decideApplication('ca-1', 'approved', null);
+    await api.admin.inquiries.answer('q-2', '체육관은 최소 인원 제한이 없습니다.');
+    await api.auth.logout();
+
+    await login('member@demo.test');
+    const mine = await api.me.notifications();
+    const fresh = mine.filter((n) => n.readAt === null && n.kind !== 'inquiry');
+    expect(fresh.map((n) => n.kind).sort()).toEqual(['application', 'club_application', 'reservation']);
+    expect(fresh.find((n) => n.kind === 'application')).toMatchObject({
+      link: '/my/applications/a-1',
+      body: expect.stringContaining('사유: 정원 조정'),
+    });
+    // 다른 회원(q-2 작성자)의 답변 알림은 보이지 않는다
+    expect(mine.some((n) => n.link === '/qna/q-2')).toBe(false);
+
+    await api.me.markNotificationsRead([fresh[0]!.id]);
+    expect((await api.me.notifications()).filter((n) => n.readAt === null)).toHaveLength(
+      mine.filter((n) => n.readAt === null).length - 1,
+    );
+    await api.me.markNotificationsRead();
+    expect((await api.me.notifications()).every((n) => n.readAt !== null)).toBe(true);
+  });
+
+  it('시드 동아리는 관리자 폼 검증을 통과하고 데모 대표·회원 동아리가 있다', () => {
+    const db = createSeed();
+    for (const c of db.clubs) {
+      const r = parseValues(clubFormSchema, { ...c, recruiting: c.recruiting ? 'on' : undefined });
+      expect(r.ok ? c.id : `${c.id} ${JSON.stringify(r.errors)}`).toBe(c.id);
+    }
+    const shared = db.clubs.find((c) =>
+      ['u-leader:leader', 'u-member:member'].every((k) =>
+        db.memberships.some((m) => m.clubId === c.id && `${m.userId}:${m.role}` === k),
+      ),
+    );
+    expect(shared).toBeDefined();
+    for (const m of [...db.memberships, ...db.clubApplications])
+      expect(db.clubs.some((c) => c.id === m.clubId)).toBe(true);
+  });
+
+  it('동아리 수정 시 소개 확장 필드를 보내지 않으면 기존 값을 유지한다', async () => {
+    await login('staff@demo.test');
+    const base = {
+      name: '사진 동아리',
+      field: '미디어',
+      summary: '요약',
+      description: '소개',
+      meetingInfo: '매주 토요일',
+      recruiting: true,
+      status: 'active' as const,
+    };
+    const created = await api.admin.clubs.create({
+      ...base,
+      target: '중학생',
+      photos: [
+        { url: 'https://example.com/a.jpg', caption: '활동', sourceUrl: 'https://example.com/p', date: null },
+      ],
+      sourceUrls: ['https://example.com/p'],
+    });
+    expect(created.activities).toEqual([]);
+    const updated = await api.admin.clubs.update(created.id, { ...base, name: '사진 동아리 2' });
+    expect(updated).toMatchObject({
+      name: '사진 동아리 2',
+      target: '중학생',
+      sourceUrls: ['https://example.com/p'],
+    });
+    expect(updated.photos).toHaveLength(1);
+  });
+});
