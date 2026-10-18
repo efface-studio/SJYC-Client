@@ -75,11 +75,8 @@ export default function GalleryPage() {
 
   return (
     <div className="container-page py-6 md:py-10">
-      <title>센터 소식 · 갤러리 | 중구청소년센터</title>
-      <PageHeader
-        title="센터 소식 · 갤러리"
-        description="센터 공식 채널에 올라온 사진과 영상을 모았습니다."
-      />
+      <title>센터 소식·갤러리 | 중구청소년센터</title>
+      <PageHeader title="센터 소식·갤러리" description="센터 공식 채널에 올라온 사진과 영상을 모았습니다." />
       {media.isPending ? (
         <ListSkeleton rows={3} label="갤러리 불러오는 중" />
       ) : media.isError ? (

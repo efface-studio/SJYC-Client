@@ -91,7 +91,7 @@ function MyReservations() {
       <p className="mt-6 text-[15px]">
         문의 내역은{' '}
         <Link href="/qna" className="font-semibold text-brand-700 underline">
-          질문 · 문의
+          질문·문의
         </Link>
         에서 확인할 수 있습니다.
       </p>

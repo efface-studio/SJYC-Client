@@ -126,7 +126,7 @@ test('프로그램 달력과 갤러리가 표시된다', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 3, name: /운영 중/ })).toBeVisible();
 
   await page.goto('/gallery');
-  await expect(page.getByRole('heading', { level: 1, name: '센터 소식 · 갤러리' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: '센터 소식·갤러리' })).toBeVisible();
   await expect(page.getByRole('link', { name: /출처/ }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /유튜브에서 보기/ }).first()).toBeVisible();
 });
