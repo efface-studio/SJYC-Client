@@ -1,7 +1,15 @@
 import { hoursOn } from '@/config/center';
 import { attendanceRate, memberStats, sessionCounts } from './attendance';
 import { daysUntil, maskName } from '@/lib/format';
-import { assignableRoles, can, canManageUser, PERMISSIONS, primaryRole } from './permissions';
+import {
+  assignableRoles,
+  can,
+  canEnterConsole,
+  canManageClub,
+  canManageUser,
+  PERMISSIONS,
+  primaryRole,
+} from './permissions';
 import { computeRecruitStatus } from './program';
 import {
   clubFormSchema,
@@ -68,6 +76,18 @@ describe('권한(RBAC)', () => {
     expect(canManageUser(admin, { roles: ['developer'] })).toBe(false);
     expect(canManageUser(admin, { roles: ['staff'] })).toBe(true);
     expect(canManageUser(developer, { roles: ['developer'] })).toBe(true);
+  });
+  it('동아리 담당자는 지정된 동아리만 관리하고, 관리자 화면은 그 메뉴로만 들어온다', () => {
+    const manager = { roles: ['member' as const], status: 'active' as const, managedClubIds: ['cl-1'] };
+    const staff = { roles: ['staff' as const], status: 'active' as const, managedClubIds: [] };
+    const member = { roles: ['member' as const], status: 'active' as const, managedClubIds: [] };
+    expect(canManageClub(manager, 'cl-1')).toBe(true);
+    expect(canManageClub(manager, 'cl-2')).toBe(false);
+    expect(canManageClub(staff, 'cl-2')).toBe(true);
+    expect(canManageClub({ ...manager, status: 'suspended' }, 'cl-1')).toBe(false);
+    expect(canEnterConsole(manager)).toBe(true);
+    expect(canEnterConsole(member)).toBe(false);
+    expect(can(manager, 'admin.access')).toBe(false);
   });
   it('대표 역할은 가장 높은 역할', () => {
     expect(primaryRole({ roles: ['member', 'developer', 'staff'] })).toBe('developer');
