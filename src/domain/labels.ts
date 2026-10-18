@@ -1,4 +1,6 @@
 import type {
+  AttendanceStatus,
+  AttendanceTargetType,
   ApplicationStatus,
   ClubApplicationStatus,
   InquiryCategory,
@@ -65,6 +67,18 @@ export const RESERVATION_STATUS: Record<ReservationStatus, Label> = {
   approved: { text: '예약 확정', tone: 'success' },
   rejected: { text: '반려', tone: 'danger' },
   cancelled: { text: '취소', tone: 'neutral' },
+};
+
+export const ATTENDANCE_STATUS: Record<AttendanceStatus, Label> = {
+  present: { text: '출석', tone: 'success' },
+  late: { text: '지각', tone: 'warning' },
+  absent: { text: '결석', tone: 'danger' },
+  excused: { text: '공결', tone: 'info' },
+};
+
+export const ATTENDANCE_TARGET_LABEL: Record<AttendanceTargetType, string> = {
+  club: '동아리',
+  program: '프로그램',
 };
 
 export const INQUIRY_STATUS: Record<InquiryStatus, Label> = {

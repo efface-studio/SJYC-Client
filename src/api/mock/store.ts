@@ -4,7 +4,7 @@ import { createSeed, type MockDb } from './seed';
  * mock 저장소 — 브라우저 sessionStorage 에만 저장되는 개발용 상태.
  * 탭을 닫으면 사라지며, 실제 저장·인증이 아니다.
  */
-const DB_KEY = 'sjyc.mock.db.v6';
+const DB_KEY = 'sjyc.mock.db.v7';
 const SESSION_KEY = 'sjyc.mock.session.v1';
 const SCENARIO_KEY = 'sjyc.mock.scenario.v1';
 
@@ -46,7 +46,7 @@ export function loadDb(): MockDb {
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as MockDb;
-      if (parsed.version === 6) return (memoryDb = parsed);
+      if (parsed.version === 7) return (memoryDb = parsed);
     } catch {
       // 손상된 값은 버리고 시드로 다시 시작
     }

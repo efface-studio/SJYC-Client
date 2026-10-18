@@ -78,6 +78,19 @@
 
 모든 관리자 변경은 서버가 감사 이벤트(`actor, action, target, summary, at`)를 남긴다. 개인정보 원문은 summary 에 넣지 않는다.
 
+### 출석 (`attendance.manage`, 서버가 대상별 권한 재검사)
+
+| 메서드     | 경로                                                                                   | 비고                                                                                                  |
+| ---------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| GET        | `/attendance/targets`                                                                  | 관리 가능한 동아리·프로그램 `{ type, id, name, rosterCount, sessionCount }`                           |
+| GET/POST   | `/attendance/sessions?targetType=&targetId=` / `{ targetType, targetId, date, title }` | 생성 시 명단(동아리원 / 승인된 신청자) 스냅샷                                                         |
+| GET/DELETE | `/attendance/sessions/{id}`                                                            |                                                                                                       |
+| PUT        | `/attendance/sessions/{id}/records` `{ marks: [{ userId, status, note? }] }`           | 명단 밖 회원이면 VALIDATION                                                                           |
+| POST       | `/attendance/sessions/{id}/check-in` `{ open }`                                        | 열면 서버가 4자리 코드 발급(암호학적 난수, 열린 회차끼리 중복 없음), 10분 후 자동 마감                |
+| GET        | `/attendance/stats?targetType=&targetId=`                                              | 회원별 출석·지각·결석·공결, 출석률 = (출석+지각)/(출석+지각+결석)                                     |
+| GET        | `/me/attendance`                                                                       | 본인 기록                                                                                             |
+| POST       | `/me/attendance/check-in` `{ code }`                                                   | 본인이 명단에 있는 열린 회차만. 5회 틀리면 10분 RATE_LIMITED. 담당자가 이미 체크한 기록은 바꾸지 않음 |
+
 ### 알림 생성 (서버 책임)
 
 서버는 다음 처리 시점에 대상 회원에게 `Notification` 을 만든다. 클라이언트는 만들지 않는다 (mock 은 같은 시점에 흉내 낸다).

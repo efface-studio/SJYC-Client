@@ -192,3 +192,26 @@ test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => 
   await page.getByRole('tab', { name: '세션·권한' }).click();
   await expect(page.getByRole('table', { name: '역할별 권한' })).toBeVisible();
 });
+
+test('출석: 직원이 출석부를 만들고 코드를 열면 회원이 코드로 출석한다', async ({ page }) => {
+  await adminLoginAs(page, '센터 직원', '/admin/attendance');
+  await page.getByRole('button', { name: '출석부 만들기' }).click();
+  await page.waitForURL(/\/admin\/attendance\/at-/);
+  await page.getByRole('button', { name: '출석 코드 열기' }).click();
+  const code = (await page.getByLabel(/^출석 코드 \d/).textContent())!.trim();
+  expect(code).toMatch(/^\d{4}$/);
+  // 담당자 체크: 이데모 지각
+  await page
+    .getByRole('radiogroup', { name: '이데모 출석 상태' })
+    .getByRole('radio', { name: '지각' })
+    .click();
+  await expect(
+    page.getByRole('radiogroup', { name: '이데모 출석 상태' }).getByRole('radio', { name: '지각' }),
+  ).toHaveAttribute('aria-checked', 'true');
+
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await loginAs(page, '일반 회원', '/my/attendance');
+  await page.getByLabel('출석 코드 입력').fill(code);
+  await page.getByRole('button', { name: '출석하기' }).click();
+  await expect(page.getByText(/정기 모임 출석이 확인되었습니다/)).toBeVisible();
+});

@@ -7,6 +7,7 @@ import { cn } from '@/lib/cn';
 
 const TABS = [
   { href: '/my', label: '신청·동아리' },
+  { href: '/my/attendance', label: '출석' },
   { href: '/my/profile', label: '내 정보' },
 ];
 
