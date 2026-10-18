@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
+next-env.d.ts
+.env
+.env.*
+!.env.example
+
+# 모바일 앱은 별도 저장소(efface-studio/SJYC-Mobile)
+mobile/
+
+# 로컬 도구 설정
+.claude/

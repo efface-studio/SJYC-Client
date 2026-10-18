@@ -1,0 +1,4 @@
+# pnpm 설정 (pnpm 11+). 네이티브 빌드 스크립트 실행 허용 목록.
+allowBuilds:
+  esbuild: true
+  sharp: true
