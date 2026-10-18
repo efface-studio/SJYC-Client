@@ -30,7 +30,7 @@ interface FooterLink {
 
 const GROUPS: { title: string; links: FooterLink[] }[] = [
   {
-    title: 'Service',
+    title: '서비스',
     links: [
       { href: '/programs', label: '프로그램 신청' },
       { href: '/spaces', label: '공간 예약' },
@@ -40,7 +40,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
-    title: 'Center',
+    title: '센터',
     links: [
       { href: '/about', label: '센터 소개' },
       { href: '/about#location', label: '오시는 길' },
@@ -48,7 +48,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
-    title: 'Policy',
+    title: '정책·약관',
     links: POLICY_NAV.map((p) => ({
       href: `/policies/${p.key}`,
       label: p.title,
@@ -56,7 +56,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     })),
   },
   {
-    title: 'Channel',
+    title: '공식 채널',
     links: OFFICIAL_CHANNELS.map((c) => ({
       href: c.url,
       label: c.label,
