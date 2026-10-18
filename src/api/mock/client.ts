@@ -3,10 +3,14 @@
  * 서버가 해야 할 검증(세션, 권한, 중복 신청, 정원, 취소 기한)을 같은 규칙으로 흉내 내지만
  * 브라우저 안에서만 동작하므로 보안 경계가 아니다. 실제 운영에는 http adapter 를 쓴다.
  */
+import { memberStats } from '@/domain/attendance';
 import { assignableRoles, can, canManageUser, type Permission } from '@/domain/permissions';
 import { computeRecruitStatus } from '@/domain/program';
+import { attendanceSessionSchema, parseValues } from '@/domain/schemas';
 import { buildSlots, overlaps, reservationWindowError } from '@/domain/space';
 import type {
+  AttendanceSession,
+  AttendanceTarget,
   AuditEvent,
   Club,
   ClubApplication,
@@ -21,6 +25,15 @@ import type {
 import { todayKst } from '@/lib/format';
 import type { AdminListQuery, ApiClient } from '../client';
 import { ApiError } from '../errors';
+import {
+  CHECK_IN_MINUTES,
+  checkIn,
+  isCheckInOpen,
+  issueCode,
+  rosterOf,
+  targetName,
+  toMyAttendance,
+} from './attendance';
 import type { MockDb } from './seed';
 import {
   expireSession,
@@ -78,6 +91,16 @@ function requirePermission(db: MockDb, permission: Permission): DbUser {
   const u = requireUser(db);
   if (!can(u, permission)) throw new ApiError('FORBIDDEN', '이 작업을 수행할 권한이 없습니다.');
   return u;
+}
+
+/** 출석부 관리 — 센터 직원 이상 */
+function requireAttendanceManager(db: MockDb, _target: AttendanceTarget): DbUser {
+  return requirePermission(db, 'attendance.manage');
+}
+
+/** 마감 시간이 지난 출석 코드는 내려주지 않는다 */
+function withCheckIn(s: AttendanceSession): AttendanceSession {
+  return isCheckInOpen(s) ? s : { ...s, checkInCode: null, checkInClosesAt: null };
 }
 
 function nextId(db: MockDb, prefix: string): string {
@@ -371,6 +394,146 @@ export const mockClient: ApiClient = {
         for (const n of db.notifications) {
           if (n.userId === u.id && n.readAt === null && (!ids || ids.includes(n.id))) n.readAt = now;
         }
+      }),
+    attendance: () =>
+      respond((db) => {
+        const u = requireUser(db);
+        if (isEmptyScenario()) return [];
+        return db.attendance
+          .filter((s) => s.records.some((r) => r.userId === u.id))
+          .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
+          .map((s) => toMyAttendance(s, u.id));
+      }),
+    checkIn: (input) =>
+      respond((db) => {
+        const u = requireUser(db);
+        return checkIn(db, u.id, input.code.trim());
+      }),
+  },
+
+  attendance: {
+    targets: () =>
+      respond((db) => {
+        requirePermission(db, 'attendance.manage');
+        if (isEmptyScenario()) return [];
+        const count = (t: AttendanceTarget) =>
+          db.attendance.filter((s) => s.targetType === t.type && s.targetId === t.id).length;
+        const clubs = db.clubs
+          .filter((c) => c.status === 'active')
+          .map((c) => ({ type: 'club' as const, id: c.id, name: c.name }));
+        const programs = db.programs
+          .filter((p) => p.status === 'published')
+          .map((p) => ({ type: 'program' as const, id: p.id, name: p.title }));
+        return [...clubs, ...programs].map((t) => ({
+          ...t,
+          rosterCount: rosterOf(db, t).length,
+          sessionCount: count(t),
+        }));
+      }),
+    sessions: (target) =>
+      respond((db) => {
+        requireAttendanceManager(db, target);
+        if (isEmptyScenario()) return [];
+        return db.attendance
+          .filter((s) => s.targetType === target.type && s.targetId === target.id)
+          .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
+          .map(withCheckIn);
+      }),
+    get: (id) =>
+      respond((db) => {
+        const s = findOr404(db.attendance, id);
+        requireAttendanceManager(db, { type: s.targetType, id: s.targetId });
+        return withCheckIn(s);
+      }),
+    create: (target, input) =>
+      respond((db) => {
+        const actor = requireAttendanceManager(db, target);
+        const parsed = parseValues(attendanceSessionSchema, input);
+        if (!parsed.ok)
+          throw new ApiError('VALIDATION', '입력값을 확인해 주세요.', { fieldErrors: parsed.errors });
+        const s: AttendanceSession = {
+          id: nextId(db, 'at'),
+          targetType: target.type,
+          targetId: target.id,
+          targetName: targetName(db, target),
+          date: parsed.data.date,
+          title: parsed.data.title,
+          checkInCode: null,
+          checkInClosesAt: null,
+          createdAt: new Date().toISOString(),
+          createdBy: actor.name,
+          records: rosterOf(db, target).map((r) => ({
+            ...r,
+            status: null,
+            checkedAt: null,
+            method: null,
+            note: null,
+          })),
+        };
+        db.attendance.push(s);
+        audit(db, actor, {
+          action: 'attendance.create',
+          targetType: 'attendance',
+          targetId: s.id,
+          summary: `출석부 생성: ${s.targetName} ${s.date} ${s.title}`,
+        });
+        return withCheckIn(s);
+      }),
+    remove: (id) =>
+      respond((db) => {
+        const s = findOr404(db.attendance, id);
+        const actor = requireAttendanceManager(db, { type: s.targetType, id: s.targetId });
+        db.attendance = db.attendance.filter((x) => x.id !== id);
+        audit(db, actor, {
+          action: 'attendance.delete',
+          targetType: 'attendance',
+          targetId: id,
+          summary: `출석부 삭제: ${s.targetName} ${s.date} ${s.title}`,
+        });
+      }),
+    mark: (id, marks) =>
+      respond((db) => {
+        const s = findOr404(db.attendance, id);
+        requireAttendanceManager(db, { type: s.targetType, id: s.targetId });
+        if (marks.some((m) => !s.records.some((r) => r.userId === m.userId))) {
+          throw new ApiError('VALIDATION', '출석부 명단에 없는 회원이 포함되어 있습니다.');
+        }
+        const now = new Date().toISOString();
+        for (const m of marks) {
+          const r = s.records.find((x) => x.userId === m.userId)!;
+          r.status = m.status;
+          r.checkedAt = m.status ? now : null;
+          r.method = m.status ? 'manager' : null;
+          if (m.note !== undefined) r.note = m.note?.trim().slice(0, 100) || null;
+        }
+        return withCheckIn(s);
+      }),
+    setCheckIn: (id, open) =>
+      respond((db) => {
+        const s = findOr404(db.attendance, id);
+        const actor = requireAttendanceManager(db, { type: s.targetType, id: s.targetId });
+        if (open) {
+          s.checkInCode = issueCode(db);
+          s.checkInClosesAt = new Date(Date.now() + CHECK_IN_MINUTES * 60_000).toISOString();
+        } else {
+          s.checkInCode = null;
+          s.checkInClosesAt = null;
+        }
+        audit(db, actor, {
+          action: open ? 'attendance.checkin.open' : 'attendance.checkin.close',
+          targetType: 'attendance',
+          targetId: id,
+          summary: `출석 코드 ${open ? '열기' : '닫기'}: ${s.targetName} ${s.date} ${s.title}`,
+        });
+        return withCheckIn(s);
+      }),
+    stats: (target) =>
+      respond((db) => {
+        requireAttendanceManager(db, target);
+        if (isEmptyScenario()) return [];
+        return memberStats(
+          db.attendance.filter((s) => s.targetType === target.type && s.targetId === target.id),
+        );
       }),
   },
 

@@ -220,3 +220,71 @@ describe('mock 데이터 내보내기·가져오기 (개발자 도구)', () => {
     await expect(api.admin.members.get('u-5')).resolves.toBeTruthy();
   });
 });
+
+describe('출석체크', () => {
+  const club = { type: 'club' as const, id: 'cl-frame' };
+
+  it('일반 회원은 출석부를 다룰 수 없다', async () => {
+    await login('member@demo.test');
+    await expectCode(api.attendance.sessions(club), 'FORBIDDEN');
+  });
+
+  it('출석부를 만들면 동아리원 / 승인된 신청자 명단이 채워진다', async () => {
+    await login('staff@demo.test');
+    const s = await api.attendance.create(club, { date: todayKst(), title: '정기 모임' });
+    expect(s.records.map((r) => r.userId).sort()).toEqual(['u-5', 'u-leader', 'u-member']);
+    expect(s.records.every((r) => r.status === null)).toBe(true);
+    const p = await api.attendance.create(
+      { type: 'program', id: 'p-6' },
+      { date: todayKst(), title: '1회차' },
+    );
+    expect(p.records.map((r) => r.userId)).toEqual(['u-member']);
+  });
+
+  it('담당자 체크와 통계', async () => {
+    await login('staff@demo.test');
+    const s = await api.attendance.create(club, { date: todayKst(), title: '정기 모임' });
+    const marked = await api.attendance.mark(s.id, [
+      { userId: 'u-member', status: 'late' },
+      { userId: 'u-5', status: 'excused', note: '학교 행사' },
+    ]);
+    expect(marked.records.find((r) => r.userId === 'u-member')).toMatchObject({
+      status: 'late',
+      method: 'manager',
+    });
+    await expectCode(api.attendance.mark(s.id, [{ userId: 'u-6', status: 'present' }]), 'VALIDATION');
+    const stats = await api.attendance.stats(club);
+    expect(stats.find((x) => x.userId === 'u-5')?.excused).toBeGreaterThanOrEqual(1);
+  });
+
+  it('출석 코드: 명단의 회원만, 틀리면 5회 후 제한, 닫히면 거부', async () => {
+    await login('staff@demo.test');
+    const s = await api.attendance.create(club, { date: todayKst(), title: '정기 모임' });
+    const opened = await api.attendance.setCheckIn(s.id, true);
+    expect(opened.checkInCode).toMatch(/^\d{4}$/);
+    const code = opened.checkInCode!;
+    await api.auth.logout();
+
+    await login('member@demo.test');
+    const mine = await api.me.checkIn({ code });
+    expect(mine).toMatchObject({ sessionId: s.id, status: 'present' });
+    expect((await api.me.attendance()).some((a) => a.sessionId === s.id && a.status === 'present')).toBe(
+      true,
+    );
+    await api.auth.logout();
+
+    await login('sample6@demo.test'); // cl-frame 동아리원이 아니다
+    const wrong = code === '0000' ? '0001' : '0000';
+    for (let i = 0; i < 4; i++) await expectCode(api.me.checkIn({ code: wrong }), 'VALIDATION');
+    await expectCode(api.me.checkIn({ code }), 'VALIDATION');
+    await expectCode(api.me.checkIn({ code }), 'RATE_LIMITED');
+    await api.auth.logout();
+
+    await login('staff@demo.test');
+    const closed = await api.attendance.setCheckIn(s.id, false);
+    expect(closed.checkInCode).toBeNull();
+    await api.auth.logout();
+    await login('leader@demo.test');
+    await expectCode(api.me.checkIn({ code }), 'VALIDATION');
+  });
+});
