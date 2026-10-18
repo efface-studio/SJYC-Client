@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+/* 자체 호스팅 Pretendard (동적 서브셋) — 외부 폰트 CDN 의존 없음 */
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+/*
+ * 디자인 토큰 — 근거는 docs/brand-audit.md, 사용 규칙은 docs/design-system.md
+ * brand-500(#F6891F)은 공식 홈페이지 강조색. 흰 글자 대비 2.47:1 이라 채움/강조 전용,
+ * 텍스트·버튼 배경은 AA(4.5:1)를 만족하는 brand-700 을 쓴다.
+ */
+@theme {
+  --color-brand-50: #fff6ed;
+  --color-brand-100: #fde6cc;
+  --color-brand-200: #fbcd99;
+  --color-brand-500: #f6891f;
+  --color-brand-700: #b35400;
+  --color-brand-800: #9a4700;
+  --color-logo-red: #c62828;
+
+  --color-ink-900: #222222;
+  --color-ink-700: #444444;
+  --color-ink-600: #595959;
+  --color-line: #dddddd;
+  --color-line-strong: #bbbbbb;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5f5;
+  --color-surface-admin: #f4f5f7;
+
+  --color-success-700: #1d6b2f;
+  --color-success-50: #ecf7ee;
+  --color-danger-700: #b42318;
+  --color-danger-50: #fdeceb;
+  --color-warning-800: #7a4d00;
+  --color-warning-50: #fff7e0;
+  --color-info-700: #1f5fa8;
+  --color-info-50: #eaf2fb;
+
+  --font-sans:
+    'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', system-ui,
+    sans-serif;
+
+  /* 공공기관 서비스 톤: 둥근 카드 대신 선과 여백으로 구획한다 */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  --shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.18);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* 포커스·스크롤 대상이 고정 헤더/하단 탭바에 가려지지 않게 (WCAG 2.4.11) */
+    scroll-padding-top: 80px;
+    scroll-padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  @media (width >= 48rem) {
+    html {
+      scroll-padding-bottom: 16px;
+    }
+  }
+  body {
+    @apply bg-surface font-sans text-ink-900 antialiased;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    letter-spacing: -0.01em;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.025em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-brand-700);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (width >= 768px) {
+    padding-inline: 24px;
+  }
+}
+
+/* 가로 스크롤 탭: 터치 스크롤은 유지하고 스크롤바만 숨긴다 */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
