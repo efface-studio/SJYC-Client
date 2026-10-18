@@ -9,15 +9,16 @@ import { useToast } from '@/components/ui/toast';
 import { DemoBanner } from '@/components/dev-panel';
 import { Logo } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
-import { can, primaryRole, ROLE_LABEL, type Permission } from '@/domain/permissions';
+import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/domain/permissions';
 import type { User } from '@/domain/types';
+import { allows, type Access } from '@/features/auth/guards';
 import { useLogout, useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
 
 interface NavItem {
   href: string;
   label: string;
-  permission: Permission;
+  permission: Access;
 }
 
 const NAV: { group: string; items: NavItem[] }[] = [
@@ -41,7 +42,8 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { href: '/admin/clubs', label: '동아리', permission: 'club.manage' },
       { href: '/admin/clubs/applications', label: '가입 신청', permission: 'club.manage' },
-      { href: '/admin/attendance', label: '출석', permission: 'attendance.manage' },
+      { href: '/admin/my-clubs', label: '동아리 운영', permission: managesAnyClub },
+      { href: '/admin/attendance', label: '출석', permission: canManageAttendance },
       { href: '/admin/inquiries', label: '문의', permission: 'inquiry.answer' },
       { href: '/admin/faqs', label: 'FAQ', permission: 'inquiry.answer' },
     ],
@@ -76,7 +78,7 @@ function roleLabel(user: User): string {
 function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; onNavigate?: () => void }) {
   const uid = useId();
   // 메뉴 숨김은 표시용일 뿐이며 서버가 모든 요청의 권한을 다시 검사한다
-  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => can(user, i.permission)) })).filter(
+  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => allows(user, i.permission)) })).filter(
     (g) => g.items.length > 0,
   );
   return (

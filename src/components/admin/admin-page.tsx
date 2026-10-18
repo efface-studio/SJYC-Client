@@ -3,8 +3,7 @@
 import { Suspense, type ReactNode } from 'react';
 import { PageHeader, type Crumb } from '@/components/ui/page-header';
 import { ListSkeleton } from '@/components/ui/states';
-import type { Permission } from '@/domain/permissions';
-import { RequirePermission } from '@/features/auth/guards';
+import { RequirePermission, type Access } from '@/features/auth/guards';
 
 export const ADMIN_TITLE_SUFFIX = '중구청소년센터 관리자';
 
@@ -14,7 +13,7 @@ export function AdminTitle({ children }: { children: string }) {
 
 interface AdminPageProps {
   title: string;
-  permission: Permission;
+  permission: Access;
   description?: ReactNode;
   breadcrumbs?: Crumb[];
   actions?: ReactNode;
