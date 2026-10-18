@@ -16,6 +16,8 @@ export const PERMISSIONS = [
   'inquiry.answer',
   'policy.manage',
   'audit.read',
+  /** 출석부 관리 (동아리·프로그램) */
+  'attendance.manage',
   /** 개발자 도구(환경·요청 로그·캐시·mock 데이터) — 개발자만 */
   'developer.access',
 ] as const;
@@ -34,6 +36,7 @@ export const PERMISSION_LABEL: Record<Permission, string> = {
   'inquiry.answer': '문의 답변·FAQ',
   'policy.manage': '정책 문서 관리',
   'audit.read': '감사 로그 조회',
+  'attendance.manage': '출석부 관리',
   'developer.access': '개발자 도구',
 };
 
@@ -48,6 +51,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     'club.manage',
     'space.manage',
     'inquiry.answer',
+    'attendance.manage',
   ],
   admin: PERMISSIONS.filter((p) => p !== 'developer.access'),
   /** 최상위 역할 — 모든 권한 */
