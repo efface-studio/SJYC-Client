@@ -59,6 +59,12 @@ e2e/               Playwright 시나리오
 - 화면 상단 "개발용 데모" 띠와 개발 도구(지연·빈 데이터·오류·세션 만료·초기화)로 상태를 재현한다.
 - 실서버 전환: `.env` 에 `NEXT_PUBLIC_API_MODE=http`, `NEXT_PUBLIC_API_BASE_URL` 설정. mock 코드는 번들에 남지만 실행되지 않는다(운영 빌드에서 제거하려면 동적 import 로 분리).
 
+## 개발자 도구 (`/admin/developer`, developer.access)
+
+- `src/api/devlog.ts` 의 `withLogging` 이 `api` 객체의 모든 호출을 감싸 메서드 이름·소요 시간·결과만 메모리에 남긴다(최근 200건). 요청 인자·응답 본문은 개인정보가 담길 수 있어 기록하지 않는다.
+- 탭: 환경 정보(진단 정보 복사), 세션·역할×권한표, API 요청 로그, 쿼리 캐시(다시 불러오기·무효화·삭제), mock 데이터(시나리오·초기화·세션 만료·내보내기/가져오기), 브라우저 저장소(키·크기만)·오류 재현.
+- 화면 접근 제한은 표시용이다. 실서버에 개발자용 API 를 추가하면 서버가 developer.access 를 검사해야 한다.
+
 ## 모바일 앱 (별도 저장소 `efface-studio/SJYC-Mobile`)
 
 - Expo SDK 57 + expo-router. `APP_FLAVOR=user|admin` 으로 라우트 폴더(`src/user`·`src/admin`)·앱 이름·번들 ID 를 나눠 두 앱을 만든다.
