@@ -5,7 +5,7 @@ import { api } from '@/api';
 import { REFERENCE_COLLECTED_AT } from '@/api/mock/research';
 import { PageHeader } from '@/components/ui/page-header';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA } from '@/config/env';
 import type { MediaItem } from '@/domain/types';
 
 function SourceLink({ href, label = '출처' }: { href: string; label?: string }) {
@@ -88,7 +88,7 @@ export default function GalleryPage() {
         />
       ) : (
         <>
-          {IS_MOCK && (
+          {DEMO_DATA && (
             <Callout className="mb-6">
               센터 공식 채널에서 수집한 참고 정보입니다 (수집일 {REFERENCE_COLLECTED_AT}). 사진·영상의
               저작권은 센터와 원저작자에게 있으며, 각 항목의 출처에서 원문을 확인할 수 있습니다.

@@ -11,7 +11,7 @@ import { Logo } from '@/components/site/site-header';
 import { Button, buttonClass } from '@/components/ui/button';
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
-import { IS_MOCK } from '@/config/env';
+import { DEMO_DATA } from '@/config/env';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
 import { canEnterConsole } from '@/domain/permissions';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
@@ -127,7 +127,7 @@ function AdminLoginForm() {
         </Button>
       </form>
 
-      {IS_MOCK && (
+      {DEMO_DATA && (
         <div className="mt-6 border-t border-dashed border-line-strong pt-4">
           <p className="text-sm font-semibold text-ink-700">개발용 데모 계정으로 입력</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
