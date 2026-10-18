@@ -9,6 +9,7 @@ import { DEMO_ACCOUNTS } from '@/api/mock/seed';
 import type { Scenario } from '@/api/mock/store';
 import { IS_MOCK } from '@/config/env';
 import { Button } from './ui/button';
+import { Radio } from './ui/choice';
 import { Modal } from './ui/dialog';
 
 const SCENARIOS: { value: Scenario; label: string; hint: string }[] = [
@@ -79,13 +80,11 @@ export function DemoBanner({ tone = 'site' }: { tone?: 'site' | 'admin' }) {
                 key={s.value}
                 className="flex min-h-11 items-center gap-3 rounded-md px-2 hover:bg-surface-muted"
               >
-                <input
-                  type="radio"
+                <Radio
                   name="scenario"
                   value={s.value}
                   checked={scenario === s.value}
                   onChange={() => apply(s.value)}
-                  className="size-5 accent-brand-700"
                 />
                 <span>
                   <span className="font-semibold">{s.label}</span>

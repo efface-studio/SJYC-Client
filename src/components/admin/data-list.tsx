@@ -2,7 +2,8 @@
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { Checkbox } from '@/components/ui/choice';
 import { cn } from '@/lib/cn';
 import type { AdminSort } from './list-params';
 
@@ -61,20 +62,14 @@ function nextSort(col: 'title' | 'date', sort: AdminSort | undefined): AdminSort
 }
 
 function SelectAll({ rows, selection }: { rows: { id: string }[]; selection: Selection }) {
-  const ref = useRef<HTMLInputElement>(null);
   const count = rows.filter((r) => selection.selected.has(r.id)).length;
   const all = rows.length > 0 && count === rows.length;
-  useEffect(() => {
-    if (ref.current) ref.current.indeterminate = count > 0 && !all;
-  }, [count, all]);
   return (
-    <input
-      ref={ref}
-      type="checkbox"
+    <Checkbox
       aria-label="이 페이지 전체 선택"
       checked={all}
+      indeterminate={count > 0 && !all}
       onChange={() => selection.onChange(all ? new Set() : new Set(rows.map((r) => r.id)))}
-      className="size-5 accent-brand-700"
     />
   );
 }
@@ -159,12 +154,10 @@ export function DataList<T extends { id: string }>({
               >
                 {selection && (
                   <td className="px-3 py-2.5">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       aria-label={`${rowLabel(row)} 선택`}
                       checked={selection.selected.has(row.id)}
                       onChange={() => toggle(selection, row.id)}
-                      className="size-5 accent-brand-700"
                     />
                   </td>
                 )}
@@ -190,12 +183,10 @@ export function DataList<T extends { id: string }>({
           >
             {selection && (
               <label className="relative z-10 -ml-3 flex size-11 shrink-0 items-start justify-center pt-0.5">
-                <input
-                  type="checkbox"
+                <Checkbox
                   aria-label={`${rowLabel(row)} 선택`}
                   checked={selection.selected.has(row.id)}
                   onChange={() => toggle(selection, row.id)}
-                  className="size-5 accent-brand-700"
                 />
               </label>
             )}
