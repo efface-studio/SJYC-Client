@@ -156,3 +156,18 @@ test('자체 날짜 선택을 키보드로 조작한다 @desktop', async ({ page
   await expect(page.getByRole('grid')).toBeHidden();
   await expect(trigger).toHaveText(/\d{4}\. \d{1,2}\. \d{1,2}\. \(.\)/);
 });
+
+test('정책 문서는 한 페이지에서 목차와 스크롤이 연동된다', async ({ page }) => {
+  await page.goto('/policies/cookies');
+  const toc = page.getByRole('navigation', { name: '정책 문서 목차' }).filter({ visible: true });
+  await expect(toc.getByRole('link', { name: '쿠키 정책' })).toHaveAttribute('aria-current', 'location');
+  await expect(page.getByRole('heading', { level: 2, name: '쿠키 정책' })).toBeInViewport();
+
+  await toc.getByRole('link', { name: '서비스 이용약관' }).click();
+  await expect(page).toHaveURL(/\/policies\/terms$/);
+  await expect(page.getByRole('heading', { level: 2, name: '서비스 이용약관' })).toBeInViewport();
+  await expect(toc.getByRole('link', { name: '서비스 이용약관' })).toHaveAttribute(
+    'aria-current',
+    'location',
+  );
+});
