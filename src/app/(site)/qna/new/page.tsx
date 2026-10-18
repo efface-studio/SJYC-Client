@@ -43,16 +43,14 @@ function InquiryForm() {
       }}
       className="space-y-4"
     >
-      <SelectField label="분류" name="category" required defaultValue="" error={errors.category}>
-        <option value="" disabled>
-          선택해 주세요
-        </option>
-        {Object.entries(INQUIRY_CATEGORY_LABEL).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </SelectField>
+      <SelectField
+        label="분류"
+        name="category"
+        required
+        placeholder="선택해 주세요"
+        error={errors.category}
+        options={Object.entries(INQUIRY_CATEGORY_LABEL).map(([value, label]) => ({ value, label }))}
+      />
       <TextField label="제목" name="title" maxLength={100} required error={errors.title} />
       <TextAreaField
         label="내용"

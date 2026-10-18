@@ -8,6 +8,8 @@ import { Suspense } from 'react';
 import { api } from '@/api';
 import { Pagination } from '@/components/ui/pagination';
 import { PageHeader } from '@/components/ui/page-header';
+import { Select } from '@/components/ui/select';
+import { SearchInput } from '@/components/ui/search-input';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { RECRUIT_STATUS } from '@/domain/labels';
 import type { RecruitStatus } from '@/domain/types';
@@ -83,15 +85,14 @@ function ProgramList() {
           <label htmlFor="program-q" className="sr-only">
             프로그램 검색
           </label>
-          <input
+          <SearchInput
             id="program-q"
             name="q"
-            type="search"
             defaultValue={q}
             key={q}
             placeholder="프로그램명, 대상으로 검색"
             enterKeyHint="search"
-            className="h-12 min-w-0 flex-1 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
+            className="h-12 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
           />
           <button
             type="submit"
@@ -130,25 +131,22 @@ function ProgramList() {
             <label htmlFor="program-category" className="shrink-0 text-[15px] font-semibold">
               분류
             </label>
-            <select
+            <Select
               id="program-category"
+              title="분류"
+              size="md"
               value={categoryId}
-              onChange={(e) => router.push(hrefWith({ category: e.target.value }))}
-              className="h-11 min-w-0 flex-1 rounded-md border border-line-strong px-3 text-base md:w-56 md:flex-none"
-            >
-              <option value="">전체 분류</option>
-              {groups.map((g) => (
-                <optgroup key={g} label={g}>
-                  {categories.data
-                    ?.filter((c) => c.group === g)
-                    .map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                </optgroup>
-              ))}
-            </select>
+              onValueChange={(v) => router.push(hrefWith({ category: v }))}
+              className="min-w-0 flex-1 md:w-56 md:flex-none"
+              options={[
+                { value: '', label: '전체 분류' },
+                ...groups.flatMap((g) =>
+                  (categories.data ?? [])
+                    .filter((c) => c.group === g)
+                    .map((c) => ({ value: c.id, label: c.name, group: g })),
+                ),
+              ]}
+            />
           </div>
         </div>
       </div>

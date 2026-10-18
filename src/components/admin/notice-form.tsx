@@ -113,26 +113,16 @@ export function NoticeForm({
             required
             defaultValue={initial?.category ?? 'center'}
             error={shown.category}
-          >
-            {Object.entries(NOTICE_CATEGORY_LABEL).map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </SelectField>
+            options={Object.entries(NOTICE_CATEGORY_LABEL).map(([value, label]) => ({ value, label }))}
+          />
           <SelectField
             label="게시 상태"
             name="status"
             required
             defaultValue={initial?.status ?? 'draft'}
             error={shown.status}
-          >
-            {Object.entries(PUBLISH_STATUS).map(([v, l]) => (
-              <option key={v} value={v}>
-                {l.text}
-              </option>
-            ))}
-          </SelectField>
+            options={Object.entries(PUBLISH_STATUS).map(([value, l]) => ({ value, label: l.text }))}
+          />
         </div>
         <TextAreaField
           label="본문"

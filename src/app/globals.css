@@ -101,3 +101,10 @@
     display: none;
   }
 }
+
+/* 검색 입력의 브라우저 기본 지우기 버튼·장식 숨김 — 지우기는 자체 버튼으로 처리 */
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button {
+  appearance: none;
+}

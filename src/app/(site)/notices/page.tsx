@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { api } from '@/api';
 import { PageHeader } from '@/components/ui/page-header';
+import { SearchInput } from '@/components/ui/search-input';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { NOTICE_CATEGORY_LABEL } from '@/domain/labels';
@@ -87,15 +88,14 @@ function NoticeList() {
         <label htmlFor="notice-q" className="sr-only">
           공지 검색
         </label>
-        <input
+        <SearchInput
           id="notice-q"
           name="q"
-          type="search"
           key={q}
           defaultValue={q}
           placeholder="제목·내용 검색"
           enterKeyHint="search"
-          className="h-12 min-w-0 flex-1 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
+          className="h-12 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
         />
         <button
           type="submit"

@@ -2,7 +2,14 @@
 
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { CheckboxField, FormError, SelectField, TextAreaField, TextField } from '@/components/ui/field';
+import {
+  CheckboxField,
+  DateField,
+  FormError,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from '@/components/ui/field';
 import { clubFormSchema, parseValues, type ClubFormInput, type FieldErrors } from '@/domain/schemas';
 import type { Club, ClubActivity, MediaPhoto } from '@/domain/types';
 
@@ -216,10 +223,10 @@ export function ClubForm({
               placeholder={URL_HINT}
               error={shown[`photos.${i}.sourceUrl`]}
             />
-            <TextField
+            <DateField
               label="게시일"
               name="photoDate"
-              type="date"
+              clearable
               defaultValue={p.date ?? ''}
               error={shown[`photos.${i}.date`]}
             />
@@ -296,10 +303,11 @@ export function ClubForm({
           required
           defaultValue={initial?.status ?? 'active'}
           error={shown.status}
-        >
-          <option value="active">운영 중</option>
-          <option value="inactive">운영 중지</option>
-        </SelectField>
+          options={[
+            { value: 'active', label: '운영 중' },
+            { value: 'inactive', label: '운영 중지' },
+          ]}
+        />
         <div className="sm:pt-8">
           <CheckboxField
             label="신규 회원 모집 중"

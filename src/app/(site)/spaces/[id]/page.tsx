@@ -6,7 +6,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api, errorMessage, isApiError } from '@/api';
 import { Button, buttonClass } from '@/components/ui/button';
-import { CheckboxField, FieldMessages, FormError, TextAreaField, TextField } from '@/components/ui/field';
+import {
+  CheckboxField,
+  DateField,
+  FieldMessages,
+  FormError,
+  TextAreaField,
+  TextField,
+} from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page-header';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
@@ -150,16 +157,15 @@ function ReservationForm({ space }: { space: Space }) {
       }}
       className="space-y-5"
     >
-      <TextField
+      <DateField
         label="이용 날짜"
         name="date"
-        type="date"
         required
         min={minDate}
         max={maxDate}
         value={date}
-        onChange={(e) => {
-          setDate(e.target.value);
+        onValueChange={(next) => {
+          setDate(next);
           setRange(null);
         }}
         error={errors.date}

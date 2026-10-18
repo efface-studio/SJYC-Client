@@ -5,7 +5,14 @@ import { useState } from 'react';
 import { api, errorMessage } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/dialog';
-import { CheckboxField, FormError, SelectField, TextAreaField, TextField } from '@/components/ui/field';
+import {
+  CheckboxField,
+  FormError,
+  NumberField,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from '@/components/ui/field';
 import { useToast } from '@/components/ui/toast';
 import { INQUIRY_CATEGORY_LABEL } from '@/domain/labels';
 import { faqFormSchema, parseForm, type FaqFormInput, type FieldErrors } from '@/domain/schemas';
@@ -66,18 +73,11 @@ export function FaqDialog({ open, faq, nextOrder, onClose }: FaqDialogProps) {
             required
             defaultValue={faq?.category ?? 'program'}
             error={errors.category}
-          >
-            {Object.entries(INQUIRY_CATEGORY_LABEL).map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </SelectField>
-          <TextField
+            options={Object.entries(INQUIRY_CATEGORY_LABEL).map(([value, label]) => ({ value, label }))}
+          />
+          <NumberField
             label="표시 순서"
             name="order"
-            type="number"
-            inputMode="numeric"
             min={0}
             max={999}
             required

@@ -130,3 +130,29 @@ test('프로그램 달력과 갤러리가 표시된다', async ({ page }) => {
   await expect(page.getByRole('link', { name: /출처/ }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /유튜브에서 보기/ }).first()).toBeVisible();
 });
+
+test('자체 셀렉트로 프로그램 분류를 고른다', async ({ page }) => {
+  await page.goto('/programs');
+  await page.getByRole('button', { name: '분류' }).click();
+  const list = page.getByRole('listbox', { name: '분류' });
+  await expect(list).toBeVisible();
+  await list.getByRole('option', { name: '문화예술활동' }).click();
+  await expect(page).toHaveURL(/category=c-culture/);
+  await expect(list).toBeHidden();
+  await expect(page.getByRole('button', { name: '분류' })).toHaveText(/문화예술활동/);
+});
+
+test('자체 날짜 선택을 키보드로 조작한다 @desktop', async ({ page }) => {
+  await page.goto('/admin/login?next=%2Fadmin%2Fspaces');
+  await page.getByRole('button', { name: '센터 직원' }).click();
+  await page.getByRole('button', { name: '관리자 로그인' }).click();
+  await page.waitForURL(/\/admin\/spaces/);
+  const trigger = page.getByRole('button', { name: '이용 날짜' });
+  await trigger.click();
+  await expect(page.getByRole('grid')).toBeVisible();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/date=\d{4}-\d{2}-\d{2}/);
+  await expect(page.getByRole('grid')).toBeHidden();
+  await expect(trigger).toHaveText(/\d{4}\. \d{1,2}\. \d{1,2}\. \(.\)/);
+});

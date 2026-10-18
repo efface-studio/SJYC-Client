@@ -1,8 +1,11 @@
 'use client';
 
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Minus, Plus } from 'lucide-react';
 import { useId, useState, type ComponentProps, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { Checkbox } from './choice';
+import { DatePicker, type DatePickerProps } from './date-picker';
+import { Select, type SelectProps } from './select';
 
 interface FieldMeta {
   label: ReactNode;
@@ -158,33 +161,119 @@ export function TextAreaField({
   );
 }
 
-type SelectFieldProps = FieldMeta & ComponentProps<'select'>;
+type SelectFieldProps = FieldMeta &
+  Omit<SelectProps, 'id' | 'title' | 'invalid' | 'describedBy'> & { required?: boolean };
 
-export function SelectField({
-  label,
-  error,
-  hint,
-  className,
-  required,
-  children,
-  ...props
-}: SelectFieldProps) {
+export function SelectField({ label, error, hint, className, required, ...props }: SelectFieldProps) {
   const ids = useFieldIds(error, hint);
   return (
     <div className={className}>
       <Label htmlFor={ids.id} required={required}>
         {label}
       </Label>
-      <select
-        id={ids.id}
-        required={required}
-        aria-invalid={!!error || undefined}
-        aria-describedby={ids.describedBy}
-        className={cn(control, 'h-12 pr-8')}
-        {...props}
+      <Select {...props} id={ids.id} title={label} invalid={!!error} describedBy={ids.describedBy} />
+      <FieldMessages {...ids} hint={hint} error={error} />
+    </div>
+  );
+}
+
+type DateFieldProps = FieldMeta &
+  Omit<DatePickerProps, 'id' | 'title' | 'invalid' | 'describedBy'> & { required?: boolean };
+
+export function DateField({ label, error, hint, className, required, ...props }: DateFieldProps) {
+  const ids = useFieldIds(error, hint);
+  return (
+    <div className={className}>
+      <Label htmlFor={ids.id} required={required}>
+        {label}
+      </Label>
+      <DatePicker {...props} id={ids.id} title={label} invalid={!!error} describedBy={ids.describedBy} />
+      <FieldMessages {...ids} hint={hint} error={error} />
+    </div>
+  );
+}
+
+type NumberFieldProps = FieldMeta &
+  Omit<ComponentProps<'input'>, 'type' | 'defaultValue' | 'min' | 'max' | 'step'> & {
+    defaultValue?: number;
+    min?: number;
+    max?: number;
+    step?: number;
+  };
+
+/** 숫자 입력 — 브라우저 스피너 대신 −/+ 버튼. 직접 입력도 된다. */
+export function NumberField({
+  label,
+  error,
+  hint,
+  className,
+  required,
+  defaultValue,
+  min,
+  max,
+  step = 1,
+  ...props
+}: NumberFieldProps) {
+  const ids = useFieldIds(error, hint);
+  const [value, setValue] = useState(defaultValue === undefined ? '' : String(defaultValue));
+  const clamp = (n: number) => Math.min(max ?? Infinity, Math.max(min ?? -Infinity, n));
+  const bump = (dir: 1 | -1) => {
+    const n = Number(value);
+    setValue(String(clamp(value === '' || Number.isNaN(n) ? (min ?? 0) : n + dir * step)));
+  };
+  const stepButton =
+    'flex w-12 shrink-0 items-center justify-center text-ink-700 hover:bg-surface-muted disabled:text-ink-600/40 disabled:hover:bg-transparent';
+  return (
+    <div className={className}>
+      <Label htmlFor={ids.id} required={required}>
+        {label}
+      </Label>
+      <div
+        className={cn(
+          'flex h-12 overflow-hidden rounded-md border border-line-strong bg-surface focus-within:border-brand-700',
+          error && 'border-danger-700',
+        )}
       >
-        {children}
-      </select>
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label={`${typeof label === 'string' ? label : ''} 줄이기`}
+          disabled={min !== undefined && Number(value) <= min}
+          onClick={() => bump(-1)}
+          className={cn(stepButton, 'border-r border-line')}
+        >
+          <Minus aria-hidden className="size-4" />
+        </button>
+        <input
+          id={ids.id}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          required={required}
+          aria-invalid={!!error || undefined}
+          aria-describedby={ids.describedBy}
+          value={value}
+          onChange={(e) => setValue(e.target.value.replace(/[^\d-]/g, ''))}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              e.preventDefault();
+              bump(e.key === 'ArrowUp' ? 1 : -1);
+            }
+          }}
+          className="min-w-0 flex-1 bg-transparent px-3 text-center text-base text-ink-900 tabular-nums focus:outline-none"
+          {...props}
+        />
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label={`${typeof label === 'string' ? label : ''} 늘리기`}
+          disabled={max !== undefined && Number(value) >= max}
+          onClick={() => bump(1)}
+          className={cn(stepButton, 'border-l border-line')}
+        >
+          <Plus aria-hidden className="size-4" />
+        </button>
+      </div>
       <FieldMessages {...ids} hint={hint} error={error} />
     </div>
   );
@@ -197,15 +286,14 @@ export function CheckboxField({ label, error, hint, className, ...props }: Check
   return (
     <div className={className}>
       <div className="flex min-h-11 items-start gap-3">
-        <input
+        <Checkbox
           id={ids.id}
-          type="checkbox"
           aria-invalid={!!error || undefined}
           aria-describedby={ids.describedBy}
-          className="mt-0.5 size-5 shrink-0 accent-brand-700"
+          className="mt-0.5"
           {...props}
         />
-        <label htmlFor={ids.id} className="text-[15px] leading-snug text-ink-900">
+        <label htmlFor={ids.id} className="cursor-pointer text-[15px] leading-snug text-ink-900">
           {label}
         </label>
       </div>

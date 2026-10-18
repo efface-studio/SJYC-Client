@@ -26,16 +26,18 @@
 
 ## 컴포넌트 (`src/components/ui`)
 
-| 컴포넌트                                                                        | 규칙                                                                                                                                                  |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Button / buttonClass                                                            | primary(brand-700) · secondary(테두리) · tertiary(텍스트) · destructive(danger). sm 36 / md 44 / lg 52px. loading 시 스피너+aria-busy, 중복 제출 방지 |
-| TextField, PasswordField, TextAreaField, SelectField, CheckboxField             | 레이블 필수, hint/error 를 aria-describedby 로 연결, aria-invalid, 필수 표시는 시각+스크린리더 문구                                                   |
-| FormError                                                                       | 서버 오류 요약, role="alert"                                                                                                                          |
-| Badge                                                                           | 색 띠 + 굵은 텍스트(색만으로 상태 전달 금지)                                                                                                          |
-| Modal / ConfirmDialog                                                           | 네이티브 `<dialog>` — 포커스 가두기·Esc·포커스 복원, 모바일 85dvh 내부 스크롤, drawer 변형                                                            |
-| Toast                                                                           | aria-live polite, 모바일은 탭바 위                                                                                                                    |
-| Skeleton, ListSkeleton, EmptyState, ErrorState(재시도), ForbiddenState, Callout | 모든 데이터 화면의 로딩·빈·오류·권한 없음 상태                                                                                                        |
-| Pagination, PageHeader(breadcrumb)                                              | aria-current, 44px 터치                                                                                                                               |
+| 컴포넌트                                                                                | 규칙                                                                                                                                                                              |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button / buttonClass                                                                    | primary(brand-700) · secondary(테두리) · tertiary(텍스트) · destructive(danger). sm 36 / md 44 / lg 52px. loading 시 스피너+aria-busy, 중복 제출 방지                             |
+| TextField, PasswordField, TextAreaField, SelectField, CheckboxField                     | 레이블 필수, hint/error 를 aria-describedby 로 연결, aria-invalid, 필수 표시는 시각+스크린리더 문구                                                                               |
+| SelectField / Select, DateField / DatePicker, NumberField, Checkbox, Radio, SearchInput | 브라우저 기본 컨트롤을 쓰지 않는다. 셀렉트는 listbox 패턴(↑↓·Home/End·Enter·Esc·글자 찾기), 날짜는 달력 그리드(←→↑↓·PageUp/Down), 숫자는 −/+ 버튼. 값은 숨김 input 으로 폼에 전송 |
+| Popover (useAnchoredPopover)                                                            | 브라우저 Popover API(top layer) — 데스크톱은 컨트롤 아래 드롭다운, 모바일은 하단 시트. 바깥 클릭·Esc 닫기, 닫힐 때 포커스 복원                                                    |
+| FormError                                                                               | 서버 오류 요약, role="alert"                                                                                                                                                      |
+| Badge                                                                                   | 색 띠 + 굵은 텍스트(색만으로 상태 전달 금지)                                                                                                                                      |
+| Modal / ConfirmDialog                                                                   | 네이티브 `<dialog>` — 포커스 가두기·Esc·포커스 복원, 모바일 85dvh 내부 스크롤, drawer 변형                                                                                        |
+| Toast                                                                                   | aria-live polite, 모바일은 탭바 위                                                                                                                                                |
+| Skeleton, ListSkeleton, EmptyState, ErrorState(재시도), ForbiddenState, Callout         | 모든 데이터 화면의 로딩·빈·오류·권한 없음 상태                                                                                                                                    |
+| Pagination, PageHeader(breadcrumb)                                                      | aria-current, 44px 터치                                                                                                                                                           |
 
 ## 패턴
 
