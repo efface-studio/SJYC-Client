@@ -64,16 +64,10 @@ function TodayStatus() {
       <div className="container-page flex flex-col gap-3 py-5 md:flex-row md:items-end md:justify-between md:py-7">
         <div suppressHydrationWarning>
           <p className="text-[15px] font-semibold text-ink-600">
-            {date} {today.weekday}요일 · 오늘
+            오늘 {date} {today.weekday}요일
           </p>
           <p className="mt-1 text-[26px] leading-tight font-extrabold tracking-tight tabular-nums md:text-[32px]">
-            {today.open ? (
-              <>
-                {today.hours} <span className="text-brand-700">운영</span>
-              </>
-            ) : (
-              <span className="text-danger-700">{today.hours}</span>
-            )}
+            {today.open ? `${today.hours} 운영` : <span className="text-danger-700">{today.hours}</span>}
           </p>
           <p className="mt-1 text-sm text-ink-600">
             {desk && today.weekday !== '일' ? `안내데스크 ${desk.value} · ` : ''}공휴일·임시 휴관은 공지를
@@ -96,8 +90,8 @@ const INDEX = [
   { href: '/spaces', title: '공간 예약', desc: '체육관·스터디룸·뮤직스튜디오 등 센터 공간 예약 신청' },
   { href: '/clubs', title: '동아리', desc: '활동 중인 청소년 동아리 둘러보기와 가입 신청' },
   { href: '/programs/calendar', title: '프로그램 일정', desc: '모집 마감일과 운영 기간을 달력으로 보기' },
-  { href: '/gallery', title: '센터 소식 · 갤러리', desc: '센터 공식 채널의 행사 사진과 영상' },
-  { href: '/qna', title: '질문 · 문의', desc: '자주 묻는 질문과 1:1 문의' },
+  { href: '/gallery', title: '센터 소식·갤러리', desc: '센터 공식 채널의 행사 사진과 영상' },
+  { href: '/qna', title: '질문·문의', desc: '자주 묻는 질문과 1:1 문의' },
   { href: '/about', title: '센터 안내', desc: '운영시간, 오시는 길, 층별 안내' },
 ];
 
