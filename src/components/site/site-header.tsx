@@ -97,11 +97,11 @@ export function SiteHeader() {
     });
 
   return (
-    <header className="sticky top-0 z-30 border-t-[3px] border-b border-t-brand-500 border-b-line bg-surface">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface">
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
         <Logo />
 
-        <nav aria-label="주 메뉴" className="hidden md:block">
+        <nav aria-label="주 메뉴" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {SITE_NAV.map((item) => (
               <li key={item.href}>
@@ -122,7 +122,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1">
           {session && <NotificationBell />}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             {session ? (
               <>
                 <Link href="/my" className={buttonClass({ variant: 'secondary', size: 'sm' })}>
@@ -142,7 +142,10 @@ export function SiteHeader() {
                 <Link href="/login" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
                   로그인
                 </Link>
-                <Link href="/signup" className={buttonClass({ variant: 'primary', size: 'sm' })}>
+                <Link
+                  href="/signup"
+                  className="inline-flex min-h-11 items-center rounded-md bg-ink-900 px-4 text-sm font-semibold text-white hover:bg-ink-700"
+                >
                   회원가입
                 </Link>
               </>
@@ -153,7 +156,7 @@ export function SiteHeader() {
           {!session && (
             <Link
               href="/login"
-              className="flex h-11 items-center gap-1 rounded-md px-2 text-[15px] font-semibold text-ink-700 md:hidden"
+              className="flex h-11 items-center gap-1 rounded-md px-2 text-[15px] font-semibold text-ink-700 lg:hidden"
             >
               <LogIn aria-hidden className="size-5" />
               로그인
@@ -164,7 +167,7 @@ export function SiteHeader() {
             onClick={() => setMenuOpen(true)}
             aria-label="전체 메뉴 열기"
             aria-expanded={menuOpen}
-            className="flex size-11 items-center justify-center rounded-md text-ink-900 hover:bg-surface-muted md:hidden"
+            className="flex size-11 items-center justify-center rounded-md text-ink-900 hover:bg-surface-muted lg:hidden"
           >
             <Menu aria-hidden className="size-6" />
           </button>

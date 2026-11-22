@@ -1,98 +1,120 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Phone } from 'lucide-react';
+import { ChevronRight, Clock3, MapPin, Phone } from 'lucide-react';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { api } from '@/api';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { CENTER, DESK_HOURS, hoursOn } from '@/config/center';
+import { todayKst } from '@/lib/format';
 import { NoticeItem } from '@/features/notices/notice-item';
 import { ProgramRow, useCategoryName } from '@/features/programs/program-card';
-import { cn } from '@/lib/cn';
 
 function Section({
-  id,
   title,
-  count,
   more,
   children,
-  className,
 }: {
-  id: string;
   title: string;
-  count?: number;
-  more?: { href: string; label: string };
+  more: { href: string; label: string };
   children: ReactNode;
-  className?: string;
 }) {
   return (
-    <section aria-labelledby={id} className={cn('border-t-2 border-ink-900 pt-3', className)}>
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 id={id} className="text-xl font-extrabold">
-          {title}
-          {count !== undefined && (
-            <span className="ml-2 text-base font-bold text-brand-700 tabular-nums">{count}</span>
-          )}
-        </h2>
-        {more && (
-          <Link
-            href={more.href}
-            className="flex min-h-11 items-center text-[15px] font-semibold text-ink-700 hover:underline"
-          >
-            {more.label}
-          </Link>
-        )}
+    <section aria-label={title}>
+      <div className="site-section-title">
+        <h2>{title}</h2>
+        <Link href={more.href}>{more.label}</Link>
       </div>
       {children}
     </section>
   );
 }
 
-function TodayStatus() {
-  const now = new Date();
+function watchDate(update: () => void) {
+  const timer = window.setInterval(update, 60000);
+  window.addEventListener('focus', update);
+  return () => {
+    window.clearInterval(timer);
+    window.removeEventListener('focus', update);
+  };
+}
+
+function TodayHours() {
+  const day = useSyncExternalStore(watchDate, todayKst, () => '');
+  if (!day)
+    return (
+      <div className="visit-hours" aria-busy="true">
+        오늘 운영시간 확인 중
+      </div>
+    );
+  const now = new Date(`${day}T12:00:00+09:00`);
   const today = hoursOn(now);
   const date = new Intl.DateTimeFormat('ko-KR', {
     timeZone: 'Asia/Seoul',
     month: 'long',
     day: 'numeric',
+    weekday: 'long',
   }).format(now);
   const desk = DESK_HOURS.find((d) => d.label === (today.weekday === '토' ? '토요일' : '평일'));
-
   return (
-    <div className="border-b border-line">
-      <div className="container-page flex flex-col gap-3 py-5 md:flex-row md:items-end md:justify-between md:py-7">
-        <div suppressHydrationWarning>
-          <p className="text-[15px] font-semibold text-ink-600">
-            오늘 {date} {today.weekday}요일
-          </p>
-          <p className="mt-1 text-[26px] leading-tight font-extrabold tracking-tight tabular-nums md:text-[32px]">
-            {today.open ? `${today.hours} 운영` : <span className="text-danger-700">{today.hours}</span>}
-          </p>
-          <p className="mt-1 text-sm text-ink-600">
-            {desk && today.weekday !== '일' ? `안내데스크 ${desk.value} · ` : ''}공휴일·임시 휴관은 공지를
-            확인해 주세요.
-          </p>
-        </div>
-        <a
-          href={`tel:${CENTER.tel}`}
-          className="inline-flex min-h-11 items-center gap-2 self-start text-[15px] font-semibold text-ink-900 underline underline-offset-4 md:self-auto"
-        >
-          <Phone aria-hidden className="size-4" />
-          {CENTER.telDisplay}
-        </a>
-      </div>
+    <div className="visit-hours">
+      <p>
+        <Clock3 size={16} aria-hidden />
+        {date} 운영시간
+      </p>
+      <strong className={today.open ? undefined : 'closed-hours'}>{today.hours}</strong>
+      {desk && today.weekday !== '일' && <p>안내데스크 {desk.value}</p>}
+      <p>
+        공휴일·임시 휴관은 <Link href="/notices">공지사항</Link>을 확인해 주세요.
+      </p>
     </div>
   );
 }
 
-const INDEX = [
-  { href: '/spaces', title: '공간 예약', desc: '체육관·스터디룸·뮤직스튜디오 등 센터 공간 예약 신청' },
-  { href: '/clubs', title: '동아리', desc: '활동 중인 청소년 동아리 둘러보기와 가입 신청' },
-  { href: '/programs/calendar', title: '프로그램 일정', desc: '모집 마감일과 운영 기간을 달력으로 보기' },
-  { href: '/gallery', title: '센터 소식·갤러리', desc: '센터 공식 채널의 행사 사진과 영상' },
-  { href: '/qna', title: '질문·문의', desc: '자주 묻는 질문과 1:1 문의' },
-  { href: '/about', title: '센터 안내', desc: '운영시간, 오시는 길, 층별 안내' },
+function VisitToday() {
+  const [showPhoto, setShowPhoto] = useState(true);
+  return (
+    <section className="visit-board" aria-labelledby="visit-title">
+      <div className="visit-copy">
+        <h1 id="visit-title">{CENTER.name}</h1>
+        <p className="visit-location">
+          <MapPin size={16} aria-hidden />
+          {CENTER.nearestStation}
+        </p>
+        <TodayHours />
+        <div className="visit-actions">
+          <Link href="/programs" className="visit-primary">
+            프로그램 찾기
+          </Link>
+          <Link href="/about#location">오시는 길</Link>
+        </div>
+      </div>
+      {showPhoto && (
+        <figure className="visit-photo">
+          <img
+            src="https://www.j-youth.org/kor/images/sub/info_00_01.jpg"
+            alt="약수역 인근 중구청소년센터 건물 전경"
+            width={910}
+            height={514}
+            referrerPolicy="no-referrer"
+            fetchPriority="high"
+            onError={() => setShowPhoto(false)}
+          />
+          <figcaption>중구청소년센터 시설안내</figcaption>
+        </figure>
+      )}
+    </section>
+  );
+}
+
+const SERVICES = [
+  { href: '/spaces', label: '공간 예약' },
+  { href: '/clubs', label: '동아리 가입' },
+  { href: '/programs/calendar', label: '프로그램 일정' },
+  { href: '/gallery', label: '센터 소식·갤러리' },
+  { href: '/qna', label: '질문·문의' },
+  { href: '/about', label: '센터 안내' },
 ];
 
 export default function HomePage() {
@@ -105,24 +127,24 @@ export default function HomePage() {
     queryFn: () => api.notices.list({ pageSize: 5 }),
   });
   const categoryName = useCategoryName();
-
   return (
-    <>
-      <h1 className="sr-only">{CENTER.formalName}</h1>
-      <TodayStatus />
-
-      <div className="container-page grid gap-10 py-8 lg:grid-cols-[1fr_380px] lg:gap-14 lg:py-12">
-        <Section
-          id="programs-title"
-          title="모집 중인 프로그램"
-          count={programs.data?.total}
-          more={{ href: '/programs', label: '전체 프로그램' }}
-        >
+    <div className="home-page container-page">
+      <VisitToday />
+      <nav className="service-links" aria-label="센터 이용 바로가기">
+        {SERVICES.map((s) => (
+          <Link key={s.href} href={s.href}>
+            {s.label}
+            <ChevronRight size={15} aria-hidden />
+          </Link>
+        ))}
+      </nav>
+      <div className="home-bulletin">
+        <Section title="모집 중인 프로그램" more={{ href: '/programs', label: '전체 프로그램' }}>
           {programs.isPending ? (
             <ListSkeleton rows={3} />
           ) : programs.isError ? (
             <ErrorState error={programs.error} onRetry={() => void programs.refetch()} />
-          ) : programs.data.items.length === 0 ? (
+          ) : !programs.data.items.length ? (
             <EmptyState
               title="지금 모집 중인 프로그램이 없습니다"
               description="모집 예정 프로그램은 전체 프로그램에서 확인할 수 있습니다."
@@ -137,14 +159,13 @@ export default function HomePage() {
             </ul>
           )}
         </Section>
-
-        <div className="space-y-10">
-          <Section id="notices-title" title="공지사항" more={{ href: '/notices', label: '전체 공지' }}>
+        <div>
+          <Section title="공지사항" more={{ href: '/notices', label: '전체 공지' }}>
             {notices.isPending ? (
               <ListSkeleton rows={3} />
             ) : notices.isError ? (
               <ErrorState error={notices.error} onRetry={() => void notices.refetch()} />
-            ) : notices.data.items.length === 0 ? (
+            ) : !notices.data.items.length ? (
               <EmptyState title="등록된 공지가 없습니다" />
             ) : (
               <ul>
@@ -154,27 +175,13 @@ export default function HomePage() {
               </ul>
             )}
           </Section>
-
-          <Section id="index-title" title="센터 이용">
-            <ul>
-              {INDEX.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="group flex items-center justify-between gap-4 border-b border-line py-4 active:bg-surface-muted"
-                  >
-                    <span>
-                      <span className="block text-[17px] font-bold group-hover:underline">{item.title}</span>
-                      <span className="mt-0.5 block text-sm text-ink-600">{item.desc}</span>
-                    </span>
-                    <ArrowRight aria-hidden className="size-5 shrink-0 text-ink-600" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Section>
+          <div className="home-contact">
+            <Phone size={18} aria-hidden />
+            <span>센터 대표전화</span>
+            <a href={`tel:${CENTER.tel}`}>{CENTER.telDisplay}</a>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

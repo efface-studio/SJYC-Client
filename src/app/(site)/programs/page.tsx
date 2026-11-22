@@ -72,7 +72,7 @@ function ProgramList() {
   return (
     <>
       <title>프로그램 | 중구청소년센터</title>
-      <div className="space-y-3">
+      <div className="space-y-4 rounded-lg bg-surface-muted p-4 md:p-5">
         <form
           role="search"
           onSubmit={(e) => {
@@ -80,7 +80,7 @@ function ProgramList() {
             const value = String(new FormData(e.currentTarget).get('q') ?? '').trim();
             router.push(hrefWith({ q: value }));
           }}
-          className="flex gap-2"
+          className="flex max-w-2xl gap-2"
         >
           <label htmlFor="program-q" className="sr-only">
             프로그램 검색
@@ -92,7 +92,7 @@ function ProgramList() {
             key={q}
             placeholder="프로그램명, 대상으로 검색"
             enterKeyHint="search"
-            className="h-12 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
+            className="h-12 rounded-md border border-line-strong bg-surface px-3 text-base focus:border-brand-700 focus:outline-none"
           />
           <button
             type="submit"
@@ -173,7 +173,7 @@ function ProgramList() {
             <p className="mb-3 text-sm text-ink-600" aria-live="polite">
               총 <strong className="text-ink-900">{programs.data.total}</strong>개
             </p>
-            <ul className="border-t-2 border-ink-900">
+            <ul className="border-t border-line-strong">
               {programs.data.items.map((p) => (
                 <li key={p.id}>
                   <ProgramRow program={p} categoryName={categoryName(p.categoryId)} />

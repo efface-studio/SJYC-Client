@@ -83,7 +83,7 @@ function NoticeList() {
           e.preventDefault();
           router.push(href({ q: String(new FormData(e.currentTarget).get('q') ?? '').trim() }));
         }}
-        className="mt-4 flex gap-2"
+        className="mt-5 flex max-w-2xl gap-2"
       >
         <label htmlFor="notice-q" className="sr-only">
           공지 검색
@@ -118,7 +118,7 @@ function NoticeList() {
             <p className="mb-2 text-sm text-ink-600" aria-live="polite">
               총 <strong className="text-ink-900">{notices.data.total}</strong>건
             </p>
-            <ul className="border-t-2 border-ink-900">
+            <ul className="border-t border-line-strong">
               {notices.data.items.map((n) => (
                 <NoticeItem key={n.id} notice={n} />
               ))}

@@ -7,10 +7,22 @@ import { api } from '@/api';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { FLOORS } from '@/config/center';
+import type { Space } from '@/domain/types';
 import { RESERVATION_MAX_DAYS_AHEAD, RESERVATION_MAX_HOURS } from '@/domain/space';
 
 export default function SpacesPage() {
   const spaces = useQuery({ queryKey: ['spaces'], queryFn: () => api.spaces.list() });
+
+  const spacesByFloor = new Map<string, Space[]>();
+  for (const space of spaces.data ?? []) {
+    const group = spacesByFloor.get(space.floor);
+    if (group) group.push(space);
+    else spacesByFloor.set(space.floor, [space]);
+  }
+  const floors = [...new Set([...FLOORS.map((f) => f.floor), ...spacesByFloor.keys()])].filter((floor) =>
+    spacesByFloor.has(floor),
+  );
 
   return (
     <div className="container-page py-6 md:py-10">
@@ -27,30 +39,33 @@ export default function SpacesPage() {
         ) : spaces.data.length === 0 ? (
           <EmptyState title="예약할 수 있는 공간이 없습니다" />
         ) : (
-          <ul className="border-t-2 border-ink-900">
-            {spaces.data.map((s) => (
-              <li key={s.id}>
-                <Link
-                  href={`/spaces/${s.id}`}
-                  className="group grid grid-cols-[44px_1fr_auto] items-center gap-3 border-b border-line py-4 active:bg-surface-muted"
-                >
-                  <span className="text-[15px] font-extrabold text-brand-700">{s.floor}</span>
-                  <span className="min-w-0">
-                    <span className="block text-[17px] font-bold group-hover:underline">{s.name}</span>
-                    <span className="mt-0.5 block text-sm text-ink-600">
-                      최대 {s.capacity}명 · {s.description}
-                    </span>
-                    {!s.reservable && (
-                      <Badge tone="warning" className="mt-1">
-                        예약 중지
-                      </Badge>
-                    )}
-                  </span>
-                  <ChevronRight aria-hidden className="size-5 text-ink-600" />
-                </Link>
-              </li>
+          <div>
+            {floors.map((floor) => (
+              <section key={floor} aria-label={floor} className="space-floor">
+                <h2>{floor}</h2>
+                <ul>
+                  {spacesByFloor.get(floor)?.map((s) => (
+                    <li key={s.id}>
+                      <Link href={`/spaces/${s.id}`} className="space-row group">
+                        <span>
+                          <span className="block text-lg font-bold group-hover:underline">{s.name}</span>
+                          <span className="mt-1 block text-sm text-ink-600">
+                            최대 {s.capacity}명 · {s.description}
+                          </span>
+                          {!s.reservable && (
+                            <Badge tone="warning" className="mt-1">
+                              예약 중지
+                            </Badge>
+                          )}
+                        </span>
+                        <ChevronRight size={18} aria-hidden className="shrink-0 text-ink-600" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

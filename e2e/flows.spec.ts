@@ -92,7 +92,7 @@ test('모바일 전체 메뉴가 열리고 Esc 로 닫힌다', async ({ page }) 
   await expect(dialog).toBeHidden();
 });
 
-test('직원은 관리자 로그인 후 대시보드에 들어간다 @desktop', async ({ page }) => {
+test('직원은 대시보드에서 집계 기간을 바꾸고 처리 대기 신청을 조회한다 @desktop', async ({ page }) => {
   await page.goto('/admin/login');
   await page
     .getByRole('button', { name: /센터 직원|staff/ })
@@ -100,6 +100,16 @@ test('직원은 관리자 로그인 후 대시보드에 들어간다 @desktop', 
     .click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await expect(page).toHaveURL(/\/admin$/);
+  const period = page.getByRole('button', { name: '최근 30일' });
+  await period.click();
+  await expect(period).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('최근 30일 프로그램 신청')).toBeVisible();
+  await page
+    .getByRole('region', { name: '처리 대기 업무' })
+    .getByRole('link', { name: /프로그램 신청/ })
+    .click();
+  await expect(page).toHaveURL(/\/admin\/applications\?status=submitted$/);
+  await expect(page.getByRole('table', { name: '프로그램 신청 목록' })).toBeVisible();
 });
 
 test('알림 센터: 읽지 않은 알림을 확인하고 모두 읽음 처리한다', async ({ page }) => {

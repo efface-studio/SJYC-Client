@@ -1,6 +1,29 @@
 'use client';
 
-import { Menu } from 'lucide-react';
+import {
+  ArrowUpRight,
+  BookOpen,
+  CalendarCheck,
+  CalendarDays,
+  CheckSquare,
+  ChevronRight,
+  CircleHelp,
+  ClipboardList,
+  FileClock,
+  FileText,
+  LayoutDashboard,
+  ListChecks,
+  LogOut,
+  Megaphone,
+  Menu,
+  MessagesSquare,
+  PanelLeft,
+  Settings2,
+  UserRound,
+  Users,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useId, useState, type ReactNode } from 'react';
@@ -13,105 +36,85 @@ import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/
 import type { User } from '@/domain/types';
 import { allows, type Access } from '@/features/auth/guards';
 import { useLogout, useSession } from '@/features/auth/session';
-import { cn } from '@/lib/cn';
+import './admin-console.css';
 
 interface NavItem {
   href: string;
   label: string;
+  icon: LucideIcon;
   permission: Access;
 }
-
 const NAV: { group: string; items: NavItem[] }[] = [
-  { group: '운영', items: [{ href: '/admin', label: '대시보드', permission: 'admin.access' }] },
+  {
+    group: '운영',
+    items: [
+      { href: '/admin', label: '대시보드', icon: LayoutDashboard, permission: 'admin.access' },
+      {
+        href: '/admin/applications',
+        label: '프로그램 신청',
+        icon: ClipboardList,
+        permission: 'application.decide',
+      },
+      { href: '/admin/spaces', label: '공간 예약', icon: CalendarCheck, permission: 'space.manage' },
+      { href: '/admin/attendance', label: '출석', icon: CheckSquare, permission: canManageAttendance },
+      { href: '/admin/inquiries', label: '문의', icon: MessagesSquare, permission: 'inquiry.answer' },
+    ],
+  },
   {
     group: '콘텐츠',
     items: [
-      { href: '/admin/notices', label: '공지', permission: 'notice.write' },
-      { href: '/admin/programs', label: '프로그램', permission: 'program.write' },
+      { href: '/admin/notices', label: '공지', icon: Megaphone, permission: 'notice.write' },
+      { href: '/admin/programs', label: '프로그램', icon: CalendarDays, permission: 'program.write' },
+      { href: '/admin/faqs', label: 'FAQ', icon: CircleHelp, permission: 'inquiry.answer' },
     ],
   },
   {
-    group: '신청·예약',
+    group: '동아리·회원',
     items: [
-      { href: '/admin/applications', label: '프로그램 신청', permission: 'application.decide' },
-      { href: '/admin/spaces', label: '공간 예약', permission: 'space.manage' },
+      { href: '/admin/clubs', label: '동아리', icon: UsersRound, permission: 'club.manage' },
+      { href: '/admin/clubs/applications', label: '가입 신청', icon: ListChecks, permission: 'club.manage' },
+      { href: '/admin/my-clubs', label: '동아리 운영', icon: BookOpen, permission: managesAnyClub },
+      { href: '/admin/members', label: '회원', icon: Users, permission: 'member.read' },
     ],
   },
-  {
-    group: '커뮤니티',
-    items: [
-      { href: '/admin/clubs', label: '동아리', permission: 'club.manage' },
-      { href: '/admin/clubs/applications', label: '가입 신청', permission: 'club.manage' },
-      { href: '/admin/my-clubs', label: '동아리 운영', permission: managesAnyClub },
-      { href: '/admin/attendance', label: '출석', permission: canManageAttendance },
-      { href: '/admin/inquiries', label: '문의', permission: 'inquiry.answer' },
-      { href: '/admin/faqs', label: 'FAQ', permission: 'inquiry.answer' },
-    ],
-  },
-  { group: '회원', items: [{ href: '/admin/members', label: '회원', permission: 'member.read' }] },
   {
     group: '설정',
     items: [
-      { href: '/admin/policies', label: '정책 문서', permission: 'policy.manage' },
-      { href: '/admin/audit', label: '감사 로그', permission: 'audit.read' },
+      { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
+      { href: '/admin/audit', label: '감사 로그', icon: FileClock, permission: 'audit.read' },
+      { href: '/admin/developer', label: '개발자 도구', icon: Settings2, permission: 'developer.access' },
     ],
   },
-  {
-    group: '개발',
-    items: [{ href: '/admin/developer', label: '개발자 도구', permission: 'developer.access' }],
-  },
 ];
-
 const ALL_ITEMS = NAV.flatMap((g) => g.items);
-
-/** 가장 길게 일치하는 메뉴가 현재 메뉴 (/admin/clubs/applications 가 /admin/clubs 보다 우선) */
-function activeItem(pathname: string): NavItem | undefined {
-  return ALL_ITEMS.filter((i) => pathname === i.href || pathname.startsWith(`${i.href}/`)).sort(
-    (a, b) => b.href.length - a.href.length,
-  )[0];
-}
-
-function roleLabel(user: User): string {
-  return ROLE_LABEL[primaryRole(user)];
-}
 
 function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; onNavigate?: () => void }) {
   const uid = useId();
-  // 메뉴 숨김은 표시용일 뿐이며 서버가 모든 요청의 권한을 다시 검사한다
-  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => allows(user, i.permission)) })).filter(
-    (g) => g.items.length > 0,
-  );
   return (
-    <nav aria-label="관리자 메뉴" className="py-2">
-      {groups.map((g, gi) => (
-        <div key={g.group} className="mt-3 first:mt-0">
-          <p id={`${uid}-${gi}`} className="px-4 pb-1 text-xs font-semibold text-ink-600">
-            {g.group}
-          </p>
-          <ul aria-labelledby={`${uid}-${gi}`}>
-            {g.items.map((i) => {
-              const current = i.href === active?.href;
-              return (
-                <li key={i.href}>
+    <nav aria-label="관리자 메뉴" className="console-nav">
+      {NAV.map((group, index) => {
+        const items = group.items.filter((i) => allows(user, i.permission));
+        if (!items.length) return null;
+        return (
+          <div key={group.group}>
+            <p id={uid + index}>{group.group}</p>
+            <ul aria-labelledby={uid + index}>
+              {items.map(({ href, label, icon: Icon }) => (
+                <li key={href}>
                   <Link
-                    href={i.href}
+                    href={href}
+                    aria-current={href === active?.href ? 'page' : undefined}
                     onClick={onNavigate}
-                    aria-current={current ? 'page' : undefined}
-                    className={cn(
-                      'flex min-h-11 items-center border-l-[3px] pr-4 pl-[13px] text-[15px]',
-                      current
-                        ? 'border-brand-500 bg-surface-admin font-semibold text-ink-900'
-                        : 'border-transparent text-ink-700 hover:bg-surface-muted hover:text-ink-900',
-                    )}
                   >
-                    {i.label}
+                    <Icon aria-hidden size={18} />
+                    {label}
                   </Link>
                 </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+              ))}
+            </ul>
+          </div>
+        );
+      })}
     </nav>
   );
 }
@@ -121,83 +124,82 @@ function UserBlock({ user }: { user: User }) {
   const toast = useToast();
   const logout = useLogout();
   return (
-    <div className="border-t border-line px-4 py-3 text-sm">
-      <p className="font-semibold text-ink-900">{user.name}</p>
-      <p className="text-ink-600">{roleLabel(user)}</p>
-      <div className="mt-2 flex flex-wrap gap-x-3">
-        <Link href="/" className="inline-flex min-h-11 items-center gap-1 text-ink-700 hover:underline">
-          사용자 화면
-        </Link>
-        <button
-          type="button"
-          disabled={logout.isPending}
-          onClick={() =>
-            logout.mutate(undefined, {
-              onSuccess: () => router.replace('/admin/login'),
-              onError: () => toast.error('로그아웃 중 문제가 발생했습니다. 다시 시도해 주세요.'),
-            })
-          }
-          className="inline-flex min-h-11 items-center gap-1 text-ink-700 hover:underline disabled:opacity-50"
-        >
-          로그아웃
-        </button>
+    <div className="console-account">
+      <span className="account-icon">
+        <UserRound size={19} aria-hidden />
+      </span>
+      <div className="min-w-0 grow">
+        <strong className="block truncate">{user.name}</strong>
+        <span className="text-xs text-ink-600">{ROLE_LABEL[primaryRole(user)]}</span>
       </div>
+      <button
+        type="button"
+        aria-label="로그아웃"
+        title="로그아웃"
+        disabled={logout.isPending}
+        onClick={() =>
+          logout.mutate(undefined, {
+            onSuccess: () => router.replace('/admin/login'),
+            onError: () => toast.error('로그아웃 중 문제가 발생했습니다. 다시 시도해 주세요.'),
+          })
+        }
+      >
+        <LogOut size={18} aria-hidden />
+      </button>
     </div>
   );
 }
 
-/** 관리자 콘솔 틀 — 데스크톱(lg 이상) 고정 사이드바, 그 미만은 상단 바 + 서랍 메뉴 */
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
-  const active = activeItem(pathname);
+  const active = ALL_ITEMS.filter((i) => pathname === i.href || pathname.startsWith(`${i.href}/`)).sort(
+    (a, b) => b.href.length - a.href.length,
+  )[0];
   const user = session?.user;
   if (!user) return null;
-
   return (
-    <div className="flex min-h-dvh flex-col bg-surface-admin">
-      <DemoBanner tone="admin" />
-      <div className="flex flex-1">
-        <aside className="sticky top-0 hidden max-h-dvh w-[232px] shrink-0 flex-col overflow-y-auto border-r border-line bg-surface lg:flex">
-          <div className="flex h-14 items-center gap-2 border-b border-line px-4">
-            <Logo className="[&_img]:h-5 md:[&_img]:h-5" />
-            <span className="text-sm font-semibold text-ink-600">관리자</span>
+    <div className="admin-console">
+      <div className="console-frame">
+        <aside className="console-rail">
+          <div className="console-brand">
+            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>
-          <div className="flex-1">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             <NavLinks user={user} active={active} />
           </div>
           <UserBlock user={user} />
         </aside>
-
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden">
-            <Logo className="[&_img]:h-5 md:[&_img]:h-5" />
-            <p className="min-w-0 flex-1 truncate border-l border-line pl-3 text-[15px] font-semibold">
-              {active?.label ?? '관리자'}
-            </p>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="관리자 메뉴 열기"
-              aria-expanded={menuOpen}
-              className="-mr-2 flex size-11 items-center justify-center rounded-md text-ink-700 hover:bg-surface-muted"
-            >
-              <Menu aria-hidden className="size-6" />
-            </button>
+          <header className="console-top">
+            <div className="flex min-w-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                aria-label="관리자 메뉴 열기"
+                aria-expanded={menuOpen}
+                className="grid size-11 place-items-center rounded-md hover:bg-surface-muted lg:hidden"
+              >
+                <Menu aria-hidden size={21} />
+              </button>
+              <PanelLeft aria-hidden size={17} className="hidden lg:block" />
+              <span>관리자 센터</span>
+              <ChevronRight size={14} aria-hidden />
+              <strong className="truncate">{active?.label ?? '관리'}</strong>
+            </div>
+            <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
+              사용자 화면
+              <ArrowUpRight size={15} aria-hidden />
+            </Link>
           </header>
-
-          <main
-            id="main"
-            tabIndex={-1}
-            className="w-full max-w-[1280px] flex-1 px-4 py-5 focus:outline-none md:px-6 lg:px-8 lg:py-7"
-          >
+          <DemoBanner tone="admin" />
+          <main id="main" tabIndex={-1} className="console-main focus:outline-none">
             {children}
           </main>
           <SiteFooter compact />
         </div>
       </div>
-
       <Modal
         open={menuOpen}
         onClose={() => setMenuOpen(false)}

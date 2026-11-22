@@ -120,7 +120,7 @@ export default function ProgramDetailPage() {
         ]}
         title={p.title}
         description={
-          <span className="mt-1 flex items-center gap-2">
+          <span className="mt-1 flex flex-wrap items-center gap-2">
             <RecruitBadge program={p} />
             {p.summary}
           </span>
@@ -135,7 +135,7 @@ export default function ProgramDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div>
-          <dl className="border-t border-ink-900">
+          <dl className="border-t border-line-strong">
             <Row label="분류">{categoryName(p.categoryId)}</Row>
             <Row label="대상">{p.target}</Row>
             <Row label="장소">{p.place}</Row>
@@ -158,9 +158,10 @@ export default function ProgramDetailPage() {
         </div>
 
         {/* 모바일: 하단 탭바 위에 고정되는 신청 영역 / 데스크톱: 우측 고정 */}
-        <aside className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-20 -mx-4 border-t border-line bg-surface px-4 py-3 md:bottom-0 lg:top-24 lg:mx-0 lg:self-start lg:rounded-lg lg:border lg:p-5">
+        <aside className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-20 -mx-4 border-t border-line bg-surface px-4 py-3 md:bottom-0 lg:top-24 lg:mx-0 lg:self-start lg:rounded-xl lg:border lg:bg-surface-muted lg:p-6">
           <p className="mb-3 hidden text-[15px] text-ink-700 lg:block">
-            모집 마감 <strong className="text-ink-900">{formatDateTime(p.recruitEndsAt)}</strong>
+            모집 마감{' '}
+            <strong className="mt-1 block text-lg text-ink-900">{formatDateTime(p.recruitEndsAt)}</strong>
           </p>
           <ApplyAction program={p} />
         </aside>

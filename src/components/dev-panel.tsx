@@ -43,13 +43,16 @@ export function DemoBanner({ tone = 'site' }: { tone?: 'site' | 'admin' }) {
       <div
         className={
           tone === 'admin'
-            ? 'bg-ink-900 text-[13px] text-white'
+            ? 'border-b border-line bg-brand-50 text-[13px] text-brand-800'
             : 'border-b border-warning-800/20 bg-warning-50 text-[13px] text-warning-800'
         }
       >
         <p className="container-page py-2 font-semibold">
-          시연 서버 · 프로그램·공지·신청·회원은 샘플, 동아리 소개·갤러리는 공식 채널 참고 정보(
-          {REFERENCE_COLLECTED_AT} 수집)
+          시연 서버 · 샘플 데이터
+          <span className="hidden md:inline">
+            {' '}
+            (프로그램·공지·신청·회원). 동아리와 갤러리는 공식 채널 자료입니다. ({REFERENCE_COLLECTED_AT} 수집)
+          </span>
         </p>
       </div>
     );
@@ -66,14 +69,17 @@ export function DemoBanner({ tone = 'site' }: { tone?: 'site' | 'admin' }) {
       <div
         className={
           tone === 'admin'
-            ? 'bg-ink-900 text-[13px] text-white'
+            ? 'border-b border-line bg-brand-50 text-[13px] text-brand-800'
             : 'border-b border-warning-800/20 bg-warning-50 text-[13px] text-warning-800'
         }
       >
         <div className="container-page flex min-h-9 items-center justify-between gap-2 py-1">
           <p className="font-semibold">
-            개발용 데모 · 프로그램·공지·신청은 샘플, 동아리 소개·갤러리는 공식 채널 참고 정보(
-            {REFERENCE_COLLECTED_AT} 수집)
+            개발용 데모 · 샘플 데이터
+            <span className="hidden md:inline">
+              {' '}
+              (프로그램·공지·신청). 동아리와 갤러리는 공식 채널 자료입니다. ({REFERENCE_COLLECTED_AT} 수집)
+            </span>
             {scenario !== 'normal' && ` · 시나리오: ${SCENARIOS.find((s) => s.value === scenario)?.label}`}
           </p>
           <button

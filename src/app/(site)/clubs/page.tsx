@@ -26,12 +26,12 @@ export default function ClubsPage() {
       ) : clubs.data.length === 0 ? (
         <EmptyState title="등록된 동아리가 없습니다" />
       ) : (
-        <ul className="border-t-2 border-ink-900 md:grid md:grid-cols-2 md:gap-x-10">
+        <ul className="border-t border-line lg:grid lg:grid-cols-2 lg:gap-x-9">
           {clubs.data.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/clubs/${c.id}`}
-                className="group flex h-full flex-col gap-1 border-b border-line py-4 active:bg-surface-muted"
+                className="group flex h-full items-start gap-4 border-b border-line py-5 hover:bg-surface-muted"
               >
                 {c.photos[0] && (
                   <img
@@ -39,25 +39,32 @@ export default function ClubsPage() {
                     alt=""
                     loading="lazy"
                     referrerPolicy="no-referrer"
-                    className="mb-2 aspect-[16/9] w-full rounded-md bg-surface-muted object-cover"
+                    className="size-[76px] shrink-0 rounded-md bg-surface-muted object-cover sm:size-28"
                   />
                 )}
-                <div className="flex items-center gap-2">
-                  {c.recruiting ? <Badge tone="brand">가입 신청 가능</Badge> : <Badge>현재 모집 없음</Badge>}
-                  <span className="text-sm text-ink-600">{c.field}</span>
+                <div className="min-w-0">
+                  <h2 className="text-xl leading-snug font-bold group-hover:underline">{c.name}</h2>
+                  <div className="my-1.5 flex flex-wrap items-center gap-2">
+                    {c.recruiting ? (
+                      <Badge tone="brand">가입 신청 가능</Badge>
+                    ) : (
+                      <Badge>현재 모집 없음</Badge>
+                    )}
+                    <span className="text-sm text-ink-600">{c.field}</span>
+                  </div>
+
+                  <p className="text-[15px] text-ink-600">{c.summary}</p>
+                  <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-700">
+                    <span className="inline-flex items-center gap-1">
+                      <CalendarClock aria-hidden className="size-4" />
+                      {c.meetingInfo}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <UsersRound aria-hidden className="size-4" />
+                      {c.memberCount}명{DEMO_DATA && ' (데모)'}
+                    </span>
+                  </p>
                 </div>
-                <h2 className="text-[17px] font-bold group-hover:underline">{c.name}</h2>
-                <p className="text-[15px] text-ink-600">{c.summary}</p>
-                <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-700">
-                  <span className="inline-flex items-center gap-1">
-                    <CalendarClock aria-hidden className="size-4" />
-                    {c.meetingInfo}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <UsersRound aria-hidden className="size-4" />
-                    {c.memberCount}명{DEMO_DATA && ' (데모)'}
-                  </span>
-                </p>
               </Link>
             </li>
           ))}

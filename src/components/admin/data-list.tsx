@@ -100,11 +100,11 @@ export function DataList<T extends { id: string }>({
 
   return (
     <>
-      <div className="hidden overflow-x-auto border-y border-line bg-surface md:block">
+      <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface md:block">
         <table className="w-full border-collapse text-left text-[15px]">
           <caption className="sr-only">{caption}</caption>
           <thead>
-            <tr className="border-b border-line-strong bg-surface-admin/60 text-sm text-ink-700">
+            <tr className="border-b border-line bg-surface-admin/60 text-sm text-ink-700">
               {selection && (
                 <th scope="col" className="w-12 px-3 py-2">
                   <SelectAll rows={rows} selection={selection} />
@@ -172,7 +172,10 @@ export function DataList<T extends { id: string }>({
         </table>
       </div>
 
-      <ul aria-label={caption} className="divide-y divide-line border-y border-line bg-surface md:hidden">
+      <ul
+        aria-label={caption}
+        className="divide-y divide-line rounded-xl border border-line bg-surface md:hidden"
+      >
         {rows.map((row) => (
           <li
             key={row.id}
