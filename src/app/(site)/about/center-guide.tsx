@@ -6,12 +6,13 @@ import { useSiteSettings } from '@/features/settings/use-settings';
 import { displayHours, settingsRows } from '@/config/site-settings';
 import type { HoursRow } from '@/config/center';
 
+import { profileTopics } from './profile-topics';
+
 const TOC = [
   ['intro', '센터 소개'],
   ['hours', '운영시간'],
   ['location', '오시는 길'],
   ['floors', '층별 안내'],
-  ['contact', '문의'],
 ] as const;
 
 function Rows({ rows }: { rows: HoursRow[] }) {
@@ -116,6 +117,14 @@ export function CenterGuide() {
           <p>{center.formalName}</p>
         </div>
         <div>
+          <nav className="profile-index" aria-label="센터 소개 상세">
+            {profileTopics.map((t) => (
+              <Link key={t.slug} href={'/about/' + t.slug}>
+                {t.name}
+                <ArrowUpRight size={17} aria-hidden />
+              </Link>
+            ))}
+          </nav>
           <Rows rows={settingsRows(center.services)} />
           <div className="guide-links">
             <Link className="guide-underlink" href="/programs">

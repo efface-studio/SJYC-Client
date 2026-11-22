@@ -176,3 +176,83 @@
     grid-template-columns: minmax(70px, 0.45fr) 1fr;
   }
 }
+
+.profile-index {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+.profile-index a,
+.profile-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+}
+.profile-index a {
+  background: #eaf1e9;
+  border-radius: 0.6rem;
+  justify-content: space-between;
+  padding: 0.75rem;
+  font-weight: 650;
+}
+.profile-index a:hover,
+.profile-nav a:hover {
+  text-decoration: underline;
+}
+.profile-page {
+  padding-block: clamp(24px, 5vw, 72px);
+}
+.profile-page .guide-wrap {
+  max-width: 960px;
+}
+.profile-page header {
+  margin-block: 2rem 1.5rem;
+}
+.profile-page h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: -0.05em;
+  font-weight: 750;
+  line-height: 1.14;
+}
+.profile-nav {
+  display: flex;
+  gap: 0.2rem 1.1rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #cbd9d0;
+}
+.profile-nav a[aria-current] {
+  color: #135747;
+  border-bottom: 3px solid;
+  font-weight: 750;
+}
+.profile-page article {
+  max-width: 76ch;
+  margin-block: 2rem;
+}
+.profile-page article h2 {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 720;
+  margin-block: 2.2rem 0.8rem;
+}
+.profile-page article p {
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+}
+.profile-page article .guide-underlink {
+  margin-top: 2rem;
+}
+.profile-page article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.profile-page .profile-foundation {
+  width: min(220px, 65%);
+}
+.profile-page .profile-character {
+  width: min(420px, 100%);
+  margin-block: 1rem;
+}
