@@ -1,4 +1,3 @@
-import { DemoBanner } from '@/components/dev-panel';
 import '@/components/site/site.css';
 import { BottomNav } from '@/components/site/bottom-nav';
 import { SiteFooter } from '@/components/site/site-footer';
@@ -14,9 +13,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       {/* 하단 탭바 높이만큼 여백 (모바일) */}
       <div className="pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
         <SiteFooter />
-        <div className="site-demo">
-          <DemoBanner />
-        </div>
       </div>
       <BottomNav />
     </div>

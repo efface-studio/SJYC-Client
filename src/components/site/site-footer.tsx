@@ -14,8 +14,20 @@ const CHANNEL_ICON: Record<(typeof OFFICIAL_CHANNELS)[number]['key'], SimpleIcon
 
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0 text-ink-900" fill="currentColor">
-      <path d={icon.path} />
+    <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0" fill={`#${icon.hex}`}>
+      {icon === siYoutube && <path fill="white" d="M7 7h10v10H7z" />}
+      {icon === siFacebook && <circle fill="white" cx="12" cy="12" r="11.7" />}
+      {icon === siInstagram && (
+        <defs>
+          <linearGradient id="footer-instagram" x1="0" y1="1" x2="1" y2="0" gradientUnits="objectBoundingBox">
+            <stop stopColor="#ffcf68" />
+            <stop offset=".36" stopColor="#ff8852" />
+            <stop offset=".67" stopColor="#f04f88" />
+            <stop offset="1" stopColor="#ba83ff" />
+          </linearGradient>
+        </defs>
+      )}
+      <path d={icon.path} fill={icon === siInstagram ? 'url(#footer-instagram)' : undefined} />
     </svg>
   );
 }

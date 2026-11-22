@@ -20,11 +20,6 @@
   color: var(--color-ink-900);
   background: var(--paper);
 }
-.site-demo > div {
-  background: #efeae3;
-  color: #514851;
-  border-color: #ded7ce;
-}
 .site-header {
   color: var(--color-ink-900);
   background: transparent;

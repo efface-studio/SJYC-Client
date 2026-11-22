@@ -58,10 +58,10 @@ export function CenterFilm() {
       />
       <h1 id="film-title">
         <Image
-          src="/brand/logo-on-dark.png"
+          src="/brand/film-wordmark.svg"
           alt={CENTER.formalName}
-          width={300}
-          height={50}
+          width={474}
+          height={75}
           unoptimized
           priority
         />

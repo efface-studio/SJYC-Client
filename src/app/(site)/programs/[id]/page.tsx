@@ -7,8 +7,7 @@ import type { ReactNode } from 'react';
 import { api, isApiError } from '@/api';
 import { buttonClass } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
-import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
-import { DEMO_DATA } from '@/config/env';
+import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { remainingSeats } from '@/domain/program';
 import type { Program } from '@/domain/types';
 import { useSession } from '@/features/auth/session';
@@ -126,12 +125,6 @@ export default function ProgramDetailPage() {
           </span>
         }
       />
-
-      {DEMO_DATA && (
-        <Callout tone="warning" className="mb-4">
-          개발용 샘플 프로그램입니다. 실제 일정·정원·장소가 아닙니다.
-        </Callout>
-      )}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div>

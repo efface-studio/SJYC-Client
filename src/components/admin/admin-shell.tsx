@@ -29,7 +29,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
-import { DemoBanner } from '@/components/dev-panel';
 import { Logo } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
 import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/domain/permissions';
@@ -211,7 +210,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
             {children}
           </main>
           <SiteFooter compact />
-          <DemoBanner tone="admin" />
         </div>
       </div>
       <Modal
