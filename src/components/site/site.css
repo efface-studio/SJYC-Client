@@ -48,6 +48,18 @@
 .site-header:not(.is-scrolled) .full-navigation {
   display: none;
 }
+.site-header > .container-page > a:first-child {
+  min-width: 0;
+  flex-shrink: 1;
+}
+.site-header > .container-page > a:first-child img {
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left;
+}
+.site-header > .container-page > div {
+  flex-shrink: 0;
+}
 .site-header:not(.is-scrolled) .compact-navigation {
   display: grid;
 }

@@ -238,6 +238,24 @@ async function adminLoginAs(
   await page.waitForURL((url) => url.pathname === next);
 }
 
+test('320px에서 회원 메뉴와 관리자 일정 입력란이 화면 안에 들어온다', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await loginAs(page, '일반 회원');
+  const menu = page.getByRole('button', { name: '전체 메뉴 열기' });
+  await expect(menu).toBeVisible();
+  expect(await menu.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(320);
+
+  await adminLoginAs(page, '최고 관리자', '/admin/programs/p-1');
+  const schedule = page.getByRole('group', { name: '일정', exact: true });
+  const dates = schedule.getByRole('button', { expanded: false });
+  await expect(dates.first()).toBeVisible();
+  for (const date of await dates.all()) {
+    const box = await date.evaluate((el) => el.getBoundingClientRect().toJSON());
+    expect(box.width).toBeGreaterThan(100);
+    expect(box.right).toBeLessThanOrEqual(320);
+  }
+});
+
 test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => {
   await adminLoginAs(page, '최고 관리자', '/admin/developer');
   await expect(page.getByText('접근 권한이 없습니다')).toBeVisible();
