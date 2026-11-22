@@ -43,12 +43,7 @@ function DeveloperTabs() {
   const Panel = active.panel;
   return (
     <>
-      <div
-        ref={listRef}
-        role="tablist"
-        aria-label="개발자 도구"
-        className="-mx-4 mb-6 scrollbar-none flex overflow-x-auto border-b border-line px-4 md:mx-0 md:px-0"
-      >
+      <div ref={listRef} role="tablist" aria-label="개발자 도구" className="console-tabs mb-6 scrollbar-none">
         {TABS.map((t, i) => (
           <button
             key={t.key}

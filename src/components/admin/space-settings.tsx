@@ -38,7 +38,7 @@ function SpaceForm({ space }: { space: Space }) {
     <form
       noValidate
       aria-labelledby={`space-${space.id}`}
-      className="border-b border-line py-5"
+      className="py-5"
       onSubmit={(e) => {
         e.preventDefault();
         if (save.isPending) return;
@@ -106,7 +106,7 @@ export function SpaceSettings() {
         empty={<EmptyState title="등록된 공간이 없습니다" />}
       >
         {(d) => (
-          <div className="max-w-3xl border-t border-line">
+          <div className="console-surface max-w-3xl divide-y divide-line px-4 md:px-6">
             {d.map((s) => (
               <SpaceForm key={JSON.stringify(s)} space={s} />
             ))}

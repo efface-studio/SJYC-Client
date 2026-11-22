@@ -90,7 +90,7 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
   const panelId = useId();
 
   return (
-    <div className="mb-4 space-y-3 rounded-xl border border-line bg-surface p-4 md:p-5">
+    <div className="console-surface mb-4 space-y-3 p-4 md:p-5">
       <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
         <form
           role="search"

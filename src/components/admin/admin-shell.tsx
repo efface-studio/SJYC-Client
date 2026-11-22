@@ -164,9 +164,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <div className="console-frame">
         <aside className="console-rail">
           <div className="console-brand">
-            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
+            <Logo onDark className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="console-nav-scroll">
             <NavLinks user={user} active={active} />
           </div>
           <UserBlock user={user} />
@@ -193,11 +193,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <ArrowUpRight size={15} aria-hidden />
             </Link>
           </header>
-          <DemoBanner tone="admin" />
           <main id="main" tabIndex={-1} className="console-main focus:outline-none">
             {children}
           </main>
           <SiteFooter compact />
+          <DemoBanner tone="admin" />
         </div>
       </div>
       <Modal
@@ -205,12 +205,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
         onClose={() => setMenuOpen(false)}
         title="관리자 메뉴"
         variant="drawer"
-        className="lg:hidden"
+        className="console-drawer lg:hidden"
+        bodyClassName="console-drawer-body overflow-hidden p-0"
       >
-        <div className="-mx-4 -my-4">
+        <div className="console-nav-scroll">
           <NavLinks user={user} active={active} onNavigate={() => setMenuOpen(false)} />
-          <UserBlock user={user} />
         </div>
+        <UserBlock user={user} />
       </Modal>
     </div>
   );

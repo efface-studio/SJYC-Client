@@ -85,7 +85,7 @@ export function NoticeForm({
         ref={formRef}
         noValidate
         hidden={preview !== null}
-        className="max-w-3xl space-y-5"
+        className="console-surface console-form max-w-3xl space-y-5"
         onSubmit={(e) => {
           e.preventDefault();
           if (pending) return;

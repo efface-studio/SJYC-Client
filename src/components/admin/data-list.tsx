@@ -100,7 +100,7 @@ export function DataList<T extends { id: string }>({
 
   return (
     <>
-      <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface md:block">
+      <div className="console-surface hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-[15px]">
           <caption className="sr-only">{caption}</caption>
           <thead>
@@ -172,10 +172,7 @@ export function DataList<T extends { id: string }>({
         </table>
       </div>
 
-      <ul
-        aria-label={caption}
-        className="divide-y divide-line rounded-xl border border-line bg-surface md:hidden"
-      >
+      <ul aria-label={caption} className="console-surface divide-y divide-line md:hidden">
         {rows.map((row) => (
           <li
             key={row.id}

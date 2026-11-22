@@ -11,7 +11,7 @@ export function BulkResultView({
   onDismiss: () => void;
 }) {
   return (
-    <div role="status" className="mb-4 border border-line bg-surface p-3 text-[15px]">
+    <div role="status" className="console-surface mb-4 p-3 text-[15px]">
       <div className="flex items-start justify-between gap-2">
         <p>
           처리 결과: 성공 <strong className="text-success-700 tabular-nums">{result.succeeded.length}</strong>

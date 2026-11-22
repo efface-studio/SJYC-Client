@@ -48,10 +48,7 @@ export function ClubManagers({ clubId, clubName }: { clubId: string; clubName: s
   });
 
   return (
-    <section
-      aria-labelledby="club-managers"
-      className="mb-8 max-w-3xl border border-line bg-surface p-4 sm:p-5"
-    >
+    <section aria-labelledby="club-managers" className="console-surface mb-8 max-w-3xl p-4 sm:p-5">
       <h2 id="club-managers" className="text-base font-bold">
         동아리 담당자
       </h2>

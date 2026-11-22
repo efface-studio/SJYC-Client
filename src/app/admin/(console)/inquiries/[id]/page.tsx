@@ -117,7 +117,7 @@ function InquiryDetail() {
             <span className="tabular-nums">{formatDateTime(x.createdAt)}</span>
           </div>
           <h2 className="mt-2 text-lg font-bold">{x.title}</h2>
-          <div className="mt-3 max-w-3xl border-y border-line bg-surface px-4 py-4 text-[15px] leading-relaxed whitespace-pre-line">
+          <div className="console-surface mt-3 max-w-3xl px-4 py-4 text-[15px] leading-relaxed whitespace-pre-line">
             {x.body}
           </div>
           <AnswerForm key={x.answer?.answeredAt ?? 'new'} inquiry={x} />

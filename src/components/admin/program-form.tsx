@@ -60,7 +60,7 @@ export function ProgramForm({
   return (
     <form
       noValidate
-      className="max-w-3xl space-y-6"
+      className="console-surface console-form max-w-3xl space-y-6"
       onSubmit={(e) => {
         e.preventDefault();
         if (pending) return;

@@ -162,7 +162,7 @@ export default function AdminLoginPage() {
         tabIndex={-1}
         className="flex flex-1 items-start justify-center px-4 py-10 focus:outline-none md:items-center"
       >
-        <div className="w-full max-w-md rounded-xl border border-line bg-surface p-6 sm:p-9">
+        <div className="console-surface w-full max-w-md p-6 sm:p-9">
           <div className="flex items-center gap-2">
             <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>

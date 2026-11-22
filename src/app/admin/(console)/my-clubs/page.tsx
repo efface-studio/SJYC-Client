@@ -21,7 +21,7 @@ function MyClubs() {
               <li key={c.id}>
                 <Link
                   href={`/admin/my-clubs/${c.id}`}
-                  className="block h-full border border-line bg-surface p-4 hover:border-ink-600"
+                  className="console-surface block h-full p-4 hover:border-ink-600"
                 >
                   <p className="text-sm text-ink-600">{c.field}</p>
                   <p className="mt-0.5 text-base font-bold">{c.name}</p>
