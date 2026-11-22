@@ -131,7 +131,12 @@ export function DatePicker({
         <CalendarDays aria-hidden className="size-4 shrink-0 text-ink-600" />
       </button>
       {name && <input type="hidden" name={name} value={valid} />}
-      <PopoverPanel panelProps={panelProps} open={open} title={title} className="md:max-h-none md:w-80">
+      <PopoverPanel
+        panelProps={panelProps}
+        open={open}
+        title={title}
+        className="md:max-h-[calc(100dvh-1rem)] md:w-80"
+      >
         <div
           role="dialog"
           aria-label={`${typeof title === 'string' ? title : '날짜'} 선택`}
@@ -202,7 +207,7 @@ export function DatePicker({
                           disabled={blocked}
                           onClick={() => commit(d)}
                           className={cn(
-                            'mx-auto flex size-10 items-center justify-center rounded-full text-[15px] tabular-nums',
+                            'mx-auto flex aspect-square w-full max-w-10 items-center justify-center rounded-full text-[15px] tabular-nums',
                             'hover:bg-surface-muted focus-visible:outline-offset-0',
                             !inMonth && 'text-ink-600/60',
                             isToday && !isSelected && 'font-bold text-brand-700 underline underline-offset-4',

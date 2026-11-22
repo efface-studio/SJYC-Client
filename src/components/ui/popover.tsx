@@ -31,18 +31,22 @@ export function useAnchoredPopover() {
         return;
       }
       const r = anchor.getBoundingClientRect();
+      panel.style.minWidth = `${Math.min(r.width, window.innerWidth - 16)}px`;
       const h = panel.offsetHeight;
       const spaceBelow = window.innerHeight - r.bottom;
-      const top = spaceBelow < h + 8 && r.top > spaceBelow ? r.top - h - 4 : r.bottom + 4;
+      const preferredTop = spaceBelow < h + 8 && r.top > spaceBelow ? r.top - h - 4 : r.bottom + 4;
+      const top = Math.max(8, Math.min(preferredTop, window.innerHeight - h - 8));
       const left = Math.max(8, Math.min(r.left, window.innerWidth - panel.offsetWidth - 8));
       panel.style.top = `${top}px`;
       panel.style.left = `${left}px`;
-      panel.style.minWidth = `${r.width}px`;
     };
     place();
+    const observer = new ResizeObserver(place);
+    observer.observe(panel);
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
     return () => {
+      observer.disconnect();
       window.removeEventListener('resize', place);
       window.removeEventListener('scroll', place, true);
     };
@@ -85,7 +89,7 @@ export function PopoverPanel({ panelProps, open, title, className, children }: P
         // 모바일: 하단 시트
         'inset-x-0 top-auto bottom-0 max-h-[70dvh] w-full max-w-none rounded-t-lg pb-[env(safe-area-inset-bottom)] backdrop:bg-black/40',
         // 데스크톱: 드롭다운 (top/left 는 JS 로 지정)
-        'md:inset-auto md:max-h-96 md:w-auto md:rounded-md md:border md:border-line md:pb-0 md:backdrop:bg-transparent',
+        'md:inset-auto md:max-h-[min(24rem,calc(100dvh-1rem))] md:w-auto md:max-w-[calc(100vw-1rem)] md:rounded-md md:border md:border-line md:pb-0 md:backdrop:bg-transparent',
         className,
       )}
     >
