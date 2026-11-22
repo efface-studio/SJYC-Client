@@ -7,6 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function loginAs(page: Page, label: '일반 회원' | '센터 직원', next = '/my') {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  await page.getByText('데모 계정으로 입력', { exact: true }).click();
   await page.getByRole('button', { name: label }).click();
   await page.getByRole('button', { name: '로그인', exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/login'));

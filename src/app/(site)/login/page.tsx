@@ -2,11 +2,14 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
+import './login.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useRef, useState } from 'react';
 import { api, errorMessage, isApiError } from '@/api';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/mock/seed';
-import { Button, buttonClass } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
 import { DEMO_DATA } from '@/config/env';
@@ -133,8 +136,8 @@ function LoginForm() {
       </div>
 
       {DEMO_DATA && (
-        <div className="mt-6 rounded-md border border-dashed border-warning-800/40 bg-warning-50 p-3">
-          <p className="text-sm font-bold text-warning-800">개발용 데모 계정으로 입력</p>
+        <details className="login-demo">
+          <summary>데모 계정으로 입력</summary>
           <div className="mt-2 grid grid-cols-2 gap-2">
             {DEMO_ACCOUNTS.map((a) => (
               <button
@@ -150,11 +153,7 @@ function LoginForm() {
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-warning-800">
-            직원·관리자 계정도 이 화면에서는 회원 화면으로만 이동합니다. 관리자 화면은 /admin/login 에서
-            들어갑니다.
-          </p>
-        </div>
+        </details>
       )}
 
       <div className="my-6 flex items-center gap-3 text-sm text-ink-600">
@@ -169,18 +168,37 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="container-page py-8 md:py-14">
+    <div className="member-login">
       <title>로그인 | 중구청소년센터</title>
-      <div className="account-sheet mx-auto">
-        <h1 className="mb-6 text-2xl font-bold">로그인</h1>
-        <Suspense fallback={<ListSkeleton rows={2} />}>
-          <LoginForm />
-        </Suspense>
-        <p className="mt-8 text-center">
-          <Link href="/" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
+      <div className="login-layout">
+        <aside className="login-art" aria-label="중구청소년센터">
+          <Image
+            src="/media/center-exterior.webp"
+            width={910}
+            height={514}
+            sizes="(min-width:800px) 40vw, 1px"
+            alt="중구청소년센터 정문"
+            priority
+          />
+          <div>
+            <span>중구청소년센터</span>
+            <p>
+              프로그램 신청부터
+              <br />
+              공간 예약까지
+            </p>
+          </div>
+        </aside>
+        <section className="login-fields" aria-labelledby="login-heading">
+          <h1 id="login-heading">로그인</h1>
+          <Suspense fallback={<ListSkeleton rows={2} />}>
+            <LoginForm />
+          </Suspense>
+          <Link href="/" className="login-back">
+            <ArrowLeft aria-hidden size={16} />
             로그인 없이 둘러보기
           </Link>
-        </p>
+        </section>
       </div>
     </div>
   );
