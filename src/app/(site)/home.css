@@ -358,11 +358,20 @@
   .home-news-visit {
     gap: 34px;
   }
+  .home-extra {
+    grid-template-columns: 1fr;
+    padding: 2px 14px;
+  }
+  .home-extra a + a {
+    border-left: 0;
+    border-top: 1px solid #d5ceca;
+  }
   .home-extra a {
-    font-size: 14px;
+    min-height: 50px;
+    font-size: 15px;
     gap: 6px;
-    padding: 12px 6px;
-    grid-template-columns: 18px minmax(0, 1fr) 12px;
+    padding: 12px 4px;
+    grid-template-columns: 22px minmax(0, 1fr) 18px;
   }
   .home-extra svg {
     width: 16px;
