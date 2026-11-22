@@ -505,9 +505,6 @@
   font-size: clamp(30px, 4vw, 52px);
   line-height: 1.15;
 }
-.public-footer svg {
-  fill: currentColor;
-}
 @media (min-width: 640px) {
   .activity-index {
     grid-template-columns: minmax(0, 1.17fr) repeat(2, minmax(0, 1fr));
