@@ -198,13 +198,23 @@ test('자체 셀렉트로 프로그램 분류를 고른다', async ({ page }) =>
 });
 
 test('자체 날짜 선택을 키보드로 조작한다 @desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 540 });
   await page.goto('/admin/login?next=%2Fadmin%2Fspaces');
   await page.getByRole('button', { name: '센터 직원' }).click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await page.waitForURL(/\/admin\/spaces/);
   const trigger = page.getByRole('button', { name: '이용 날짜' });
   await trigger.click();
-  await expect(page.getByRole('grid')).toBeVisible();
+  const grid = page.getByRole('grid');
+  await expect(grid).toBeVisible();
+  const previous = page.getByRole('button', { name: '이전 달' });
+  const today = page.getByRole('button', { name: '오늘', exact: true });
+  await expect(previous).toBeInViewport({ ratio: 1 });
+  await expect(today).toBeInViewport({ ratio: 1 });
+  await page.getByRole('button', { name: '다음 달' }).click();
+  await expect(previous).toBeInViewport({ ratio: 1 });
+  await expect(today).toBeInViewport({ ratio: 1 });
+  await grid.locator('button[tabindex="0"]').focus();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/date=\d{4}-\d{2}-\d{2}/);
