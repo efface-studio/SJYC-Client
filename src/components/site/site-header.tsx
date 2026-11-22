@@ -184,9 +184,16 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <Modal open={menuOpen} onClose={() => setMenuOpen(false)} title="전체 메뉴" variant="drawer">
+      <Modal
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title="전체 메뉴"
+        variant="drawer"
+        className="site-menu-sheet"
+        bodyClassName="site-menu-body"
+      >
         <nav aria-label="전체 메뉴">
-          <ul className="-mx-2">
+          <ul className="site-menu-main">
             {[
               { href: '/', label: '홈' },
               ...SITE_NAV,
@@ -200,20 +207,21 @@ export function SiteHeader() {
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                   aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-                  className="flex min-h-12 items-center rounded-md px-2 text-base font-semibold hover:bg-surface-muted aria-[current=page]:text-brand-700"
+                  className="site-menu-link"
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
-          <ul className="-mx-2 mt-4 border-t border-line pt-4">
+          <ul className="site-menu-more">
             {MORE.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex min-h-12 items-center rounded-md px-2 text-[15px] text-ink-700 hover:bg-surface-muted"
+                  aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+                  className="site-menu-link"
                 >
                   {item.label}
                 </Link>
