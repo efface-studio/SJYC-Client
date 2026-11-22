@@ -557,6 +557,54 @@
   min-height: 70px;
   padding: 10px 0;
 }
+/* 같은 공간의 목록 사진과 상세 사진은 같은 원본을 사용한다. */
+.space-thumbnail,
+.space-detail-photo {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+.space-thumbnail img,
+.space-detail-photo img {
+  object-fit: cover;
+}
+.space-thumbnail {
+  width: clamp(110px, 12vw, 156px);
+  aspect-ratio: 3 / 2;
+  border-radius: 10px;
+  flex: none;
+}
+.space-detail-photo {
+  margin-bottom: 24px;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+}
+.space-thumbnail figcaption,
+.space-detail-photo figcaption {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #fff;
+  background: #332c36e8;
+  font-size: 11px;
+  font-weight: 600;
+}
+@media (max-width: 639px) {
+  .public-site .space-floor {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .space-thumbnail {
+    width: 88px;
+  }
+  .space-thumbnail figcaption {
+    right: 3px;
+    bottom: 3px;
+    padding-inline: 3px;
+  }
+}
 .program-row {
   padding: 22px 4px;
 }

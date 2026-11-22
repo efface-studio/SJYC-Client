@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { api } from '@/api';
 import { Badge } from '@/components/ui/badge';
+import { SpacePhoto } from '@/components/site/space-photo';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { FLOORS } from '@/config/center';
@@ -48,7 +49,8 @@ export default function SpacesPage() {
                   {spacesByFloor.get(floor)?.map((s) => (
                     <li key={s.id}>
                       <Link href={`/spaces/${s.id}`} className="space-row group">
-                        <span>
+                        <SpacePhoto space={s} thumbnail />
+                        <span className="min-w-0 flex-1">
                           <span className="block text-lg font-bold group-hover:underline">{s.name}</span>
                           <span className="mt-1 block text-sm text-ink-600">
                             최대 {s.capacity}명 · {s.description}

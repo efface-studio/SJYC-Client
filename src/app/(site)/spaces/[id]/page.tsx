@@ -14,6 +14,7 @@ import {
   TextAreaField,
   TextField,
 } from '@/components/ui/field';
+import { SpacePhoto } from '@/components/site/space-photo';
 import { PageHeader } from '@/components/ui/page-header';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
@@ -252,6 +253,7 @@ export default function SpaceDetailPage() {
               title={space.data.name}
               description={`${space.data.floor} · 최대 ${space.data.capacity}명 · ${space.data.description}`}
             />
+            <SpacePhoto space={space.data} />
             {space.data.reservable ? (
               <ReservationForm space={space.data} />
             ) : (
