@@ -1,5 +1,6 @@
 'use client';
 
+import { MapLinks } from '@/components/site/map-links';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRight,
@@ -220,6 +221,7 @@ export default function HomePage() {
             <Link href="/about#location">
               {center.nearestStation} <ArrowUpRight aria-hidden size={15} />
             </Link>
+            <MapLinks address={center.address} />
           </div>
           <div>
             <h3>
