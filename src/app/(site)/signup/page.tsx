@@ -53,7 +53,7 @@ export default function SignupPage() {
   return (
     <div className="container-page py-8 md:py-14">
       <title>회원가입 | 중구청소년센터</title>
-      <div className="mx-auto max-w-md">
+      <div className="account-sheet mx-auto">
         <h1 className="text-2xl font-bold">회원가입</h1>
         <p className="mt-1 mb-6 text-[15px] text-ink-600">
           가입 후 프로그램 신청과 동아리 가입 신청을 할 수 있습니다.

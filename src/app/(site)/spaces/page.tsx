@@ -27,8 +27,9 @@ export default function SpacesPage() {
   return (
     <div className="container-page py-6 md:py-10">
       <title>공간 예약 | 중구청소년센터</title>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto">
         <PageHeader
+          className="directory-heading spaces-photo"
           title="공간 예약"
           description={`내일부터 ${RESERVATION_MAX_DAYS_AHEAD}일 이내, 1시간 단위로 최대 ${RESERVATION_MAX_HOURS}시간까지 신청할 수 있습니다. 담당자 확인 후 확정됩니다.`}
         />

@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, Clock3, MapPin, Phone } from 'lucide-react';
+import { ArrowUpRight, Clock3, MapPin } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useSyncExternalStore, type ReactNode } from 'react';
 import { api } from '@/api';
+import { CenterFilm } from '@/components/site/center-film';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { CENTER, DESK_HOURS, hoursOn } from '@/config/center';
 import { todayKst } from '@/lib/format';
@@ -72,53 +73,10 @@ function TodayHours() {
   );
 }
 
-function VisitToday() {
-  const [showPhoto, setShowPhoto] = useState(true);
-  return (
-    <section className="visit-board" aria-labelledby="visit-title">
-      <div className="visit-copy">
-        <h1 id="visit-title">{CENTER.name}</h1>
-        <p className="visit-location">
-          <MapPin size={16} aria-hidden />
-          {CENTER.nearestStation}
-        </p>
-        <TodayHours />
-        <div className="visit-actions">
-          <Link href="/programs" className="visit-primary">
-            프로그램 찾기
-          </Link>
-          <Link href="/about#location">오시는 길</Link>
-        </div>
-      </div>
-      {showPhoto && (
-        <figure className="visit-photo">
-          <img
-            src="https://www.j-youth.org/kor/images/sub/info_00_01.jpg"
-            alt="약수역 인근 중구청소년센터 건물 전경"
-            width={910}
-            height={514}
-            referrerPolicy="no-referrer"
-            fetchPriority="high"
-            ref={(img) => {
-              // 서버 HTML에서 먼저 요청한 사진은 하이드레이션 전에 실패할 수 있다.
-              if (img?.complete && img.naturalWidth === 0) setShowPhoto(false);
-            }}
-            onError={() => setShowPhoto(false)}
-          />
-          <figcaption>중구청소년센터 시설안내</figcaption>
-        </figure>
-      )}
-    </section>
-  );
-}
-
-const SERVICES = [
-  { href: '/spaces', label: '공간 예약' },
-  { href: '/clubs', label: '동아리 가입' },
-  { href: '/programs/calendar', label: '프로그램 일정' },
-  { href: '/gallery', label: '센터 소식·갤러리' },
-  { href: '/qna', label: '질문·문의' },
-  { href: '/about', label: '센터 안내' },
+const ACTIVITIES = [
+  { href: '/programs', label: '프로그램 찾기', image: '/media/program-studio.webp' },
+  { href: '/spaces', label: '공간 예약', image: '/media/spaces-studio.webp' },
+  { href: '/clubs', label: '동아리 가입', image: '/media/clubs-studio.webp' },
 ];
 
 export default function HomePage() {
@@ -132,59 +90,79 @@ export default function HomePage() {
   });
   const categoryName = useCategoryName();
   return (
-    <div className="home-page container-page">
-      <VisitToday />
-      <nav className="service-links" aria-label="센터 이용 바로가기">
-        {SERVICES.map((s) => (
-          <Link key={s.href} href={s.href}>
-            {s.label}
-            <ChevronRight size={15} aria-hidden />
-          </Link>
-        ))}
-      </nav>
-      <div className="home-bulletin">
-        <Section title="모집 중인 프로그램" more={{ href: '/programs', label: '전체 프로그램' }}>
-          {programs.isPending ? (
-            <ListSkeleton rows={3} />
-          ) : programs.isError ? (
-            <ErrorState error={programs.error} onRetry={() => void programs.refetch()} />
-          ) : !programs.data.items.length ? (
-            <EmptyState
-              title="지금 모집 중인 프로그램이 없습니다"
-              description="모집 예정 프로그램은 전체 프로그램에서 확인할 수 있습니다."
-            />
-          ) : (
-            <ul>
-              {programs.data.items.map((p) => (
-                <li key={p.id}>
-                  <ProgramRow program={p} categoryName={categoryName(p.categoryId)} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
-        <div>
-          <Section title="공지사항" more={{ href: '/notices', label: '전체 공지' }}>
-            {notices.isPending ? (
+    <div className="home-page">
+      <CenterFilm />
+      <div className="home-content container-page" id="explore">
+        <nav className="activity-index" aria-label="센터 이용 바로가기">
+          {ACTIVITIES.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <span className="activity-photo" style={{ backgroundImage: `url(${item.image})` }} />
+              <span>
+                {item.label}
+                <ArrowUpRight size={23} aria-hidden />
+              </span>
+            </Link>
+          ))}
+        </nav>
+        <div className="home-bulletin">
+          <Section title="모집 중인 프로그램" more={{ href: '/programs', label: '전체 프로그램' }}>
+            {programs.isPending ? (
               <ListSkeleton rows={3} />
-            ) : notices.isError ? (
-              <ErrorState error={notices.error} onRetry={() => void notices.refetch()} />
-            ) : !notices.data.items.length ? (
-              <EmptyState title="등록된 공지가 없습니다" />
+            ) : programs.isError ? (
+              <ErrorState error={programs.error} onRetry={() => void programs.refetch()} />
+            ) : !programs.data.items.length ? (
+              <EmptyState
+                title="지금 모집 중인 프로그램이 없습니다"
+                description="모집 예정 프로그램은 전체 프로그램에서 확인할 수 있습니다."
+              />
             ) : (
               <ul>
-                {notices.data.items.map((n) => (
-                  <NoticeItem key={n.id} notice={n} />
+                {programs.data.items.map((p) => (
+                  <li key={p.id}>
+                    <ProgramRow program={p} categoryName={categoryName(p.categoryId)} />
+                  </li>
                 ))}
               </ul>
             )}
           </Section>
-          <div className="home-contact">
-            <Phone size={18} aria-hidden />
-            <span>센터 대표전화</span>
-            <a href={`tel:${CENTER.tel}`}>{CENTER.telDisplay}</a>
+          <div>
+            <Section title="공지사항" more={{ href: '/notices', label: '전체 공지' }}>
+              {notices.isPending ? (
+                <ListSkeleton rows={3} />
+              ) : notices.isError ? (
+                <ErrorState error={notices.error} onRetry={() => void notices.refetch()} />
+              ) : !notices.data.items.length ? (
+                <EmptyState title="등록된 공지가 없습니다" />
+              ) : (
+                <ul>
+                  {notices.data.items.map((n) => (
+                    <NoticeItem key={n.id} notice={n} />
+                  ))}
+                </ul>
+              )}
+            </Section>
           </div>
         </div>
+        <aside className="visit-info" aria-label="센터 방문 정보">
+          <TodayHours />
+          <div>
+            <h2>오시는 길</h2>
+            <p>{CENTER.address}</p>
+            <Link href="/about#location">
+              <MapPin aria-hidden size={16} /> {CENTER.nearestStation}
+            </Link>
+          </div>
+          <div>
+            <h2>센터 대표전화</h2>
+            <a href={`tel:${CENTER.tel}`}>{CENTER.telDisplay}</a>
+          </div>
+        </aside>
+        <nav className="home-extra" aria-label="센터 소식과 문의">
+          <Link href="/programs/calendar">프로그램 일정</Link>
+          <Link href="/gallery">센터 소식·갤러리</Link>
+          <Link href="/qna">질문·문의</Link>
+          <Link href="/about">센터 안내</Link>
+        </nav>
       </div>
     </div>
   );

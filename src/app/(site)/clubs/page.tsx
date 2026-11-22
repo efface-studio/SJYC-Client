@@ -16,6 +16,7 @@ export default function ClubsPage() {
     <div className="container-page py-6 md:py-10">
       <title>동아리 | 중구청소년센터</title>
       <PageHeader
+        className="directory-heading clubs-photo"
         title="동아리"
         description="센터에서 활동하는 청소년 동아리를 둘러보고 가입을 신청하세요."
       />
@@ -26,21 +27,12 @@ export default function ClubsPage() {
       ) : clubs.data.length === 0 ? (
         <EmptyState title="등록된 동아리가 없습니다" />
       ) : (
-        <ul className="border-t border-line lg:grid lg:grid-cols-2 lg:gap-x-9">
+        <ul className="club-directory">
           {clubs.data.map((c) => (
             <li key={c.id}>
-              <Link
-                href={`/clubs/${c.id}`}
-                className="group flex h-full items-start gap-4 border-b border-line py-5 hover:bg-surface-muted"
-              >
+              <Link href={`/clubs/${c.id}`} className="club-entry group">
                 {c.photos[0] && (
-                  <img
-                    src={c.photos[0].url}
-                    alt=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    className="size-[76px] shrink-0 rounded-md bg-surface-muted object-cover sm:size-28"
-                  />
+                  <img src={c.photos[0].url} alt="" loading="lazy" referrerPolicy="no-referrer" />
                 )}
                 <div className="min-w-0">
                   <h2 className="text-xl leading-snug font-bold group-hover:underline">{c.name}</h2>

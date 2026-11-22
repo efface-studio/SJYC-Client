@@ -7,7 +7,6 @@ import { SiteHeader } from '@/components/site/site-header';
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="public-site flex min-h-dvh flex-col">
-      <DemoBanner />
       <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         {children}
@@ -15,6 +14,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       {/* 하단 탭바 높이만큼 여백 (모바일) */}
       <div className="pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
         <SiteFooter />
+        <div className="site-demo">
+          <DemoBanner />
+        </div>
       </div>
       <BottomNav />
     </div>

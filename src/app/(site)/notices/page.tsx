@@ -140,7 +140,11 @@ export default function NoticesPage() {
   return (
     <div className="container-page py-6 md:py-10">
       <title>공지사항 | 중구청소년센터</title>
-      <PageHeader title="공지사항" description="센터 운영과 프로그램 관련 소식을 알려 드립니다." />
+      <PageHeader
+        className="news-heading"
+        title="공지사항"
+        description="센터 운영과 프로그램 관련 소식을 알려 드립니다."
+      />
       <Suspense fallback={<ListSkeleton rows={4} />}>
         <NoticeList />
       </Suspense>

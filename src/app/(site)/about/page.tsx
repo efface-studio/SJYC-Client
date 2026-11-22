@@ -71,6 +71,7 @@ export default function AboutPage() {
     <div className="container-page py-6 md:py-10">
       <div className="mx-auto max-w-3xl">
         <PageHeader
+          className="news-heading"
           title="센터 안내"
           description={`${CENTER.formalName} · 정보 확인일 ${VERIFIED_AT}. 운영 사정에 따라 바뀔 수 있으니 방문 전 전화로 확인해 주세요.`}
         />

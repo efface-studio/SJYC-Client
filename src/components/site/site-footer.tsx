@@ -126,7 +126,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
       </footer>
     );
   return (
-    <footer className="bg-surface-muted text-[13px] leading-relaxed text-ink-600">
+    <footer className="public-footer bg-surface-muted text-[13px] leading-relaxed text-ink-600">
       <div className="container-page py-10 md:py-14">
         <div className="mb-8">
           <p className="text-[13px] font-semibold text-ink-700">대표전화</p>
@@ -177,13 +177,12 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         </nav>
 
         <address className="mt-10 border-t border-line pt-8 not-italic">
-          {/* 공식 로고(흰 배경 JPG) — multiply 로 회색 배경에 녹인다 */}
           <Image
             src="/brand/logo-horizontal.jpg"
             alt={CENTER.formalName}
             width={300}
             height={50}
-            className="mb-4 h-7 w-auto mix-blend-multiply"
+            className="footer-logo mb-4"
           />
           <CenterContactDetails />
         </address>

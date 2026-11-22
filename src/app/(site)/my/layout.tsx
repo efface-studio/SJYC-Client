@@ -17,7 +17,7 @@ export default function MyLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="container-page py-6 md:py-10">
       <div className="mx-auto max-w-3xl">
-        <PageHeader title="마이페이지" />
+        <PageHeader className="member-heading" title="마이페이지" />
         <nav aria-label="마이페이지 메뉴" className="mt-4 mb-6 border-b border-line">
           <ul className="flex">
             {TABS.map((t) => {

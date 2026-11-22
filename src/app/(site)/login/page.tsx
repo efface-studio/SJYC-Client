@@ -171,7 +171,7 @@ export default function LoginPage() {
   return (
     <div className="container-page py-8 md:py-14">
       <title>로그인 | 중구청소년센터</title>
-      <div className="mx-auto max-w-md">
+      <div className="account-sheet mx-auto">
         <h1 className="mb-6 text-2xl font-bold">로그인</h1>
         <Suspense fallback={<ListSkeleton rows={2} />}>
           <LoginForm />

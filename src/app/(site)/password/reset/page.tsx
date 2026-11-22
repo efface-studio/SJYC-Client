@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="container-page py-8 md:py-14">
       <title>비밀번호 재설정 | 중구청소년센터</title>
-      <div className="mx-auto max-w-md">
+      <div className="account-sheet mx-auto">
         <h1 className="mb-6 text-2xl font-bold">비밀번호 재설정</h1>
         <Suspense fallback={<ListSkeleton rows={1} />}>
           <ResetForm />

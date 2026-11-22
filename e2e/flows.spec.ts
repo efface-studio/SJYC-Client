@@ -23,13 +23,45 @@ test('비로그인 사용자가 공개 페이지를 탐색할 수 있다', async
   await expect(page.locator('a[href*="j-youth"]')).toHaveCount(0);
 });
 
-test('센터 전경 사진을 불러올 수 없어도 운영시간과 프로그램 바로가기가 남는다', async ({ page }) => {
-  await page.route('**/info_00_01.jpg', (route) => route.abort());
+test('배경 영상 요청이 실패해도 로고와 프로그램 바로가기가 남는다', async ({ page }) => {
+  await page.route('**/media/center-film.mp4', (route) => route.abort());
   await page.goto('/');
+  await expect(page.locator('.center-film video')).toBeHidden();
+  await expect(page.locator('.center-film h1 img')).toBeVisible();
   await expect(page.getByText(/공휴일·임시 휴관은/)).toBeVisible();
-  await expect(page.getByRole('img', { name: '약수역 인근 중구청소년센터 건물 전경' })).toHaveCount(0);
   await page.getByRole('link', { name: '프로그램 찾기' }).click();
   await expect(page.getByRole('heading', { level: 1, name: '프로그램', exact: true })).toBeVisible();
+});
+
+test('동작 줄이기 설정에서는 포스터부터 표시하고 사용자가 영상을 재생하고 멈출 수 있다', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const film = page.locator('.center-film video');
+  await expect(film).not.toHaveAttribute('src');
+  await page.getByRole('button', { name: '배경 영상 재생' }).click();
+  await expect
+    .poll(() => film.evaluate((video: HTMLVideoElement) => video.currentTime))
+    .toBeGreaterThan(0.12);
+  await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.playbackRate)).toBe(1.2);
+  await page.getByRole('button', { name: '배경 영상 일시정지' }).click();
+  await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+});
+
+test('홈 상단은 스크롤 위치에 따라 아이콘 메뉴와 전체 메뉴를 전환한다 @desktop', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const header = page.locator('header.site-header');
+  const nav = header.getByRole('navigation', { name: '주 메뉴', includeHidden: true });
+  await expect(nav).toBeHidden();
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await header.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await expect(page.getByRole('dialog', { name: '전체 메뉴' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(nav).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(nav).toBeHidden();
+  await expect(header.getByRole('button', { name: '전체 메뉴 열기' })).toBeVisible();
 });
 
 test('잘못된 로그인 입력은 오류를 표시한다', async ({ page }) => {

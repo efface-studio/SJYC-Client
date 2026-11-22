@@ -237,6 +237,7 @@ export default function ProgramCalendarPage() {
     <div className="container-page py-6 md:py-10">
       <title>프로그램 일정 | 중구청소년센터</title>
       <PageHeader
+        className="news-heading"
         breadcrumbs={[{ label: '프로그램', href: '/programs' }, { label: '일정 달력' }]}
         title="프로그램 일정"
         description="모집 마감일과 운영 기간을 달력으로 확인하세요."

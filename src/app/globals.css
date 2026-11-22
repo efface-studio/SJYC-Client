@@ -38,7 +38,7 @@
     'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', system-ui,
     sans-serif;
 
-  /* 공공기관 서비스 톤: 둥근 카드 대신 선과 여백으로 구획한다 */
+  /* 공통 기본값. 사용자 웹과 관리자 콘솔에서 각 영역의 반경을 지정한다 */
   --radius-sm: 2px;
   --radius-md: 4px;
   --radius-lg: 6px;

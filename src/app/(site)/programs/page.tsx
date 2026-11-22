@@ -197,6 +197,7 @@ export default function ProgramsPage() {
   return (
     <div className="container-page py-6 md:py-10">
       <PageHeader
+        className="directory-heading program-photo"
         title="프로그램"
         description="청소년활동·체육/교육·진로체험·꿈드림 프로그램을 찾아 신청하세요."
         actions={<ProgramViewToggle current="list" />}
