@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 import { Button } from './button';
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div aria-hidden className={cn('animate-pulse rounded-md bg-line/60', className)} />;
+  return <div aria-hidden className={cn('motion-safe:animate-pulse rounded-md bg-line/60', className)} />;
 }
 
 /** 목록 로딩 — 실제 레이아웃과 비슷한 자리 표시 */

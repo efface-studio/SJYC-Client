@@ -1,14 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../src/api/mock/seed';
 
 /**
  * 마스터 프롬프트 §13 주요 테스트 시나리오 — mock 모드 빌드 기준.
- * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 화면의 데모 버튼으로 채운다.
+ * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 로그인 폼으로 입력한다.
  */
 
 async function loginAs(page: Page, label: '일반 회원' | '센터 직원', next = '/my') {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByText('데모 계정으로 입력', { exact: true }).click();
-  await page.getByRole('button', { name: label }).click();
+  const account = DEMO_ACCOUNTS.find((candidate) => candidate.label === label);
+  if (!account) throw new Error('테스트 회원이 없습니다.');
+  await page.getByLabel('이메일').fill(account.email);
+  await page.locator('input[name="password"]').fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: '로그인', exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/login'));
 }
@@ -410,4 +413,38 @@ test('관리자 통합검색에서 업무를 열고 담당자 권한을 적용�
   await expect(dialog.getByText('검색 결과가 없습니다.')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
+});
+
+test('동아리와 공간 목록은 느린 응답에 스켈레톤을 표시하고 결과로 전환한다', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('sjyc.mock.scenario.v1', 'slow'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const [path, label, selector] of [
+    ['/clubs', '동아리 불러오는 중', '.club-list-link'],
+    ['/spaces', '공간 불러오는 중', '.space-row'],
+  ]) {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    const pending = page.getByRole('status', { name: label });
+    await expect(pending).toBeVisible();
+    await expect(pending.locator('[aria-hidden]').last()).toHaveCSS('animation-name', 'none');
+    await expect(pending).toHaveCount(0);
+    await expect(page.locator('a' + selector).first()).toBeVisible();
+  }
+});
+
+test('홈 영상은 화면 밖에서 멈추고 사용자가 멈춘 뒤에는 자동으로 재생되지 않는다', async ({ page }) => {
+  await page.goto('/');
+  const video = page.locator('.center-film video');
+  const paused = () => video.evaluate((el: HTMLVideoElement) => el.paused);
+  await expect.poll(paused).toBe(false);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await expect.poll(paused).toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(paused).toBe(false);
+  await page.locator('.film-playback').focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(paused).toBe(true);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.locator('.film-playback')).toHaveText('배경 영상 재생');
+  await expect.poll(paused).toBe(true);
 });
