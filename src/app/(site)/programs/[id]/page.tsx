@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { api, isApiError } from '@/api';
 import { buttonClass } from '@/components/ui/button';
+import '@/components/site/directories.css';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { remainingSeats } from '@/domain/program';
@@ -110,7 +111,7 @@ export default function ProgramDetailPage() {
 
   const p = program.data;
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-detail directory-programs directory-content">
       <title>{`${p.title} | 중구청소년센터`}</title>
       <PageHeader
         breadcrumbs={[

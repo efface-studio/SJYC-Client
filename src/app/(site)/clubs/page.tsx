@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight } from 'lucide-react';
-import Image from 'next/image';
+import { DirectoryIntro } from '@/components/site/directory-intro';
 import Link from 'next/link';
 import { useState } from 'react';
 import { api } from '@/api';
@@ -17,74 +17,63 @@ export default function ClubsPage() {
   const visible = clubs.data?.filter((club) => !recruitingOnly || club.recruiting);
 
   return (
-    <div className="club-page container-page">
+    <div className="club-page directory-page directory-clubs">
       <title>동아리 | 중구청소년센터</title>
-      <header className="club-cover">
-        <div>
-          <h1>동아리</h1>
-          <p>센터에서 함께 활동할 동아리를 찾아보세요.</p>
-        </div>
-        <Image
-          src="/media/clubs-studio.webp"
-          width={840}
-          height={480}
-          sizes="(min-width: 768px) 520px, 60vw"
-          alt=""
-          priority
-        />
-      </header>
-      {clubs.isPending ? (
-        <ListSkeleton rows={3} label="동아리 불러오는 중" />
-      ) : clubs.isError ? (
-        <ErrorState error={clubs.error} onRetry={() => void clubs.refetch()} />
-      ) : !clubs.data.length ? (
-        <EmptyState title="등록된 동아리가 없습니다" />
-      ) : (
-        <section aria-labelledby="club-list-heading">
-          <div className="club-list-tools">
-            <h2 id="club-list-heading">
-              동아리 목록 <span aria-live="polite">{visible?.length}개</span>
-            </h2>
-            <label>
-              <input
-                type="checkbox"
-                checked={recruitingOnly}
-                onChange={(e) => setRecruitingOnly(e.target.checked)}
+      <DirectoryIntro kind="clubs" />
+      <div className="directory-content" id="directory-content">
+        {clubs.isPending ? (
+          <ListSkeleton rows={3} label="동아리 불러오는 중" />
+        ) : clubs.isError ? (
+          <ErrorState error={clubs.error} onRetry={() => void clubs.refetch()} />
+        ) : !clubs.data.length ? (
+          <EmptyState title="등록된 동아리가 없습니다" />
+        ) : (
+          <section aria-labelledby="club-list-heading">
+            <div className="club-list-tools">
+              <h2 id="club-list-heading">
+                동아리 목록 <span aria-live="polite">{visible?.length}개</span>
+              </h2>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={recruitingOnly}
+                  onChange={(e) => setRecruitingOnly(e.target.checked)}
+                />
+                모집 중만 보기
+              </label>
+            </div>
+            {visible?.length ? (
+              <ul className="clubs-index">
+                {visible.map((club) => (
+                  <li key={club.id}>
+                    <Link href={`/clubs/${club.id}`} className="club-list-link">
+                      <ClubVisual photo={club.photos[0]} field={club.field} decorative />
+                      <div className="club-list-copy">
+                        <span className="club-field">{club.field}</span>
+                        <h3>{club.name}</h3>
+                        <p>{club.summary}</p>
+                        <Badge tone={club.recruiting ? 'brand' : 'neutral'}>
+                          {club.recruiting ? '가입 신청 가능' : '현재 모집 없음'}
+                        </Badge>
+                      </div>
+                      <ArrowUpRight className="club-open" size={18} aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <EmptyState
+                title="모집 중인 동아리가 없습니다"
+                action={
+                  <button className="underline" type="button" onClick={() => setRecruitingOnly(false)}>
+                    전체 동아리 보기
+                  </button>
+                }
               />
-              모집 중만 보기
-            </label>
-          </div>
-          {visible?.length ? (
-            <ul className="clubs-index">
-              {visible.map((club) => (
-                <li key={club.id}>
-                  <Link href={`/clubs/${club.id}`} className="club-list-link">
-                    <ClubVisual photo={club.photos[0]} field={club.field} decorative />
-                    <div className="club-list-copy">
-                      <span className="club-field">{club.field}</span>
-                      <h3>{club.name}</h3>
-                      <p>{club.summary}</p>
-                      <Badge tone={club.recruiting ? 'brand' : 'neutral'}>
-                        {club.recruiting ? '가입 신청 가능' : '현재 모집 없음'}
-                      </Badge>
-                    </div>
-                    <ArrowUpRight className="club-open" size={18} aria-hidden />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState
-              title="모집 중인 동아리가 없습니다"
-              action={
-                <button className="underline" type="button" onClick={() => setRecruitingOnly(false)}>
-                  전체 동아리 보기
-                </button>
-              }
-            />
-          )}
-        </section>
-      )}
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

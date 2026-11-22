@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { api, isApiError } from '@/api';
 import { buttonClass } from '@/components/ui/button';
+import '@/components/site/directories.css';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { NOTICE_CATEGORY_LABEL } from '@/domain/labels';
@@ -16,7 +17,7 @@ export default function NoticeDetailPage() {
   const notice = useQuery({ queryKey: ['notice', id], queryFn: () => api.notices.get(id) });
 
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-detail directory-notices directory-content">
       <div className="mx-auto max-w-3xl">
         {notice.isPending ? (
           <ListSkeleton rows={2} />
