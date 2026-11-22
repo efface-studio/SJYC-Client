@@ -141,7 +141,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
   return (
     <footer className="public-footer bg-surface-muted text-[13px] leading-relaxed text-ink-600">
       <div className="container-page py-10 md:py-14">
-        <div className="mb-8">
+        <div id="contact" className="mb-8 scroll-mt-24">
           <p className="text-[13px] font-semibold text-ink-700">대표전화</p>
           <a
             href={`tel:${CENTER.tel}`}

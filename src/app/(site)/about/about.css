@@ -151,31 +151,6 @@
   gap: 16px;
   margin-top: 12px;
 }
-.guide-contact {
-  background: #153e3f;
-  color: #fff;
-}
-.guide-contact > .guide-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-block: 44px;
-  gap: 20px;
-}
-.guide-contact h2 {
-  font-size: 23px;
-  margin-bottom: 5px;
-}
-.guide-contact a[href^='tel'] {
-  font-size: clamp(30px, 4.4vw, 58px);
-  font-weight: 760;
-  letter-spacing: -0.05em;
-}
-.guide-contact .guide-action {
-  background: #e4efc6;
-  color: #193d35;
-  margin: 0;
-}
 .center-guide section[id] {
   scroll-margin-top: 84px;
 }
@@ -196,10 +171,6 @@
   }
   .guide-visit {
     gap: 38px;
-  }
-  .guide-contact > .guide-wrap {
-    align-items: flex-start;
-    flex-direction: column;
   }
   .guide-rows > div {
     grid-template-columns: minmax(70px, 0.45fr) 1fr;

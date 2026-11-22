@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Clock3, MapPin, Phone } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Clock3, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -82,10 +82,6 @@ export function CenterGuide() {
             ({CENTER.postalCode}) {CENTER.address}
           </address>
           <Rows rows={DIRECTIONS} />
-          <a className="guide-underlink" href={`tel:${CENTER.tel}`}>
-            대표전화 {CENTER.telDisplay}
-            <Phone size={15} aria-hidden />
-          </a>
         </section>
       </div>
       <section className="guide-building" id="floors">
@@ -120,19 +116,10 @@ export function CenterGuide() {
             <Link className="guide-underlink" href="/gallery">
               센터 소식·갤러리 <ArrowUpRight size={16} aria-hidden />
             </Link>
+            <Link className="guide-underlink" href="/qna">
+              자주 묻는 질문·1:1 문의 <ArrowUpRight size={16} aria-hidden />
+            </Link>
           </div>
-        </div>
-      </section>
-      <section id="contact" className="guide-contact">
-        <div className="guide-wrap">
-          <div>
-            <h2>센터 문의</h2>
-            <a href={`tel:${CENTER.tel}`}>{CENTER.telDisplay}</a>
-            <p>팩스 {CENTER.fax}</p>
-          </div>
-          <Link href="/qna" className="guide-action">
-            자주 묻는 질문·1:1 문의 <ArrowUpRight size={16} aria-hidden />
-          </Link>
         </div>
       </section>
     </div>
