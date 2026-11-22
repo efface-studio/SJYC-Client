@@ -64,6 +64,13 @@
   border-bottom: 1px solid #ffffff24;
 }
 .console-nav {
+  min-height: 0;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #62738b transparent;
   padding: 16px 12px 22px;
 }
 .console-nav > div + div {
@@ -183,13 +190,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-}
-.console-nav-scroll {
-  min-height: 0;
-  flex: 1;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #62738b transparent;
 }
 .console-surface,
 .dash-panel {

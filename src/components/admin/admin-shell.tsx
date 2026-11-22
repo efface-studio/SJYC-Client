@@ -166,9 +166,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="console-brand">
             <Logo onDark className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>
-          <div className="console-nav-scroll">
-            <NavLinks user={user} active={active} />
-          </div>
+          <NavLinks user={user} active={active} />
           <UserBlock user={user} />
         </aside>
         <div className="flex min-w-0 flex-1 flex-col">
@@ -208,9 +206,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         className="console-drawer lg:hidden"
         bodyClassName="console-drawer-body overflow-hidden p-0"
       >
-        <div className="console-nav-scroll">
-          <NavLinks user={user} active={active} onNavigate={() => setMenuOpen(false)} />
-        </div>
+        <NavLinks user={user} active={active} onNavigate={() => setMenuOpen(false)} />
         <UserBlock user={user} />
       </Modal>
     </div>

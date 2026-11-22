@@ -312,3 +312,38 @@ test('동아리 담당자는 담당 동아리만 운영하고 직원은 담당�
   await page.getByRole('button', { name: '담당자 지정' }).click();
   await expect(page.getByText('sample5@demo.test ·')).toBeVisible();
 });
+
+test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크를 각각 누를 수 있다 @desktop', async ({ page }) => {
+  await adminLoginAs(page, '개발자', '/admin');
+  for (const [width, height] of [
+    [1440, 900],
+    [1024, 540],
+    [390, 600],
+  ]) {
+    await page.setViewportSize({ width, height });
+    if (width < 1024) await page.getByRole('button', { name: '관리자 메뉴 열기' }).click();
+    const nav = page.getByRole('navigation', { name: '관리자 메뉴' });
+    const last = nav.getByRole('link', { name: '개발자 도구' });
+    const account = page.getByRole('button', { name: '로그아웃' });
+    await expect(account).toBeVisible();
+    const initial = await account.boundingBox();
+    await last.focus();
+    await expect(last).toBeFocused();
+    for (const target of [last, account]) {
+      await expect
+        .poll(() =>
+          target.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+          }),
+        )
+        .toBe(true);
+    }
+    expect(await account.boundingBox()).toEqual(initial);
+    const port = await nav.boundingBox();
+    const footerTop = await account.evaluate(
+      (el) => el.closest('.console-account')!.getBoundingClientRect().top,
+    );
+    expect(port!.y + port!.height).toBeLessThanOrEqual(footerTop + 1);
+  }
+});
