@@ -377,3 +377,46 @@
     width: 16px;
   }
 }
+.home-service img {
+  transition: transform 0.3s ease-out;
+}
+.home-service > span {
+  position: relative;
+  z-index: 1;
+  background: inherit;
+}
+.home-service > span svg {
+  transition:
+    transform 0.23s ease-out,
+    background-color 0.23s ease-out,
+    color 0.23s ease-out;
+}
+.home-service:focus-visible {
+  outline: 3px solid #5e406c;
+  outline-offset: 4px;
+}
+.home-service:focus-visible > span svg {
+  background: #35263e;
+  color: #fff;
+  transform: translate(2px, -2px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-service:hover img {
+    transform: scale(1.035);
+  }
+  .home-service:hover > span svg {
+    background: #35263e;
+    color: #fff;
+    transform: translate(2px, -2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-service img,
+  .home-service > span svg {
+    transition: none;
+  }
+  .home-service:is(:hover, :focus-visible) img,
+  .home-service:is(:hover, :focus-visible) > span svg {
+    transform: none;
+  }
+}

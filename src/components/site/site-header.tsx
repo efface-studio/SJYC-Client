@@ -112,7 +112,7 @@ export function SiteHeader() {
       )}
     >
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
-        <Logo onDark={pathname === '/' || scrolled} />
+        <Logo onDark={pathname === '/' && !scrolled} />
 
         <nav aria-label="주 메뉴" className="full-navigation hidden lg:block">
           <ul className="flex items-center gap-1">
