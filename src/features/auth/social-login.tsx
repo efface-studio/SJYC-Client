@@ -2,14 +2,21 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { siKakaotalk, siNaver, siApple } from 'simple-icons';
+import { siNaver, siApple } from 'simple-icons';
 import { oauthStartUrl, providerStates } from '@/config/oauth';
 import { OAUTH_PROVIDER_LABEL } from '@/domain/labels';
 import type { OAuthProvider } from '@/domain/types';
 import { cn } from '@/lib/cn';
 
-const icons = { kakao: siKakaotalk, naver: siNaver, apple: siApple };
+const icons = { naver: siNaver, apple: siApple };
 function ProviderMark({ provider }: { provider: OAuthProvider }) {
+  if (provider === 'kakao') {
+    return (
+      <svg width="20" height="20" viewBox="60 15 16 16" fill="#000000" aria-hidden>
+        <path d="M68.001 16.5225C64.4222 16.5225 61.5225 19.0037 61.5225 22.0641C61.5225 24.0312 62.7219 25.7596 64.5292 26.7423L63.9181 29.2113C63.8954 29.285 63.9132 29.364 63.9619 29.4184C63.9975 29.457 64.0461 29.478 64.0931 29.478C64.1337 29.478 64.1742 29.464 64.2082 29.4341L66.834 27.5144C67.2117 27.5723 67.6007 27.6039 67.9994 27.6039C71.5767 27.6039 74.478 25.1226 74.478 22.0623C74.478 19.002 71.5783 16.5225 68.001 16.5225Z" />
+      </svg>
+    );
+  }
   if (provider === 'google')
     return <Image src="/brand/google-signin.png" width={20} height={20} alt="" unoptimized />;
   return (
