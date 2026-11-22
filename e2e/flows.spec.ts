@@ -38,12 +38,16 @@ test('동작 줄이기 설정에서는 포스터부터 표시하고 사용자가
   await page.goto('/');
   const film = page.locator('.center-film video');
   await expect(film).not.toHaveAttribute('src');
-  await page.getByRole('button', { name: '배경 영상 재생' }).click();
+  await expect(page.locator('.film-scroll-cue svg')).toHaveCSS('animation-name', 'none');
+  const playback = page.locator('.film-playback');
+  await playback.focus();
+  await playback.press('Enter');
   await expect
     .poll(() => film.evaluate((video: HTMLVideoElement) => video.currentTime))
     .toBeGreaterThan(0.12);
   await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.playbackRate)).toBe(1.2);
-  await page.getByRole('button', { name: '배경 영상 일시정지' }).click();
+  await expect(playback).toHaveText('배경 영상 일시정지');
+  await playback.press('Enter');
   await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
 });
 

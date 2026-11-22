@@ -210,50 +210,46 @@
   width: 100%;
   height: auto;
 }
-.film-controls {
+.film-scroll-cue {
   position: absolute;
-  inset: auto 0 clamp(18px, 3vw, 40px);
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.film-controls :is(a, button) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 44px;
+  z-index: 1;
+  inset-inline: 0;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  width: fit-content;
+  margin-inline: auto;
   color: white;
-  font-size: 14px;
-  font-weight: 650;
+  filter: drop-shadow(0 1px 3px #16121880);
+  pointer-events: none;
 }
-.film-explore,
-.film-tools {
-  border: 1px solid #ffffff70;
-  border-radius: 999px;
-  background: #211c22cc;
+@media (prefers-reduced-motion: no-preference) {
+  .film-scroll-cue svg {
+    animation: film-scroll-down 1.5s ease-in-out 3;
+  }
 }
-.film-explore {
-  padding: 0 15px;
+@keyframes film-scroll-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
 }
-.film-tools {
-  display: flex;
-  padding-inline: 3px;
-}
-.film-tools button {
-  width: 44px;
-  border-radius: 50%;
-}
-.film-tools a {
-  padding: 0 12px;
-}
-.film-controls :is(a, button):hover {
-  text-decoration: underline;
-}
-.film-tools button:hover {
-  background: #ffffff30;
+.film-playback:focus-visible {
+  position: absolute;
+  z-index: 2;
+  inset: auto auto 20px 20px;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  clip: auto;
+  margin: 0;
+  padding: 12px 16px;
+  overflow: visible;
+  border-radius: 8px;
+  background: #211c22;
+  color: white;
+  outline: 2px solid white;
 }
 .home-content {
   padding-block: clamp(30px, 5vw, 76px) clamp(45px, 6vw, 92px);

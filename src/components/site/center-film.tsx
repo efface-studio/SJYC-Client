@@ -1,8 +1,7 @@
 'use client';
 
-import { ArrowDown, ArrowUpRight, Pause, Play } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { CENTER } from '@/config/center';
 
@@ -67,26 +66,14 @@ export function CenterFilm() {
           priority
         />
       </h1>
-      <div className="film-controls container-page">
-        <a href="#explore" className="film-explore">
-          <ArrowDown aria-hidden size={17} /> 센터 둘러보기
-        </a>
-        <div className="film-tools">
-          {!failed && (
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label={playing ? '배경 영상 일시정지' : '배경 영상 재생'}
-            >
-              {playing ? <Pause aria-hidden size={17} /> : <Play aria-hidden size={17} />}
-            </button>
-          )}
-          <Link href="https://www.youtube.com/watch?v=XFs71iyvkv0" target="_blank" rel="noopener noreferrer">
-            원본 영상 <ArrowUpRight aria-hidden size={15} />
-            <span className="sr-only">(새 창)</span>
-          </Link>
-        </div>
-      </div>
+      <span className="film-scroll-cue" aria-hidden="true">
+        <ArrowDown size={24} strokeWidth={1.5} />
+      </span>
+      {!failed && (
+        <button type="button" className="film-playback sr-only" onClick={toggle}>
+          {playing ? '배경 영상 일시정지' : '배경 영상 재생'}
+        </button>
+      )}
     </section>
   );
 }
