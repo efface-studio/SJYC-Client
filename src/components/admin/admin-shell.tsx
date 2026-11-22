@@ -79,6 +79,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: '설정',
     items: [
+      { href: '/admin/settings', label: '사이트 설정', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
       { href: '/admin/audit', label: '감사 로그', icon: FileClock, permission: 'audit.read' },
       { href: '/admin/developer', label: '개발자 도구', icon: Settings2, permission: 'developer.access' },

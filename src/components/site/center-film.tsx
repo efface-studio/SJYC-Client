@@ -3,13 +3,13 @@
 import { ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { CENTER } from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
 
-const MOVIE = '/media/center-film.mp4';
 const PLAYBACK_RATE = 1.2;
-const POSTER = '/media/center-film-poster.webp';
 
 export function CenterFilm() {
+  const settings = useSiteSettings();
+  const movie = settings.film;
   const film = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -23,20 +23,20 @@ export function CenterFilm() {
     const followPreference = () => {
       if (motion.matches) video.pause();
       else {
-        if (!video.src) video.src = MOVIE;
+        if (video.getAttribute('src') !== movie) video.src = movie;
         void video.play().catch(() => {});
       }
     };
     followPreference();
     motion.addEventListener('change', followPreference);
     return () => motion.removeEventListener('change', followPreference);
-  }, []);
+  }, [movie]);
 
   function toggle() {
     const video = film.current;
     if (!video) return;
     if (video.paused) {
-      if (!video.src) video.src = MOVIE;
+      if (video.getAttribute('src') !== movie) video.src = movie;
       void video.play().catch(() => {});
     } else video.pause();
   }
@@ -49,7 +49,7 @@ export function CenterFilm() {
         playsInline
         loop
         preload="none"
-        poster={POSTER}
+        poster={settings.poster}
         aria-hidden="true"
         onPlaying={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -58,8 +58,8 @@ export function CenterFilm() {
       />
       <h1 id="film-title">
         <Image
-          src="/brand/film-wordmark.svg"
-          alt={CENTER.formalName}
+          src={settings.heroLogo}
+          alt={settings.formalName}
           width={474}
           height={75}
           unoptimized

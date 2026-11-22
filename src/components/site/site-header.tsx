@@ -10,18 +10,11 @@ import { api } from '@/api';
 import { buttonClass } from '@/components/ui/button';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
-import { CENTER } from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
+import { NAV_LINKS } from '@/domain/site-settings';
+import { orderedKeys } from '@/config/site-settings';
 import { useLogout, useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
-
-export const SITE_NAV = [
-  { href: '/programs', label: '프로그램' },
-  { href: '/spaces', label: '공간 예약' },
-  { href: '/clubs', label: '동아리' },
-  { href: '/kdream', label: '꿈드림' },
-  { href: '/notices', label: '공지사항' },
-  { href: '/about', label: '센터 안내' },
-] as const;
 
 const MORE = [
   { href: '/gallery', label: '센터 소식·갤러리' },
@@ -36,11 +29,12 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 export function Logo({ className, onDark = false }: { className?: string; onDark?: boolean }) {
+  const settings = useSiteSettings();
   return (
     <Link href="/" className={cn('inline-flex shrink-0 items-center', className)}>
       <Image
-        src={onDark ? '/brand/logo-on-dark.png' : '/brand/logo-horizontal.jpg'}
-        alt={`${CENTER.formalName} 홈`}
+        src={onDark ? settings.heroLogo : settings.headerLogo}
+        alt={`${settings.formalName} 홈`}
         width={300}
         height={50}
         priority
@@ -86,6 +80,11 @@ function watchScroll(update: () => void) {
 const pastTop = () => window.scrollY > 24;
 
 export function SiteHeader() {
+  const settings = useSiteSettings();
+  const nav = orderedKeys(settings.navOrder, NAV_LINKS).map((key) => ({
+    href: '/' + key,
+    label: NAV_LINKS[key],
+  }));
   const pathname = usePathname();
   const scrolled = useSyncExternalStore(watchScroll, pastTop, () => false);
   const router = useRouter();
@@ -116,7 +115,7 @@ export function SiteHeader() {
 
         <nav aria-label="주 메뉴" className="full-navigation hidden lg:block">
           <ul className="flex items-center gap-1">
-            {SITE_NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -196,7 +195,7 @@ export function SiteHeader() {
           <ul className="site-menu-main">
             {[
               { href: '/', label: '홈' },
-              ...SITE_NAV,
+              ...nav,
               { href: '/my', label: '마이페이지' },
               ...(session
                 ? [{ href: '/notifications', label: '알림' }]

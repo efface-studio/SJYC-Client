@@ -1,16 +1,10 @@
+'use client';
 import { ArrowDown, ArrowUpRight, Clock3, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  CENTER,
-  CENTER_SERVICES,
-  DESK_HOURS,
-  DESK_HOURS_NOTE,
-  DIRECTIONS,
-  FLOORS,
-  OPERATING_HOURS,
-  type HoursRow,
-} from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
+import { displayHours, settingsRows } from '@/config/site-settings';
+import type { HoursRow } from '@/config/center';
 
 const TOC = [
   ['intro', '센터 소개'],
@@ -34,6 +28,20 @@ function Rows({ rows }: { rows: HoursRow[] }) {
 }
 
 export function CenterGuide() {
+  const center = useSiteSettings();
+  const hours = [
+    { label: '평일', value: displayHours(center.weekdayHours) },
+    { label: '토요일', value: displayHours(center.saturdayHours) },
+    {
+      label: '일요일',
+      value:
+        displayHours(center.sundayHours) + (center.closedSunday === 'second' ? ' (매월 둘째 주 휴관)' : ''),
+    },
+  ];
+  const desk = [
+    { label: '평일', value: displayHours(center.deskWeekday) },
+    { label: '토요일', value: displayHours(center.deskSaturday) },
+  ];
   return (
     <div className="center-guide">
       <header className="guide-opening">
@@ -41,10 +49,10 @@ export function CenterGuide() {
           <div>
             <p className="guide-place">
               <MapPin size={17} aria-hidden />
-              서울 중구 · 약수역
+              {center.name}
             </p>
             <h1>센터 안내</h1>
-            <p className="guide-slogan">{CENTER.slogan}</p>
+            <p className="guide-slogan">{center.slogan}</p>
             <a className="guide-action" href="#location">
               찾아오는 길 <ArrowDown size={17} aria-hidden />
             </a>
@@ -70,18 +78,18 @@ export function CenterGuide() {
         <section id="hours">
           <Clock3 aria-hidden />
           <h2>운영시간</h2>
-          <Rows rows={OPERATING_HOURS} />
+          <Rows rows={hours} />
           <h3>안내데스크 방문 접수</h3>
-          <Rows rows={DESK_HOURS} />
-          <p className="guide-note">{DESK_HOURS_NOTE}</p>
+          <Rows rows={desk} />
+          <p className="guide-note">{center.deskNote}</p>
         </section>
         <section id="location">
           <MapPin aria-hidden />
           <h2>오시는 길</h2>
           <address>
-            ({CENTER.postalCode}) {CENTER.address}
+            ({center.postalCode}) {center.address}
           </address>
-          <Rows rows={DIRECTIONS} />
+          <Rows rows={settingsRows(center.directions)} />
         </section>
       </div>
       <section className="guide-building" id="floors">
@@ -93,10 +101,10 @@ export function CenterGuide() {
             </Link>
           </div>
           <ol>
-            {FLOORS.map((f) => (
-              <li key={f.floor}>
-                <strong>{f.floor}</strong>
-                <span>{f.spaces.join(' · ')}</span>
+            {settingsRows(center.floors).map((f) => (
+              <li key={f.label}>
+                <strong>{f.label}</strong>
+                <span>{f.value}</span>
               </li>
             ))}
           </ol>
@@ -105,10 +113,10 @@ export function CenterGuide() {
       <section id="intro" className="guide-wrap guide-split guide-services">
         <div>
           <h2>센터 소개</h2>
-          <p>{CENTER.formalName}</p>
+          <p>{center.formalName}</p>
         </div>
         <div>
-          <Rows rows={CENTER_SERVICES} />
+          <Rows rows={settingsRows(center.services)} />
           <div className="guide-links">
             <Link className="guide-underlink" href="/programs">
               프로그램 찾기 <ArrowUpRight size={16} aria-hidden />
