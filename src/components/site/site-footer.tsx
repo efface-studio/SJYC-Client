@@ -178,7 +178,8 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
 
         <address className="mt-10 border-t border-line pt-8 not-italic">
           <Image
-            src="/brand/logo-horizontal.jpg"
+            src="/brand/logo-on-dark.png"
+            unoptimized
             alt={CENTER.formalName}
             width={300}
             height={50}
