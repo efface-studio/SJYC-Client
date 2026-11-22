@@ -319,7 +319,7 @@ test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크�
     [1440, 900],
     [1024, 540],
     [390, 600],
-  ]) {
+  ] as const) {
     await page.setViewportSize({ width, height });
     if (width < 1024) await page.getByRole('button', { name: '관리자 메뉴 열기' }).click();
     const nav = page.getByRole('navigation', { name: '관리자 메뉴' });
