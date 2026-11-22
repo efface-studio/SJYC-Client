@@ -153,6 +153,12 @@ function SearchBody({ user, menus, close }: { user: User; menus: Match[]; close:
           placeholder="메뉴, 프로그램, 신청자 검색"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              close();
+            }
+          }}
         />
       </label>
       <p role="status" className="console-search-status">
