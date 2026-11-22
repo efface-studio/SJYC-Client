@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { DemoBanner } from '@/components/dev-panel';
@@ -90,8 +90,24 @@ const ALL_ITEMS = NAV.flatMap((g) => g.items);
 
 function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; onNavigate?: () => void }) {
   const uid = useId();
+  const menuRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    // 창 높이가 줄어도 키보드로 선택한 메뉴가 계정 영역에 가려지지 않게 한다.
+    const observer = new ResizeObserver(() => {
+      const activeLink = document.activeElement;
+      if (!(activeLink instanceof HTMLAnchorElement) || !menu.contains(activeLink)) return;
+      const link = activeLink.getBoundingClientRect();
+      const port = menu.getBoundingClientRect();
+      if (link.bottom > port.bottom) menu.scrollTop += link.bottom - port.bottom;
+      else if (link.top < port.top) menu.scrollTop += link.top - port.top;
+    });
+    observer.observe(menu);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <nav aria-label="관리자 메뉴" className="console-nav">
+    <nav ref={menuRef} aria-label="관리자 메뉴" className="console-nav">
       {NAV.map((group, index) => {
         const items = group.items.filter((i) => allows(user, i.permission));
         if (!items.length) return null;
