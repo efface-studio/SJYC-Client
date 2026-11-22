@@ -347,3 +347,23 @@ test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크�
     expect(port!.y + port!.height).toBeLessThanOrEqual(footerTop + 1);
   }
 });
+
+test('꿈드림 메뉴에서 지원 분야와 참여 방법을 찾을 수 있다', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: '꿈드림', exact: true }).click();
+  await expect(page).toHaveURL(/\/kdream$/);
+  await expect(page.getByRole('heading', { name: '중구 꿈드림', level: 1 })).toBeVisible();
+  await page.getByRole('link', { name: /진로·자립 나에게 맞는/ }).click();
+  await expect(page).toHaveURL(/#career$/);
+  await page.getByRole('link', { name: '이용 방법 보기' }).click();
+  await expect(page).toHaveURL(/#participate$/);
+  await expect(page.getByRole('link', { name: /청소년1388 온라인 신청/ })).toHaveAttribute(
+    'href',
+    'https://www.1388.go.kr/ind/YTOSP_SC_IND_01',
+  );
+  await expect(page.getByRole('link', { name: '전화 문의', exact: true })).toHaveAttribute(
+    'href',
+    'tel:0222500543',
+  );
+});

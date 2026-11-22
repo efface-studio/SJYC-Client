@@ -18,6 +18,7 @@ export const SITE_NAV = [
   { href: '/programs', label: '프로그램' },
   { href: '/spaces', label: '공간 예약' },
   { href: '/clubs', label: '동아리' },
+  { href: '/kdream', label: '꿈드림' },
   { href: '/notices', label: '공지사항' },
   { href: '/about', label: '센터 안내' },
 ] as const;

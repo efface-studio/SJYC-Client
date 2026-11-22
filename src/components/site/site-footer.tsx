@@ -43,6 +43,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     title: '센터',
     links: [
       { href: '/about', label: '센터 소개' },
+      { href: '/kdream', label: '꿈드림' },
       { href: '/about#location', label: '오시는 길' },
       { href: '/qna', label: '질문·문의' },
     ],
