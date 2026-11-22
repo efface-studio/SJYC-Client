@@ -421,7 +421,7 @@ test('동아리와 공간 목록은 느린 응답에 스켈레톤을 표시하�
   for (const [path, label, selector] of [
     ['/clubs', '동아리 불러오는 중', '.club-list-link'],
     ['/spaces', '공간 불러오는 중', '.space-row'],
-  ]) {
+  ] as const) {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     const pending = page.getByRole('status', { name: label });
     await expect(pending).toBeVisible();
