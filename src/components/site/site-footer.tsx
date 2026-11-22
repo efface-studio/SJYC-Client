@@ -14,7 +14,7 @@ const CHANNEL_ICON: Record<(typeof OFFICIAL_CHANNELS)[number]['key'], SimpleIcon
 
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" className="size-4 shrink-0" fill={`#${icon.hex}`}>
+    <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0 text-ink-900" fill="currentColor">
       <path d={icon.path} />
     </svg>
   );
