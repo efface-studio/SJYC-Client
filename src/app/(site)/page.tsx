@@ -99,6 +99,10 @@ function VisitToday() {
             height={514}
             referrerPolicy="no-referrer"
             fetchPriority="high"
+            ref={(img) => {
+              // 서버 HTML에서 먼저 요청한 사진은 하이드레이션 전에 실패할 수 있다.
+              if (img?.complete && img.naturalWidth === 0) setShowPhoto(false);
+            }}
             onError={() => setShowPhoto(false)}
           />
           <figcaption>중구청소년센터 시설안내</figcaption>

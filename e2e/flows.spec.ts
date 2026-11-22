@@ -23,6 +23,15 @@ test('비로그인 사용자가 공개 페이지를 탐색할 수 있다', async
   await expect(page.locator('a[href*="j-youth"]')).toHaveCount(0);
 });
 
+test('센터 전경 사진을 불러올 수 없어도 운영시간과 프로그램 바로가기가 남는다', async ({ page }) => {
+  await page.route('**/info_00_01.jpg', (route) => route.abort());
+  await page.goto('/');
+  await expect(page.getByText(/공휴일·임시 휴관은/)).toBeVisible();
+  await expect(page.getByRole('img', { name: '약수역 인근 중구청소년센터 건물 전경' })).toHaveCount(0);
+  await page.getByRole('link', { name: '프로그램 찾기' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '프로그램', exact: true })).toBeVisible();
+});
+
 test('잘못된 로그인 입력은 오류를 표시한다', async ({ page }) => {
   await page.goto('/login');
   await page.getByRole('button', { name: '로그인', exact: true }).click();
