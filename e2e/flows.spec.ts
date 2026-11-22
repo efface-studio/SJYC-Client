@@ -388,3 +388,26 @@ test('꿈드림 메뉴에서 지원 분야와 참여 방법을 찾을 수 있다
     'tel:0222500543',
   );
 });
+
+test('관리자 통합검색에서 업무를 열고 담당자 권한을 적용한다', async ({ page }) => {
+  await adminLoginAs(page, '최고 관리자', '/admin');
+  const open = page.getByRole('button', { name: '관리자 통합검색 열기' });
+  await open.click();
+  const dialog = page.getByRole('dialog', { name: '관리자 통합검색' });
+  const input = dialog.getByRole('searchbox', { name: '관리자 검색어' });
+  await expect(input).toBeFocused();
+  await input.fill('농구');
+  const program = dialog.getByRole('link', { name: /주말 농구 교실/ }).first();
+  await program.click();
+  await expect(page).toHaveURL(/\/admin\/programs\/[^/]+$/);
+  await expect(dialog).toBeHidden();
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '동아리 담당자', '/admin/my-clubs');
+  await open.click();
+  await expect(dialog.getByRole('link', { name: '동아리 운영' })).toBeVisible();
+  await expect(dialog.getByRole('link', { name: '회원', exact: true })).toHaveCount(0);
+  await input.fill('농구');
+  await expect(dialog.getByText('검색 결과가 없습니다.')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+});
