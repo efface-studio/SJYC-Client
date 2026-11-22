@@ -32,6 +32,21 @@ function BrandIcon({ icon }: { icon: SimpleIcon }) {
   );
 }
 
+function MakerCredit() {
+  return (
+    <a
+      href="https://v2.efface.dev/en"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex min-h-10 items-center gap-1.5 self-start hover:underline"
+    >
+      Made by <Image src="/brand/efface-mark.png" width={18} height={18} alt="" unoptimized />
+      <span className="font-semibold">efface</span>
+      <span className="sr-only">(새 창)</span>
+    </a>
+  );
+}
+
 interface FooterLink {
   href: string;
   label: string;
@@ -127,14 +142,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
               </p>
             </address>
           </details>
-          <a
-            href="https://v2.efface.dev/en"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="py-1 hover:underline"
-          >
-            Made by efface<span className="sr-only">(새 창)</span>
-          </a>
+          <MakerCredit />
         </div>
       </footer>
     );
@@ -204,15 +212,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
           <p>
             Copyright © {CENTER.copyrightSince} {CENTER.englishName}. All rights reserved.
           </p>
-          <a
-            href="https://v2.efface.dev/en"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-ink-600 hover:text-ink-900"
-          >
-            Made by <span className="font-semibold">efface</span>
-            <span className="sr-only">(새 창)</span>
-          </a>
+          <MakerCredit />
         </div>
       </div>
     </footer>
