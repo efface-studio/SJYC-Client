@@ -27,10 +27,10 @@
 .site-header.over-film {
   margin-bottom: calc(0px - var(--header-height));
 }
-.site-header.over-film:not(.is-scrolled) {
+.site-header.on-film {
   color: white;
 }
-.site-header.is-scrolled {
+.site-header.is-scrolled:not(.on-film) {
   top: 6px;
   width: min(calc(100% - 24px), 1780px);
   margin-inline: auto;
@@ -41,30 +41,30 @@
   box-shadow: 0 3px 10px rgb(44 32 40 / 7%);
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header.is-scrolled {
+  .site-header.is-scrolled:not(.on-film) {
     background: rgb(255 251 245 / 52%);
     -webkit-backdrop-filter: blur(17px) saturate(135%) brightness(1.16);
     backdrop-filter: blur(17px) saturate(135%) brightness(1.16);
   }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .site-header.is-scrolled {
+  .site-header.is-scrolled:not(.on-film) {
     background: #faf8f7;
     backdrop-filter: none;
   }
 }
 @media (max-width: 639px) {
-  .site-header.is-scrolled {
+  .site-header.is-scrolled:not(.on-film) {
     top: 5px;
     width: calc(100% - 12px);
     border-radius: 12px;
   }
 }
-.site-header.is-scrolled > .container-page nav a:is(:hover, [aria-current='page']),
-.site-header.is-scrolled > .container-page > div :is(a, button):hover {
+.site-header.is-scrolled:not(.on-film) > .container-page nav a:is(:hover, [aria-current='page']),
+.site-header.is-scrolled:not(.on-film) > .container-page > div :is(a, button):hover {
   background: #eae3ea;
 }
-.site-header.is-scrolled .container-page > a img {
+.site-header.is-scrolled:not(.on-film) .container-page > a img {
   mix-blend-mode: multiply;
 }
 .site-header > .container-page {
@@ -126,6 +126,14 @@
 .site-header > .container-page a[href='/signup']:hover,
 .site-header .full-navigation a[href='/my']:hover {
   background: #ffc9a9;
+}
+.site-header.on-film > .container-page :is(nav a, div a, div button) {
+  color: white;
+  background: transparent;
+  box-shadow: none;
+}
+.site-header.on-film > .container-page :is(nav a, div a, div button):hover {
+  background: rgb(255 255 255 / 14%);
 }
 .site-header:is(.over-film, .is-scrolled) > .container-page :focus-visible,
 .center-film :focus-visible,

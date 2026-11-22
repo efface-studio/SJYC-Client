@@ -64,6 +64,16 @@ test('홈 상단은 스크롤 위치에 따라 아이콘 메뉴와 전체 메뉴
   await page.keyboard.press('Escape');
   await page.evaluate(() => window.scrollTo(0, 300));
   await expect(nav).toBeVisible();
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(nav.getByRole('link').first()).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await expect(header.getByRole('link', { name: '회원가입' })).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const boundary = await page
+    .locator('.center-film')
+    .evaluate((el) => el.getBoundingClientRect().bottom + scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y), boundary);
+  await expect(header).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(nav).toBeHidden();
   await expect(header.getByRole('button', { name: '전체 메뉴 열기' })).toBeVisible();

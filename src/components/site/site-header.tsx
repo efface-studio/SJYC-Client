@@ -5,7 +5,7 @@ import { Bell, Menu, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { api } from '@/api';
 import { buttonClass } from '@/components/ui/button';
 import { Modal } from '@/components/ui/dialog';
@@ -73,11 +73,20 @@ function NotificationBell() {
   );
 }
 
-function watchScroll(update: () => void) {
+function watchPosition(update: () => void) {
   window.addEventListener('scroll', update, { passive: true });
-  return () => window.removeEventListener('scroll', update);
+  window.addEventListener('resize', update);
+  window.addEventListener('pageshow', update);
+  const resize = new ResizeObserver(update);
+  const film = document.querySelector('.center-film');
+  if (film) resize.observe(film);
+  return () => {
+    resize.disconnect();
+    window.removeEventListener('scroll', update);
+    window.removeEventListener('resize', update);
+    window.removeEventListener('pageshow', update);
+  };
 }
-const pastTop = () => window.scrollY > 24;
 
 export function SiteHeader() {
   const settings = useSiteSettings();
@@ -86,7 +95,18 @@ export function SiteHeader() {
     label: NAV_LINKS[key],
   }));
   const pathname = usePathname();
-  const scrolled = useSyncExternalStore(watchScroll, pastTop, () => false);
+  const home = pathname === '/';
+  const readPosition = useCallback(() => {
+    if (window.scrollY <= 24) return 'top';
+    if (home) {
+      const film = document.querySelector('.center-film');
+      const bar = document.querySelector('.site-header > .container-page');
+      if (film && bar && film.getBoundingClientRect().bottom >= bar.clientHeight) return 'film';
+    }
+    return 'content';
+  }, [home]);
+  const position = useSyncExternalStore(watchPosition, readPosition, () => 'top');
+  const onFilm = home && position !== 'content';
   const router = useRouter();
   const toast = useToast();
   const { data: session } = useSession();
@@ -106,12 +126,13 @@ export function SiteHeader() {
     <header
       className={cn(
         'site-header sticky top-0 z-30',
-        pathname === '/' && 'over-film',
-        scrolled && 'is-scrolled',
+        home && 'over-film',
+        onFilm && 'on-film',
+        position !== 'top' && 'is-scrolled',
       )}
     >
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
-        <Logo onDark={pathname === '/' && !scrolled} />
+        <Logo onDark={onFilm} />
 
         <nav aria-label="주 메뉴" className="full-navigation hidden lg:block">
           <ul className="flex items-center gap-1">
