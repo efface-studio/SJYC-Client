@@ -19,7 +19,12 @@ async function loginAs(page: Page, label: '일반 회원' | '센터 직원', nex
 test('비로그인 사용자가 공개 페이지를 탐색할 수 있다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /모집 중인 프로그램/ })).toBeVisible();
-  await page.getByRole('navigation', { name: '하단 메뉴' }).getByRole('link', { name: '프로그램' }).click();
+  await expect(page.getByRole('navigation', { name: '하단 메뉴' })).toHaveCount(0);
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page
+    .getByRole('navigation', { name: '전체 메뉴' })
+    .getByRole('link', { name: '프로그램', exact: true })
+    .click();
   await expect(page.getByRole('heading', { level: 1, name: '프로그램' })).toBeVisible();
   await page.getByRole('link', { name: /주말 농구 교실/ }).click();
   await expect(page.getByRole('link', { name: '로그인하고 신청하기' })).toBeVisible();

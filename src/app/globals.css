@@ -49,7 +49,7 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    /* 포커스·스크롤 대상이 고정 헤더/하단 탭바에 가려지지 않게 (WCAG 2.4.11) */
+    /* 고정 UI에 포커스 대상이 가려지지 않도록 스크롤 여백을 둔다. */
     scroll-padding-top: 80px;
     scroll-padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
