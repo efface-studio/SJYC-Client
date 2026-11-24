@@ -132,6 +132,15 @@ export default function SignupPage() {
             error={errors.birthYear}
           />
 
+          <TextField
+            label="휴대전화 (선택)"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="010-1234-5678"
+            error={errors.phone}
+          />
           <fieldset className="rounded-md border border-line p-4">
             <legend className="px-1 text-[15px] font-bold">약관 동의</legend>
             <CheckboxField
