@@ -1,4 +1,5 @@
 'use client';
+import { MapLinks } from '@/components/site/map-links';
 import { ArrowDown, ArrowUpRight, Clock3, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -91,6 +92,7 @@ export function CenterGuide() {
             ({center.postalCode}) {center.address}
           </address>
           <Rows rows={settingsRows(center.directions)} />
+          <MapLinks address={center.address} />
         </section>
       </div>
       <section className="guide-building" id="floors">
