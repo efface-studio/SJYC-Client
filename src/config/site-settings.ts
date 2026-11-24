@@ -1,3 +1,4 @@
+import { defaultBanners } from '../domain/mobile-banners';
 import { CENTER, CENTER_SERVICES, DESK_HOURS_NOTE, DIRECTIONS, FLOORS, OFFICIAL_CHANNELS } from './center';
 import { HOME_SECTIONS, NAV_LINKS, type SettingKey, type SiteSettings } from '../domain/site-settings';
 
@@ -61,6 +62,7 @@ export const SETTING_GROUPS: Group[] = [
       clubImage: '동아리 사진',
     },
   },
+  { name: '앱 홈 배너', fields: { mobileBanners: '사용자 앱 홈 배너' } },
   { name: '검색 정보', fields: { seoTitle: '사이트 제목', seoDescription: '사이트 설명' } },
 ];
 const lines = (rows: { label: string; value: string }[]) =>
@@ -73,6 +75,7 @@ export function settingsRows(value: string) {
 }
 export const DEFAULT_SETTINGS: Required<SiteSettings> = {
   ...CENTER,
+  mobileBanners: JSON.stringify(defaultBanners),
   weekdayHours: '06:00-22:00',
   saturdayHours: '06:00-21:00',
   sundayHours: '06:00-18:00',
