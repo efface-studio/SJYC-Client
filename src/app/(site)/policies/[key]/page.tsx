@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '@/api';
 import { BookOpenText } from 'lucide-react';
 import './policy-reader.css';
-import { Callout, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { ErrorState, ListSkeleton } from '@/components/ui/states';
 import { OSS_WEB } from '@/config/oss-licenses';
 import { POLICY_NAV, POLICY_TITLE } from '@/domain/labels';
 import type { PolicyDoc, PolicyKey } from '@/domain/types';
@@ -42,12 +42,7 @@ function PolicySection({ doc }: { doc: PolicyDoc }) {
         title={doc.title}
         sub={doc.effectiveAt ? `시행일 ${formatDate(doc.effectiveAt)}` : undefined}
       />
-      {!doc.confirmed && (
-        <Callout tone="warning" title="센터 확정본 미등록" className="mb-6">
-          아래 내용은 초안입니다. 센터가 확정한 문서가 등록되면 이 화면에 표시됩니다.
-        </Callout>
-      )}
-      <div className="policy-prose">{doc.body}</div>
+      <div className="policy-prose">{doc.confirmed ? doc.body : '게시된 문서가 없습니다.'}</div>
     </>
   );
 }
