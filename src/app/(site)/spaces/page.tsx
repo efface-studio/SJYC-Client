@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { api } from '@/api';
 import { Badge } from '@/components/ui/badge';
 import { SpacePhoto } from '@/components/site/space-photo';
+import { DirectorySkeleton } from '@/components/site/directory-skeleton';
 import { DirectoryIntro } from '@/components/site/directory-intro';
-import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { EmptyState, ErrorState } from '@/components/ui/states';
 import { FLOORS } from '@/config/center';
 import type { Space } from '@/domain/types';
 import { RESERVATION_MAX_DAYS_AHEAD, RESERVATION_MAX_HOURS } from '@/domain/space';
@@ -38,7 +39,7 @@ export default function SpacesPage() {
           담당자 확인 후 확정
         </p>
         {spaces.isPending ? (
-          <ListSkeleton rows={4} label="공간 불러오는 중" />
+          <DirectorySkeleton kind="spaces" />
         ) : spaces.isError ? (
           <ErrorState error={spaces.error} onRetry={() => void spaces.refetch()} />
         ) : spaces.data.length === 0 ? (

@@ -18,7 +18,7 @@
 ```
 src/
   app/
-    (site)/        사용자 웹 (모바일 우선, 하단 탭바)
+    (site)/        사용자 웹 (모바일은 상단 전체 메뉴)
     admin/         관리자 웹 (login + (console) 레이아웃)
   api/
     client.ts      ApiClient 인터페이스 (UI 가 의존하는 유일한 계약)
