@@ -99,13 +99,17 @@ test('잘못된 로그인 입력은 오류를 표시한다', async ({ page }) =>
   ).toBeVisible();
 });
 
-test('OAuth 설정이 없으면 성공을 가장하지 않는다', async ({ page }) => {
+test('지원 전인 Google과 미설정 공급자는 로그인을 시작할 수 없다', async ({ page }) => {
   await page.goto('/login');
-  await expect(page.getByText('설정 필요')).toHaveCount(4);
-  // aria-disabled 버튼은 Playwright 가 활성화를 기다리므로 force — 실제 사용자는 눌러서 안내를 받는다
-  await page.getByRole('button', { name: /네이버 로그인/ }).click({ force: true });
-  await expect(page.getByRole('status').filter({ hasText: '설정이 필요합니다' })).toBeVisible();
+  for (const provider of ['카카오', '네이버', 'Apple']) {
+    const button = page.getByRole('button', { name: new RegExp(provider + '.*설정 필요') });
+    await expect(button).toBeDisabled();
+  }
+  const google = page.getByRole('button', { name: /Google.*준비 중/ });
+  await expect(google).toBeDisabled();
+  await google.click({ force: true });
   await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('status').filter({ hasText: '이메일 로그인' })).toBeVisible();
 });
 
 test('일반 회원은 관리자 화면에 접근할 수 없다', async ({ page }) => {
