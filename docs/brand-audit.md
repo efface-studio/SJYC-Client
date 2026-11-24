@@ -84,3 +84,7 @@
 - 센터 캐릭터("라미") 사용 가능 여부
 - 이용약관·개인정보처리방침 확정본(앱 내 등록 필요)
 - 공휴일 운영 규칙, 공간 예약 정책(예약 가능 시간·인원·승인 절차)
+
+## 영상 위 로고
+
+`public/brand/film-wordmark.svg`의 휘장은 중구청 [CI 기본형 AI](https://www.junggu.seoul.kr/ci/data/ci_basic.ai.zip)의 원본 벡터·색상을 사용했다. 기관명은 공식 표기를 유지하고 프로젝트 서체 Pretendard SemiBold·Bold로 다시 조판해 윤곽선으로 저장했다. 센터가 제공한 공식 가로형 벡터 원본은 아니다.

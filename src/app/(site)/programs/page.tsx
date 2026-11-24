@@ -7,7 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { api } from '@/api';
 import { Pagination } from '@/components/ui/pagination';
-import { PageHeader } from '@/components/ui/page-header';
+import { DirectoryIntro } from '@/components/site/directory-intro';
 import { Select } from '@/components/ui/select';
 import { SearchInput } from '@/components/ui/search-input';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
@@ -173,7 +173,7 @@ function ProgramList() {
             <p className="mb-3 text-sm text-ink-600" aria-live="polite">
               총 <strong className="text-ink-900">{programs.data.total}</strong>개
             </p>
-            <ul className="border-t border-line-strong">
+            <ul className="program-catalog">
               {programs.data.items.map((p) => (
                 <li key={p.id}>
                   <ProgramRow program={p} categoryName={categoryName(p.categoryId)} />
@@ -195,16 +195,17 @@ function ProgramList() {
 
 export default function ProgramsPage() {
   return (
-    <div className="container-page py-6 md:py-10">
-      <PageHeader
-        className="directory-heading program-photo"
-        title="프로그램"
-        description="청소년활동·체육/교육·진로체험·꿈드림 프로그램을 찾아 신청하세요."
-        actions={<ProgramViewToggle current="list" />}
-      />
-      <Suspense fallback={<ListSkeleton rows={3} />}>
-        <ProgramList />
-      </Suspense>
+    <div className="directory-page directory-programs">
+      <DirectoryIntro kind="programs" />
+      <div id="directory-content" className="directory-content">
+        <div className="directory-toolbar">
+          <h2>프로그램 찾기</h2>
+          <ProgramViewToggle current="list" />
+        </div>
+        <Suspense fallback={<ListSkeleton rows={3} />}>
+          <ProgramList />
+        </Suspense>
+      </div>
     </div>
   );
 }

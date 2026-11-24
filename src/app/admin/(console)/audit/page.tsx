@@ -3,31 +3,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
-import { DataList, type Column } from '@/components/admin/data-list';
+import { FileClock } from 'lucide-react';
+import '@/features/developer/operations.css';
 import { FilterBar } from '@/components/admin/filter-bar';
 import { ADMIN_PAGE_SIZE, useListParams } from '@/components/admin/list-params';
 import { QueryState } from '@/components/admin/query-state';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState } from '@/components/ui/states';
-import type { AuditEvent } from '@/domain/types';
 import { formatDateTime } from '@/lib/format';
-
-const COLUMNS: Column<AuditEvent>[] = [
-  { key: 'summary', header: '내용', primary: true, cell: (e) => e.summary },
-  {
-    key: 'at',
-    header: '일시',
-    cell: (e) => formatDateTime(e.at),
-    className: 'tabular-nums whitespace-nowrap',
-  },
-  { key: 'actor', header: '처리자', cell: (e) => e.actorName, className: 'whitespace-nowrap' },
-  { key: 'action', header: '작업', cell: (e) => <code className="text-sm">{e.action}</code> },
-  {
-    key: 'target',
-    header: '대상',
-    cell: (e) => <code className="text-sm break-all">{`${e.targetType}:${e.targetId}`}</code>,
-  },
-];
 
 function AuditList() {
   const lp = useListParams();
@@ -40,24 +23,58 @@ function AuditList() {
 
   return (
     <>
-      <FilterBar searchLabel="감사 로그 검색" placeholder="내용, 처리자로 검색" total={events.data?.total} />
-      <QueryState
-        query={events}
-        isEmpty={(d) => d.items.length === 0}
-        empty={<EmptyState title="기록된 이벤트가 없습니다" />}
-      >
-        {(d) => (
-          <>
-            <DataList caption="감사 로그" rows={d.items} columns={COLUMNS} rowLabel={(e) => e.summary} />
-            <Pagination
-              page={lp.page}
-              total={d.total}
-              pageSize={ADMIN_PAGE_SIZE}
-              hrefFor={(p) => lp.hrefWith({ page: p })}
-            />
-          </>
-        )}
-      </QueryState>
+      <div className="audit-workspace">
+        <header className="operations-heading">
+          <FileClock size={23} />
+          <strong>Audit trail</strong>
+          <span>관리자 작업 이력</span>
+        </header>
+        <FilterBar
+          searchLabel="감사 로그 검색"
+          placeholder="내용, 처리자로 검색"
+          total={events.data?.total}
+        />
+        <QueryState
+          query={events}
+          isEmpty={(d) => d.items.length === 0}
+          empty={<EmptyState title="기록된 이벤트가 없습니다" />}
+        >
+          {(d) => (
+            <>
+              <ol className="audit-stream">
+                {d.items.map((e) => (
+                  <li key={e.id}>
+                    <details>
+                      <summary>
+                        <time dateTime={e.at}>{formatDateTime(e.at)}</time>
+                        <div>
+                          <code>{e.action}</code>
+                          <strong>{e.summary}</strong>
+                        </div>
+                        <span>{e.actorName}</span>
+                      </summary>
+                      <dl>
+                        <dt>이벤트 ID</dt>
+                        <dd>{e.id}</dd>
+                        <dt>대상</dt>
+                        <dd>
+                          {e.targetType} / {e.targetId}
+                        </dd>
+                      </dl>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+              <Pagination
+                page={lp.page}
+                total={d.total}
+                pageSize={ADMIN_PAGE_SIZE}
+                hrefFor={(p) => lp.hrefWith({ page: p })}
+              />
+            </>
+          )}
+        </QueryState>
+      </div>
     </>
   );
 }

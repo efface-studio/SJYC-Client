@@ -29,13 +29,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
-import { DemoBanner } from '@/components/dev-panel';
 import { Logo } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
 import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/domain/permissions';
 import type { User } from '@/domain/types';
 import { allows, type Access } from '@/features/auth/guards';
 import { useLogout, useSession } from '@/features/auth/session';
+import { ConsoleSearch } from './console-search';
 import './admin-console.css';
 
 interface NavItem {
@@ -80,6 +80,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: '설정',
     items: [
+      { href: '/admin/settings', label: '사이트 설정', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
       { href: '/admin/audit', label: '감사 로그', icon: FileClock, permission: 'audit.read' },
       { href: '/admin/developer', label: '개발자 도구', icon: Settings2, permission: 'developer.access' },
@@ -202,16 +203,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <ChevronRight size={14} aria-hidden />
               <strong className="truncate">{active?.label ?? '관리'}</strong>
             </div>
-            <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
-              사용자 화면
-              <ArrowUpRight size={15} aria-hidden />
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <ConsoleSearch user={user} menus={ALL_ITEMS.filter((i) => allows(user, i.permission))} />
+              <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
+                사용자 화면
+                <ArrowUpRight size={15} aria-hidden />
+              </Link>
+            </div>
           </header>
           <main id="main" tabIndex={-1} className="console-main focus:outline-none">
             {children}
           </main>
           <SiteFooter compact />
-          <DemoBanner tone="admin" />
         </div>
       </div>
       <Modal
