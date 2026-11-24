@@ -1,7 +1,16 @@
 'use client';
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, ClipboardList, FileText, RotateCw } from 'lucide-react';
+import {
+  CalendarCheck,
+  MessageCircle,
+  UsersRound,
+  CalendarDays,
+  ChevronRight,
+  ClipboardList,
+  FileText,
+  RotateCw,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -23,28 +32,32 @@ const QUEUES = [
     label: '프로그램 신청',
     href: '/admin/applications?status=submitted',
     permission: 'application.decide',
-    color: '#346dda',
+    icon: ClipboardList,
+    tint: 'application',
   },
   {
     key: 'clubApplicationsPending',
     label: '동아리 가입',
     href: '/admin/clubs/applications?status=pending',
     permission: 'club.manage',
-    color: '#56a9cd',
+    icon: UsersRound,
+    tint: 'club',
   },
   {
     key: 'reservationsPending',
     label: '공간 예약',
     href: '/admin/spaces?status=pending',
     permission: 'space.manage',
-    color: '#7a76b6',
+    icon: CalendarCheck,
+    tint: 'reservation',
   },
   {
     key: 'inquiriesOpen',
     label: '문의 답변',
     href: '/admin/inquiries?status=open',
     permission: 'inquiry.answer',
-    color: '#e3a156',
+    icon: MessageCircle,
+    tint: 'inquiry',
   },
 ] as const;
 
@@ -64,9 +77,9 @@ function WorkQueue({ data, user }: { data: DashboardSummary; user: User | undefi
   return (
     <section className="dash-panel queue-panel" aria-labelledby="queue-heading">
       <div className="queue-heading">
-        <h2 id="queue-heading">처리 대기 업무</h2>
+        <h2 id="queue-heading">처리할 일</h2>
         <span>
-          총 <b>{total.toLocaleString('ko-KR')}</b>건
+          <b>{total.toLocaleString('ko-KR')}</b>건
         </span>
       </div>
       <div className="queue-body">
@@ -74,19 +87,14 @@ function WorkQueue({ data, user }: { data: DashboardSummary; user: User | undefi
           {QUEUES.map((q) => (
             <li key={q.key}>
               <DrillDown href={q.href} allowed={can(user, q.permission)}>
+                <span className="queue-icon" data-kind={q.tint}>
+                  <q.icon size={20} aria-hidden />
+                </span>
                 <span className="grow">{q.label}</span>
                 <b>
                   {data[q.key].toLocaleString('ko-KR')}
                   <small>건</small>
                 </b>
-                <span className="queue-track" aria-hidden>
-                  <i
-                    style={{
-                      width: (total ? (data[q.key] / total) * 100 : 0) + '%',
-                      backgroundColor: q.color,
-                    }}
-                  />
-                </span>
               </DrillDown>
             </li>
           ))}
@@ -171,7 +179,7 @@ function Dashboard() {
         {(d) => (
           <div className="dashboard-grid">
             <WorkQueue data={d} user={user} />
-            <section className="dash-panel" aria-labelledby="stats-heading">
+            <section className="dash-panel overview-stats" aria-labelledby="stats-heading">
               <div className="dash-section-heading">
                 <h2 id="stats-heading">운영 현황</h2>
                 <div role="group" aria-label="집계 기간" className="period-switch">
