@@ -267,6 +267,10 @@ let lastResetToken: { token: string; userId: string } | null = null;
 
 export const mockClient: ApiClient = {
   auth: {
+    socialProviders: async () => [],
+    startWebLink: async () => {
+      throw new ApiError('NOT_CONFIGURED', '소셜 로그인을 사용할 수 없습니다.');
+    },
     me: () => respond((db) => (currentUser(db) ? toSession(db, currentUser(db)!) : null)),
     login: (input) =>
       respond((db) => {
