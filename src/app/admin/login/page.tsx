@@ -93,6 +93,7 @@ function AdminLoginForm() {
       )}
 
       <form
+        method="post"
         noValidate
         onChange={feedback.edit}
         onSubmit={(e) => {
