@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
+import { Skeleton } from '@/components/ui/states';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -190,7 +191,7 @@ function Dashboard() {
         </div>
       }
     >
-      <QueryState query={summary}>
+      <QueryState query={summary} loading={<DashboardSkeleton />}>
         {(d) => (
           <div className="dashboard-grid">
             <WorkQueue data={d} user={user} />
@@ -301,6 +302,25 @@ function Dashboard() {
         )}
       </QueryState>
     </AdminPage>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div role="status" aria-label="운영 현황 불러오는 중" className="dashboard-grid">
+      {[4, 3].map((rows) => (
+        <div key={rows} className="dash-panel" aria-hidden="true">
+          <Skeleton className="mb-4 h-6 w-28" />
+          {Array.from({ length: rows }, (_, index) => (
+            <div key={index} className="dash-row">
+              <Skeleton className="size-5" />
+              <Skeleton className="h-4 w-2/5" />
+              <Skeleton className="ml-auto h-4 w-8" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
