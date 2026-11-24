@@ -105,7 +105,7 @@ export function SiteHeader() {
     }
     return 'content';
   }, [home]);
-  const position = useSyncExternalStore(watchPosition, readPosition, () => 'top');
+  const position = useSyncExternalStore(watchPosition, readPosition, () => 'initial');
   const onFilm = home && position !== 'content';
   const router = useRouter();
   const toast = useToast();
@@ -128,7 +128,7 @@ export function SiteHeader() {
         'site-header sticky top-0 z-30',
         home && 'over-film',
         onFilm && 'on-film',
-        position !== 'top' && 'is-scrolled',
+        (position === 'film' || position === 'content') && 'is-scrolled',
       )}
     >
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
@@ -195,6 +195,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
+            disabled={position === 'initial'}
             aria-label="전체 메뉴 열기"
             aria-expanded={menuOpen}
             className="compact-navigation flex size-11 items-center justify-center rounded-full lg:hidden"

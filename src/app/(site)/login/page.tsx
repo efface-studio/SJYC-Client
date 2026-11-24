@@ -8,11 +8,9 @@ import './login.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useRef, useState } from 'react';
 import { api, errorMessage, isApiError } from '@/api';
-import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/mock/seed';
 import { Button } from '@/components/ui/button';
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
-import { DEMO_DATA } from '@/config/env';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { PENDING_VERIFY_KEY, SESSION_KEY, useSession } from '@/features/auth/session';
@@ -134,27 +132,6 @@ function LoginForm() {
           회원가입
         </Link>
       </div>
-
-      {DEMO_DATA && (
-        <details className="login-demo">
-          <summary>데모 계정으로 입력</summary>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {DEMO_ACCOUNTS.map((a) => (
-              <button
-                key={a.email}
-                type="button"
-                onClick={() => {
-                  if (emailRef.current) emailRef.current.value = a.email;
-                  if (passwordRef.current) passwordRef.current.value = DEMO_PASSWORD;
-                }}
-                className="min-h-11 rounded-md border border-line-strong bg-surface px-2 text-sm font-semibold"
-              >
-                {a.label}
-              </button>
-            ))}
-          </div>
-        </details>
-      )}
 
       <div className="my-6 flex items-center gap-3 text-sm text-ink-600">
         <span className="h-px flex-1 bg-line" />
