@@ -6,16 +6,18 @@ import './login.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useRef, useState } from 'react';
 import { api, errorMessage, isApiError } from '@/api';
-import { Button } from '@/components/ui/button';
+
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
+import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { PENDING_VERIFY_KEY, SESSION_KEY, useSession } from '@/features/auth/session';
 import { SocialLoginButtons } from '@/features/auth/social-login';
 import { memberRedirect } from '@/lib/safe-redirect';
 
 function LoginForm() {
+  const feedback = useLoginFeedback();
   const params = useSearchParams();
   const router = useRouter();
   const qc = useQueryClient();
@@ -33,12 +35,13 @@ function LoginForm() {
     onSuccess: (s) => {
       qc.setQueryData(SESSION_KEY, s);
       // 이동 경로는 내부 경로만 허용하고, 회원 로그인으로는 관리자 화면에 보내지 않는다
-      router.replace(memberRedirect(next));
+      feedback.finish(() => router.replace(memberRedirect(next)));
     },
     onError: (error, input) => {
       if (isApiError(error, 'FORBIDDEN') && error.message.includes('이메일 인증')) {
         setUnverifiedEmail(input.email);
       }
+      feedback.fail();
       setFormError(errorMessage(error));
       passwordRef.current?.focus();
     },
@@ -64,20 +67,23 @@ function LoginForm() {
 
       <form
         noValidate
+        onChange={feedback.edit}
         onSubmit={(e) => {
           e.preventDefault();
-          if (login.isPending) return;
+          if (login.isPending || feedback.phase === 'success') return;
           setFormError(null);
           setUnverifiedEmail(null);
           const parsed = parseForm(loginSchema, new FormData(e.currentTarget));
           if (!parsed.ok) {
+            feedback.fail();
             setErrors(parsed.errors);
             return;
           }
           setErrors({});
+          feedback.start();
           login.mutate(parsed.data);
         }}
-        className="space-y-4"
+        className="auth-form space-y-4"
       >
         <TextField
           ref={emailRef}
@@ -108,9 +114,7 @@ function LoginForm() {
             인증 메일 다시 받기
           </Link>
         )}
-        <Button type="submit" size="lg" block loading={login.isPending}>
-          로그인
-        </Button>
+        <LoginSubmit phase={feedback.phase} attempt={feedback.attempt} title="로그인" />
       </form>
 
       <nav className="login-help" aria-label="계정 도움말">
@@ -127,15 +131,15 @@ export default function LoginPage() {
   return (
     <div className="member-login">
       <title>로그인 | 중구청소년센터</title>
-        <section className="login-fields" aria-labelledby="login-heading">
-          <h1 id="login-heading">로그인</h1>
-          <Suspense fallback={<ListSkeleton rows={2} />}>
-            <LoginForm />
-          </Suspense>
-          <Link href="/" className="login-back">
-            로그인 없이 둘러보기
-          </Link>
-        </section>
+      <section className="login-fields" aria-labelledby="login-heading">
+        <h1 id="login-heading">로그인</h1>
+        <Suspense fallback={<ListSkeleton rows={2} />}>
+          <LoginForm />
+        </Suspense>
+        <Link href="/" className="login-back">
+          로그인 없이 둘러보기
+        </Link>
+      </section>
     </div>
   );
 }

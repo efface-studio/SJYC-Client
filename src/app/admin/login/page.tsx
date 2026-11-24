@@ -10,12 +10,13 @@ import { api, errorMessage } from '@/api';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/mock/seed';
 import { AdminTitle } from '@/components/admin/admin-page';
 import { Logo } from '@/components/site/site-header';
-import { Button, buttonClass } from '@/components/ui/button';
+import { buttonClass } from '@/components/ui/button';
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
 import { DEMO_DATA } from '@/config/env';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
 import { canEnterConsole } from '@/domain/permissions';
+import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { SESSION_KEY, useLogout, useSession } from '@/features/auth/session';
 import { safeRedirect } from '@/lib/safe-redirect';
@@ -33,6 +34,7 @@ function adminRedirect(target: string | null): string {
 }
 
 function AdminLoginForm() {
+  const feedback = useLoginFeedback();
   const params = useSearchParams();
   const router = useRouter();
   const qc = useQueryClient();
@@ -50,14 +52,16 @@ function AdminLoginForm() {
     onSuccess: (s) => {
       // 역할 판단은 서버가 돌려준 세션만 근거로 한다 (URL 값은 신뢰하지 않음)
       if (!canEnterConsole(s.user)) {
+        feedback.fail();
         setFormError('관리자 권한이 없는 계정입니다.');
         logout.mutate();
         return;
       }
       qc.setQueryData(SESSION_KEY, s);
-      router.replace(adminRedirect(next));
+      feedback.finish(() => router.replace(adminRedirect(next)));
     },
     onError: (error) => {
+      feedback.fail();
       setFormError(errorMessage(error));
       passwordRef.current?.focus();
     },
@@ -90,19 +94,22 @@ function AdminLoginForm() {
 
       <form
         noValidate
+        onChange={feedback.edit}
         onSubmit={(e) => {
           e.preventDefault();
-          if (busy) return;
+          if (busy || feedback.phase === 'success') return;
           setFormError(null);
           const parsed = parseForm(loginSchema, new FormData(e.currentTarget));
           if (!parsed.ok) {
+            feedback.fail();
             setErrors(parsed.errors);
             return;
           }
           setErrors({});
+          feedback.start();
           login.mutate(parsed.data);
         }}
-        className="space-y-4"
+        className="auth-form space-y-4"
       >
         <TextField
           ref={emailRef}
@@ -124,9 +131,12 @@ function AdminLoginForm() {
           error={errors.password}
         />
         <FormError message={formError} />
-        <Button type="submit" size="lg" block loading={busy}>
-          관리자 로그인
-        </Button>
+        <LoginSubmit
+          phase={feedback.phase}
+          attempt={feedback.attempt}
+          title="관리자 로그인"
+          disabled={logout.isPending}
+        />
       </form>
 
       {DEMO_DATA && (

@@ -45,33 +45,39 @@
   height: 1px;
   background: var(--color-line);
 }
-.social-auth-grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px clamp(8px, 3vw, 20px);
-}
 .oauth-button {
   display: grid;
-  justify-items: center;
-  gap: 6px;
-  min-width: 50px;
-  color: var(--color-ink-700);
-  font-size: 12px;
+  grid-template-columns: minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr);
+  align-items: center;
+  column-gap: 4px;
+  padding: 8px 12px;
 }
-.oauth-button .oauth-mark {
+.oauth-mark {
+  width: 22px;
+  height: 22px;
   display: grid;
-  width: 44px;
-  height: 44px;
   place-items: center;
-  border-radius: 50%;
+  justify-self: start;
+}
+.oauth-mark > * {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.oauth-label {
+  grid-column: 2;
+  text-align: center;
+  line-height: 1.35;
+}
+.oauth-status {
+  grid-column: 3;
+  justify-self: end;
+  font-size: 11px;
+  line-height: 1.25;
 }
 .oauth-button:focus-visible {
   outline: 2px solid var(--color-brand-700);
   outline-offset: 3px;
-}
-.oauth-button:hover .oauth-mark {
-  box-shadow: 0 0 0 1px var(--color-line-strong);
 }
 .login-social-note,
 .login-back {
