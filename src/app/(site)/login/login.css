@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: 0.88fr 1.12fr;
   background: #fffdf8;
-  border: 1px solid #dfdfd3;
+  border: 1px solid var(--sjyc-line);
   border-radius: 22px;
   overflow: hidden;
 }
@@ -17,7 +17,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #21554c;
+  background: var(--sjyc-deep);
   color: #fffae6;
 }
 .login-art img {
@@ -34,7 +34,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, #102d2730 0%, #102d274a 42%, #0c302bea 100%);
+  background: linear-gradient(180deg, #291d1c30 0%, #291d1c4a 42%, #2e1719ea 100%);
 }
 .login-art > div {
   position: absolute;
@@ -58,25 +58,25 @@
   font-size: clamp(33px, 3.7vw, 50px);
   font-weight: 790;
   line-height: 1.2;
-  color: #163e36;
+  color: var(--sjyc-ink);
   letter-spacing: -0.055em;
   margin-bottom: 25px;
 }
 .login-fields form button[type='submit'] {
-  background: #235a4d;
+  background: var(--color-brand-700);
   color: white;
 }
 .login-fields form :is(input, button[type='submit']) {
   border-radius: 9px;
 }
 .login-fields form button[type='submit']:hover {
-  background: #174438;
+  background: var(--sjyc-deep);
 }
 .login-demo {
   border-bottom: 1px solid #e3e2d8;
   padding: 5px 0 10px;
   font-size: 13px;
-  color: #586359;
+  color: var(--sjyc-muted);
 }
 .login-demo summary {
   cursor: pointer;
@@ -92,7 +92,7 @@
   min-height: 40px;
   margin-top: 6px;
   font-size: 14px;
-  color: #41584d;
+  color: var(--sjyc-muted);
 }
 .oauth-button {
   display: grid;
@@ -111,10 +111,10 @@
   padding: 2px 5px;
   border-radius: 4px;
   background: #ffffffeb;
-  color: #424641;
+  color: var(--sjyc-ink);
 }
 .oauth-button:focus-visible {
-  outline: 3px solid #35745c;
+  outline: 3px solid var(--color-brand-700);
   outline-offset: 2px;
 }
 @media (max-width: 760px) {

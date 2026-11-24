@@ -97,7 +97,7 @@ export const DEFAULT_SETTINGS: Required<SiteSettings> = {
   footerLogo: '/brand/logo-on-dark.png',
   film: '/media/center-film.mp4',
   poster: '/media/center-film-poster.webp',
-  accent: '#a33b19',
+  accent: '#b51e28',
   seoTitle: CENTER.name,
   seoDescription: '서울시 중구청소년센터 — 프로그램·공지·동아리·센터 이용 안내',
 };

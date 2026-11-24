@@ -1,6 +1,6 @@
 .kdream {
-  --dream-ink: #173f46;
-  --dream-green: #13675c;
+  --dream-ink: var(--sjyc-ink);
+  --dream-accent: var(--color-brand-700);
   color: var(--dream-ink);
   background: #fff;
   word-break: keep-all;
@@ -10,7 +10,7 @@
   margin-inline: auto;
 }
 .dream-intro {
-  background: #f2f1df;
+  background: var(--sjyc-sun-soft);
 }
 .dream-opening {
   display: grid;
@@ -22,7 +22,7 @@
 .dream-kicker,
 .dream-category {
   font-weight: 700;
-  color: var(--dream-green);
+  color: var(--dream-accent);
 }
 .dream-kicker {
   font-size: 17px;
@@ -33,7 +33,7 @@
   line-height: 1.05;
 }
 .kdream em {
-  color: var(--dream-green);
+  color: var(--dream-accent);
   font-style: normal;
 }
 .dream-lead {
@@ -58,10 +58,10 @@
 }
 .dream-primary {
   color: white;
-  background: var(--dream-green);
+  background: var(--dream-accent);
 }
 .dream-primary:hover {
-  background: #104e46;
+  background: var(--sjyc-deep);
 }
 .dream-opening .dream-primary {
   margin-top: 28px;
@@ -80,7 +80,7 @@
 }
 .dream-fields {
   padding-block: clamp(54px, 6.8vw, 96px);
-  background: #edf5f3;
+  background: var(--sjyc-cream);
 }
 .dream-fields h2,
 .dream-stories h2 {
@@ -100,10 +100,10 @@
   padding: 25px;
   border-radius: 17px;
   background: #fff;
-  box-shadow: 0 3px 8px #1f4e4210;
+  box-shadow: 0 3px 8px #4a262010;
 }
 .dream-tile:hover {
-  box-shadow: 0 5px 15px #21564b24;
+  box-shadow: 0 5px 15px #4a262024;
 }
 .dream-tile:hover strong {
   text-decoration: underline;
@@ -148,7 +148,7 @@
 }
 .dream-photos p,
 .dream-details dd {
-  color: #435c5c;
+  color: var(--sjyc-muted);
   line-height: 1.65;
 }
 .dream-details {
@@ -168,7 +168,7 @@
   grid-template-columns: 87px 1fr;
   gap: 12px;
   padding-block: 20px;
-  border-bottom: 1px solid #d5dfdb;
+  border-bottom: 1px solid var(--sjyc-line);
 }
 .dream-details [id] {
   scroll-margin-top: 96px;
@@ -183,7 +183,7 @@
 }
 .dream-directions {
   min-height: 38px;
-  color: var(--dream-green);
+  color: var(--dream-accent);
 }
 .dream-actions {
   display: flex;
@@ -192,13 +192,13 @@
   margin-top: 22px;
 }
 .dream-call {
-  border: 1px solid #9ab5ad;
+  border: 1px solid var(--sjyc-rule);
 }
 .dream-call:hover {
-  background: #edf5f3;
+  background: var(--sjyc-cream);
 }
 .kdream a:focus-visible {
-  outline: 3px solid #1970a6;
+  outline: 3px solid var(--color-brand-700);
   outline-offset: 3px;
 }
 @media (max-width: 850px) {

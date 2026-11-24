@@ -1,10 +1,10 @@
 .policy-reader {
   background: #f6f5f0;
-  color: #263831;
+  color: var(--sjyc-ink);
 }
 .policy-intro {
-  background: #e5ebe1;
-  border-bottom: 1px solid #d7dfd2;
+  background: var(--sjyc-sun-soft);
+  border-bottom: 1px solid var(--sjyc-line);
 }
 .policy-intro > div,
 .policy-body {
@@ -15,7 +15,7 @@
   padding-block: clamp(30px, 5vw, 64px);
 }
 .policy-intro svg {
-  color: #44735b;
+  color: var(--color-brand-700);
   margin-bottom: 12px;
 }
 .public-site .policy-intro h1 {
@@ -35,25 +35,25 @@
   padding: 15px 0;
 }
 .policy-body nav a[aria-current='location'] {
-  color: #205540;
-  background: #e9eee5;
+  color: var(--color-brand-700);
+  background: var(--sjyc-cream);
 }
 .policy-articles > section {
   background: #fffefa;
-  border: 1px solid #dcded4;
+  border: 1px solid var(--sjyc-line);
   border-radius: 10px;
   padding: clamp(20px, 3.5vw, 48px);
   scroll-margin-top: 100px;
 }
 .policy-articles > section header {
-  border-color: #819483;
+  border-color: var(--sjyc-rule);
 }
 .policy-articles h2 {
   font-size: clamp(23px, 2.4vw, 33px);
   letter-spacing: -0.045em;
 }
 .policy-prose {
-  color: #343a36;
+  color: var(--sjyc-ink);
   font-size: 16px;
   line-height: 1.9;
   overflow-wrap: anywhere;
