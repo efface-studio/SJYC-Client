@@ -1,5 +1,7 @@
 'use client';
 
+import { ProfilePhoto } from '@/features/profile/profile-photo';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -50,6 +52,9 @@ export default function ProfilePage() {
   return (
     <>
       <title>내 정보 | 중구청소년센터</title>
+      <div className="mb-5">
+        <ProfilePhoto userId={user.id} editable />
+      </div>
       <form
         noValidate
         onSubmit={(e) => {
