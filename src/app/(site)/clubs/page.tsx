@@ -2,13 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ArrowUpRight } from 'lucide-react';
+import { DirectorySkeleton } from '@/components/site/directory-skeleton';
 import { DirectoryIntro } from '@/components/site/directory-intro';
 import Link from 'next/link';
 import { useState } from 'react';
 import { api } from '@/api';
 import { ClubVisual } from '@/components/site/club-visual';
 import { Badge } from '@/components/ui/badge';
-import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { EmptyState, ErrorState } from '@/components/ui/states';
 import './clubs.css';
 
 export default function ClubsPage() {
@@ -22,7 +23,7 @@ export default function ClubsPage() {
       <DirectoryIntro kind="clubs" />
       <div className="directory-content" id="directory-content">
         {clubs.isPending ? (
-          <ListSkeleton rows={3} label="동아리 불러오는 중" />
+          <DirectorySkeleton kind="clubs" />
         ) : clubs.isError ? (
           <ErrorState error={clubs.error} onRetry={() => void clubs.refetch()} />
         ) : !clubs.data.length ? (
