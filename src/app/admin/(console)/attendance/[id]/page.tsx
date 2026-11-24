@@ -229,8 +229,10 @@ function SessionDetail({ id }: { id: string }) {
                 출석부 삭제
               </Button>
             </div>
-            <CheckInPanel session={s} onChange={update} />
-            <Roster session={s} onChange={update} />
+            <div className="attendance-register">
+              <CheckInPanel session={s} onChange={update} />
+              <Roster session={s} onChange={update} />
+            </div>
             <ConfirmDialog
               open={confirm}
               title="출석부를 삭제할까요?"
@@ -252,6 +254,7 @@ export default function AdminAttendanceDetailPage() {
   const { id } = useParams<{ id: string }>();
   return (
     <AdminPage
+      view="record"
       title="출석부"
       permission={canManageAttendance}
       breadcrumbs={[{ label: '출석', href: '/admin/attendance' }, { label: '출석부' }]}

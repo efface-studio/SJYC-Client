@@ -12,6 +12,19 @@ export function AdminTitle({ children }: { children: string }) {
 }
 
 interface AdminPageProps {
+  view:
+    | 'inbox'
+    | 'list'
+    | 'record'
+    | 'editor'
+    | 'attendance'
+    | 'journal'
+    | 'tools'
+    | 'directory'
+    | 'settings'
+    | 'library'
+    | 'reference'
+    | 'policy';
   title: string;
   permission: Access;
   description?: ReactNode;
@@ -25,6 +38,7 @@ interface AdminPageProps {
 /** 관리자 섹션 공통 틀 — 권한 확인, 문서 제목, 머리글, useSearchParams 용 Suspense */
 export function AdminPage({
   title,
+  view,
   permission,
   description,
   breadcrumbs,
@@ -35,14 +49,16 @@ export function AdminPage({
   return (
     <RequirePermission permission={permission}>
       <AdminTitle>{docTitle ?? title}</AdminTitle>
-      <PageHeader
-        title={title}
-        description={description}
-        breadcrumbs={breadcrumbs}
-        actions={actions}
-        className="mb-5"
-      />
-      <Suspense fallback={<ListSkeleton rows={4} />}>{children}</Suspense>
+      <div className="workspace-page" data-layout={view}>
+        <PageHeader
+          title={title}
+          description={description}
+          breadcrumbs={breadcrumbs}
+          actions={actions}
+          className="mb-5"
+        />
+        <Suspense fallback={<ListSkeleton rows={4} />}>{children}</Suspense>
+      </div>
     </RequirePermission>
   );
 }

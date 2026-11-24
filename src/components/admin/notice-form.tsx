@@ -1,5 +1,7 @@
 'use client';
 
+import { EditorIndex } from './editor-index';
+
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckboxField, FormError, SelectField, TextAreaField, TextField } from '@/components/ui/field';
@@ -85,7 +87,7 @@ export function NoticeForm({
         ref={formRef}
         noValidate
         hidden={preview !== null}
-        className="console-surface console-form max-w-3xl space-y-5"
+        className="editor-sheet console-form space-y-5"
         onSubmit={(e) => {
           e.preventDefault();
           if (pending) return;
@@ -98,50 +100,57 @@ export function NoticeForm({
           onSubmit(parsed.data);
         }}
       >
-        <TextField
-          label="제목"
-          name="title"
-          required
-          maxLength={100}
-          defaultValue={initial?.title}
-          error={shown.title}
-        />
-        <div className="grid gap-5 sm:grid-cols-2">
-          <SelectField
-            label="분류"
-            name="category"
+        <EditorIndex sections={['공지 작성', '게시 설정']} />
+        <fieldset id="edit-공지-작성" className="editor-section space-y-5">
+          <legend>공지 작성</legend>{' '}
+          <TextField
+            label="제목"
+            name="title"
             required
-            defaultValue={initial?.category ?? 'center'}
-            error={shown.category}
-            options={Object.entries(NOTICE_CATEGORY_LABEL).map(([value, label]) => ({ value, label }))}
+            maxLength={100}
+            defaultValue={initial?.title}
+            error={shown.title}
           />
-          <SelectField
-            label="게시 상태"
-            name="status"
+          <TextAreaField
+            label="본문"
+            name="body"
             required
-            defaultValue={initial?.status ?? 'draft'}
-            error={shown.status}
-            options={Object.entries(PUBLISH_STATUS).map(([value, l]) => ({ value, label: l.text }))}
+            rows={14}
+            maxLength={10000}
+            defaultValue={initial?.body}
+            error={shown.body}
+            hint="일반 텍스트로 게시됩니다. 줄바꿈은 그대로 표시됩니다."
           />
-        </div>
-        <TextAreaField
-          label="본문"
-          name="body"
-          required
-          rows={14}
-          maxLength={10000}
-          defaultValue={initial?.body}
-          error={shown.body}
-          hint="일반 텍스트로 게시됩니다. 줄바꿈은 그대로 표시됩니다."
-        />
-        <CheckboxField
-          label="목록 상단에 고정"
-          name="pinned"
-          defaultChecked={initial?.pinned}
-          error={shown.pinned}
-        />
+        </fieldset>
+        <fieldset id="edit-게시-설정" className="editor-section space-y-5">
+          <legend>게시 설정</legend>{' '}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <SelectField
+              label="분류"
+              name="category"
+              required
+              defaultValue={initial?.category ?? 'center'}
+              error={shown.category}
+              options={Object.entries(NOTICE_CATEGORY_LABEL).map(([value, label]) => ({ value, label }))}
+            />
+            <SelectField
+              label="게시 상태"
+              name="status"
+              required
+              defaultValue={initial?.status ?? 'draft'}
+              error={shown.status}
+              options={Object.entries(PUBLISH_STATUS).map(([value, l]) => ({ value, label: l.text }))}
+            />
+          </div>
+          <CheckboxField
+            label="목록 상단에 고정"
+            name="pinned"
+            defaultChecked={initial?.pinned}
+            error={shown.pinned}
+          />
+        </fieldset>
         <FormError message={formError} />
-        <div className="flex flex-col-reverse gap-2 border-t border-line pt-5 sm:flex-row sm:justify-between">
+        <div className="editor-actions flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
           <div>{extraActions}</div>
           <Button type="submit" loading={pending}>
             {submitLabel}

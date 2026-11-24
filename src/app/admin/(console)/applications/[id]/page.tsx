@@ -48,86 +48,89 @@ function ApplicationDetail() {
   return (
     <QueryState query={app} notFound="신청 내역을 찾을 수 없습니다">
       {(a) => (
-        <>
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge tone={APPLICATION_STATUS[a.status].tone}>{APPLICATION_STATUS[a.status].text}</Badge>
-            <span className="text-sm text-ink-600 tabular-nums">접수 번호 {a.receiptNo ?? '미발급'}</span>
-          </div>
-          <h2 className="mt-2 text-lg font-bold">
-            {a.applicantName} · {a.programTitle}
-          </h2>
-
-          <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
-            <dt className="text-ink-600">프로그램</dt>
-            <dd>
-              <Link href={`/admin/programs/${a.programId}`} className="text-brand-700 hover:underline">
-                {a.programTitle}
-              </Link>
-            </dd>
-            <dt className="text-ink-600">신청자</dt>
-            <dd>{a.applicantName}</dd>
-            <dt className="text-ink-600">연락처</dt>
-            <dd className="tabular-nums">{a.phone}</dd>
-            <dt className="text-ink-600">신청 일시</dt>
-            <dd className="tabular-nums">{formatDateTime(a.createdAt)}</dd>
-            <dt className="text-ink-600">요청 사항</dt>
-            <dd className="whitespace-pre-line">{a.note || '없음'}</dd>
-          </dl>
-
-          {a.status === 'submitted' && (
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-              <Button onClick={() => setDialog('approved')}>승인</Button>
-              <Button variant="secondary" className="text-danger-700" onClick={() => setDialog('rejected')}>
-                반려
-              </Button>
+        <div className="review-layout">
+          <article className="review-record">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge tone={APPLICATION_STATUS[a.status].tone}>{APPLICATION_STATUS[a.status].text}</Badge>
+              <span className="text-sm text-ink-600 tabular-nums">접수 번호 {a.receiptNo ?? '미발급'}</span>
             </div>
-          )}
-
-          <section aria-labelledby="history-title" className="mt-8 max-w-2xl">
-            <h2 id="history-title" className="mb-3 text-base font-bold">
-              처리 이력
+            <h2 className="mt-2 text-lg font-bold">
+              {a.applicantName} · {a.programTitle}
             </h2>
-            <ol className="space-y-3 border-l-2 border-line pl-4">
-              {a.history.map((h, i) => (
-                <li key={`${h.at}-${i}`}>
-                  <p className="text-[15px] font-semibold">
-                    {APPLICATION_STATUS[h.status].text}{' '}
-                    <span className="font-normal text-ink-600">· {ACTOR[h.actor]}</span>
-                  </p>
-                  <p className="text-sm text-ink-600 tabular-nums">{formatDateTime(h.at)}</p>
-                  {h.reason && <p className="mt-1 text-sm text-ink-700">사유: {h.reason}</p>}
-                </li>
-              ))}
-            </ol>
-          </section>
 
-          <ConfirmDialog
-            open={dialog === 'approved'}
-            title="신청을 승인할까요?"
-            description={
-              <>
-                <strong>{a.applicantName}</strong>님의 <strong>{a.programTitle}</strong> 신청을 승인합니다.
-                결과는 신청자 화면에 바로 표시됩니다.
-              </>
-            }
-            confirmLabel="승인"
-            loading={decide.isPending}
-            onConfirm={() => decide.mutate({ decision: 'approved', reason: null })}
-            onClose={() => setDialog(null)}
-          />
-          <RejectDialog
-            open={dialog === 'rejected'}
-            title="신청을 반려할까요?"
-            description={
-              <>
-                <strong>{a.applicantName}</strong>님의 <strong>{a.programTitle}</strong> 신청을 반려합니다.
-              </>
-            }
-            loading={decide.isPending}
-            onConfirm={(reason) => decide.mutate({ decision: 'rejected', reason })}
-            onClose={() => setDialog(null)}
-          />
-        </>
+            <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
+              <dt className="text-ink-600">프로그램</dt>
+              <dd>
+                <Link href={`/admin/programs/${a.programId}`} className="text-brand-700 hover:underline">
+                  {a.programTitle}
+                </Link>
+              </dd>
+              <dt className="text-ink-600">신청자</dt>
+              <dd>{a.applicantName}</dd>
+              <dt className="text-ink-600">연락처</dt>
+              <dd className="tabular-nums">{a.phone}</dd>
+              <dt className="text-ink-600">신청 일시</dt>
+              <dd className="tabular-nums">{formatDateTime(a.createdAt)}</dd>
+              <dt className="text-ink-600">요청 사항</dt>
+              <dd className="whitespace-pre-line">{a.note || '없음'}</dd>
+            </dl>
+
+            {a.status === 'submitted' && (
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+                <Button onClick={() => setDialog('approved')}>승인</Button>
+                <Button variant="secondary" className="text-danger-700" onClick={() => setDialog('rejected')}>
+                  반려
+                </Button>
+              </div>
+            )}
+          </article>
+          <div className="review-side">
+            <section aria-labelledby="history-title" className="mt-8 max-w-2xl">
+              <h2 id="history-title" className="mb-3 text-base font-bold">
+                처리 이력
+              </h2>
+              <ol className="space-y-3 border-l-2 border-line pl-4">
+                {a.history.map((h, i) => (
+                  <li key={`${h.at}-${i}`}>
+                    <p className="text-[15px] font-semibold">
+                      {APPLICATION_STATUS[h.status].text}{' '}
+                      <span className="font-normal text-ink-600">· {ACTOR[h.actor]}</span>
+                    </p>
+                    <p className="text-sm text-ink-600 tabular-nums">{formatDateTime(h.at)}</p>
+                    {h.reason && <p className="mt-1 text-sm text-ink-700">사유: {h.reason}</p>}
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <ConfirmDialog
+              open={dialog === 'approved'}
+              title="신청을 승인할까요?"
+              description={
+                <>
+                  <strong>{a.applicantName}</strong>님의 <strong>{a.programTitle}</strong> 신청을 승인합니다.
+                  결과는 신청자 화면에 바로 표시됩니다.
+                </>
+              }
+              confirmLabel="승인"
+              loading={decide.isPending}
+              onConfirm={() => decide.mutate({ decision: 'approved', reason: null })}
+              onClose={() => setDialog(null)}
+            />
+            <RejectDialog
+              open={dialog === 'rejected'}
+              title="신청을 반려할까요?"
+              description={
+                <>
+                  <strong>{a.applicantName}</strong>님의 <strong>{a.programTitle}</strong> 신청을 반려합니다.
+                </>
+              }
+              loading={decide.isPending}
+              onConfirm={(reason) => decide.mutate({ decision: 'rejected', reason })}
+              onClose={() => setDialog(null)}
+            />
+          </div>
+        </div>
       )}
     </QueryState>
   );
@@ -136,6 +139,7 @@ function ApplicationDetail() {
 export default function AdminApplicationDetailPage() {
   return (
     <AdminPage
+      view="record"
       title="신청 상세"
       permission="application.decide"
       breadcrumbs={[{ label: '프로그램 신청', href: '/admin/applications' }, { label: '상세' }]}

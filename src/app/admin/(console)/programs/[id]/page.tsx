@@ -108,6 +108,7 @@ function EditProgram() {
 export default function AdminProgramEditPage() {
   return (
     <AdminPage
+      view="editor"
       title="프로그램 수정"
       permission="program.write"
       breadcrumbs={[{ label: '프로그램 관리', href: '/admin/programs' }, { label: '수정' }]}

@@ -84,6 +84,10 @@ function DeveloperTabs() {
           aria-labelledby={`dev-tab-${active.key}`}
           className="space-y-8"
         >
+          <div className="tool-context">
+            <active.icon size={18} aria-hidden />
+            <strong>{active.label}</strong>
+          </div>
           <Panel />
         </div>
       </div>
@@ -93,11 +97,7 @@ function DeveloperTabs() {
 
 export default function DeveloperPage() {
   return (
-    <AdminPage
-      title="개발자 도구"
-      permission="developer.access"
-      description="개발자 전용 — 환경·세션·권한 확인, API 요청 로그, 캐시, 개발용 데이터를 다룹니다."
-    >
+    <AdminPage view="tools" title="개발자 도구" permission="developer.access">
       <DeveloperTabs />
     </AdminPage>
   );

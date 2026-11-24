@@ -171,7 +171,7 @@ function TargetPanel({ target }: { target: AttendanceTargetSummary }) {
     queryFn: () => api.attendance.sessions(target),
   });
   return (
-    <div className="space-y-8">
+    <div className="attendance-spread">
       <section aria-labelledby="att-sessions">
         <h2 id="att-sessions" className="mb-3 text-base font-bold">
           출석부 <span className="font-normal text-ink-600">· 명단 {target.rosterCount}명</span>
@@ -252,6 +252,7 @@ function AttendanceIndex() {
 export default function AdminAttendancePage() {
   return (
     <AdminPage
+      view="attendance"
       title="출석"
       permission={canManageAttendance}
       description="동아리 모임·프로그램 회차별 출석부를 만들고 체크합니다. 출석 코드를 열면 회원이 직접 출석할 수 있습니다."

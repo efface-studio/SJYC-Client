@@ -1,6 +1,7 @@
 'use client';
 
 import '@/components/admin/admin-console.css';
+import '@/components/admin/workspace.css';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -165,31 +166,24 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="admin-console console-login flex min-h-dvh flex-col">
+    <div className="admin-console workspace-login">
       <AdminTitle>로그인</AdminTitle>
-      <main
-        id="main"
-        tabIndex={-1}
-        className="flex flex-1 items-start justify-center px-4 py-10 focus:outline-none md:items-center"
-      >
-        <div className="console-surface w-full max-w-md p-6 sm:p-9">
-          <div className="flex items-center gap-2">
-            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
+      <main id="main" tabIndex={-1} className="login-layout">
+        <div className="login-photo" role="img" aria-label="중구청소년센터 건물 전경" />
+        <div className="login-paper">
+          <div className="login-content">
+            <Logo className="[&_img]:h-7" />
+            <h1>관리자 로그인</h1>
+            <p>센터 직원 및 동아리 담당자 계정으로 로그인해 주세요.</p>
+            <Suspense fallback={<ListSkeleton rows={2} />}>
+              <AdminLoginForm />
+            </Suspense>
+            <Link href="/" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
+              사용자 화면으로
+            </Link>
           </div>
-          <h1 className="mt-7 text-[28px] font-bold">관리자 로그인</h1>
-          <p className="mt-1 mb-5 text-sm text-ink-600">
-            센터 직원·관리자·동아리 담당자 계정으로 로그인해 주세요.
-          </p>
-          <Suspense fallback={<ListSkeleton rows={2} />}>
-            <AdminLoginForm />
-          </Suspense>
         </div>
       </main>
-      <p className="pb-6 text-center">
-        <Link href="/" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
-          사용자 화면으로
-        </Link>
-      </p>
     </div>
   );
 }

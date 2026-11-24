@@ -1,14 +1,12 @@
 'use client';
 
 import {
-  ArrowUpRight,
   BookOpen,
   Braces,
   CalendarCheck,
   CalendarDays,
   CheckSquare,
   ChevronDown,
-  ChevronRight,
   Terminal,
   CircleHelp,
   ClipboardList,
@@ -20,7 +18,7 @@ import {
   Megaphone,
   Menu,
   MessagesSquare,
-  PanelsTopLeft,
+  Globe,
   Settings2,
   UserRound,
   Users,
@@ -38,8 +36,10 @@ import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/
 import type { User } from '@/domain/types';
 import { allows, type Access } from '@/features/auth/guards';
 import { useLogout, useSession } from '@/features/auth/session';
+import { NavPreference, useNavPreference } from './nav-preference';
 import { ConsoleSearch } from './console-search';
 import './admin-console.css';
+import './workspace.css';
 
 interface NavItem {
   href: string;
@@ -193,58 +193,86 @@ export function AdminShell({ children }: { children: ReactNode }) {
     (a, b) => b.href.length - a.href.length,
   )[0];
   const user = session?.user;
+  const preference = useNavPreference(user?.id);
   if (!user) return null;
+  const groups = NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => allows(user, item.permission)),
+  })).filter((group) => group.items.length);
+  const current = groups.find((group) => group.items.some((item) => item.href === active?.href));
   return (
-    <div className="admin-console">
-      <div className="console-frame">
-        <aside className="console-rail">
-          <div className="console-brand">
-            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
-          </div>
-          <NavLinks user={user} active={active} />
-          <UserBlock user={user} />
-        </aside>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="console-top">
-            <div className="flex min-w-0 items-center gap-2">
+    <div className="admin-console workspace" data-nav={preference.layout}>
+      <div className="workspace-frame console-frame">
+        <header className="workspace-header">
+          <div className="workspace-header-inner">
+            <div className="workspace-brand">
+              <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
+              <span>관리자</span>
+            </div>
+            <nav className="workspace-groups" aria-label="업무 영역">
+              {groups.map((g) => (
+                <Link
+                  key={g.group}
+                  href={g.items[0]!.href}
+                  aria-current={current === g ? 'location' : undefined}
+                >
+                  {g.group}
+                </Link>
+              ))}
+            </nav>
+            <div className="workspace-tools">
+              <NavPreference {...preference} />
+              <ConsoleSearch user={user} menus={groups.flatMap((g) => g.items)} />
+              <Link href="/" aria-label="사용자 화면" title="사용자 화면" className="workspace-site">
+                <Globe size={18} aria-hidden />
+              </Link>
               <button
                 type="button"
                 onClick={() => setMenuOpen(true)}
                 aria-label="관리자 메뉴 열기"
                 aria-expanded={menuOpen}
-                className="grid size-11 place-items-center rounded-md hover:bg-surface-muted lg:hidden"
+                className="workspace-menu"
               >
-                <Menu aria-hidden size={21} />
+                <Menu size={20} aria-hidden />
               </button>
-              <PanelsTopLeft aria-hidden size={17} className="hidden lg:block" />
-              <span>센터 운영</span>
-              <ChevronRight size={14} aria-hidden />
-              <strong className="truncate">
-                {NAV.find((g) => g.items.some((item) => item.href === active?.href))?.group ?? '관리'}
-              </strong>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <ConsoleSearch user={user} menus={ALL_ITEMS.filter((i) => allows(user, i.permission))} />
-              <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
-                사용자 화면
-                <ArrowUpRight size={15} aria-hidden />
-              </Link>
+          </div>
+        </header>
+        {preference.layout === 'side' && (
+          <aside className="workspace-sidebar">
+            <NavLinks user={user} active={active} />
+            <UserBlock user={user} />
+          </aside>
+        )}
+        {current && preference.layout === 'top' && (
+          <nav className="workspace-local-nav" aria-label={current.group + ' 메뉴'}>
+            <div>
+              {current.items.map(({ href, label, icon: Icon }) => (
+                <Link key={href} href={href} aria-current={href === active?.href ? 'page' : undefined}>
+                  <Icon size={16} aria-hidden />
+                  {label}
+                </Link>
+              ))}
             </div>
-          </header>
-          <main id="main" tabIndex={-1} className="console-main focus:outline-none">
-            {children}
-          </main>
-          <SiteFooter compact />
-        </div>
+          </nav>
+        )}
+        <main id="main" tabIndex={-1} className="console-main workspace-main focus:outline-none">
+          {children}
+        </main>
+        <SiteFooter compact />
       </div>
       <Modal
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         title="관리자 메뉴"
         variant="drawer"
-        className="console-drawer lg:hidden"
+        className="console-drawer"
         bodyClassName="console-drawer-body overflow-hidden p-0"
       >
+        <div className="drawer-preference">
+          <span>메뉴 배치</span>
+          <NavPreference {...preference} />
+        </div>
         <NavLinks user={user} active={active} onNavigate={() => setMenuOpen(false)} />
         <UserBlock user={user} />
       </Modal>

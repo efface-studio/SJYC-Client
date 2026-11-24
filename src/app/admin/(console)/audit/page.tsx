@@ -10,7 +10,7 @@ import { ADMIN_PAGE_SIZE, useListParams } from '@/components/admin/list-params';
 import { QueryState } from '@/components/admin/query-state';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState } from '@/components/ui/states';
-import { formatDateTime } from '@/lib/format';
+import { formatDate, formatDateTime } from '@/lib/format';
 
 function AuditList() {
   const lp = useListParams();
@@ -36,14 +36,12 @@ function AuditList() {
         >
           {(d) => (
             <>
-              <div className="audit-columns" aria-hidden>
-                <span>기록 시각</span>
-                <span>작업 내용</span>
-                <span>처리자</span>
-              </div>
               <ol className="audit-stream">
-                {d.items.map((e) => (
+                {d.items.map((e, i) => (
                   <li key={e.id}>
+                    {(i === 0 || formatDate(d.items[i - 1]!.at) !== formatDate(e.at)) && (
+                      <h2 className="audit-day">{formatDate(e.at)}</h2>
+                    )}
                     <details>
                       <summary>
                         <time dateTime={e.at}>{formatDateTime(e.at)}</time>
@@ -85,6 +83,7 @@ function AuditList() {
 export default function AdminAuditPage() {
   return (
     <AdminPage
+      view="journal"
       title="감사 로그"
       permission="audit.read"
       description="관리자 작업 기록입니다. 수정·삭제할 수 없습니다."

@@ -15,54 +15,13 @@
   --radius-md: 9px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-  --rail: #ffffff;
   --panel-shadow: none;
   --color-surface-muted: #f2f4f6;
   color: var(--color-ink-900);
   background: var(--color-surface-admin);
   min-height: 100dvh;
 }
-.console-frame {
-  display: flex;
-  min-height: 100dvh;
-}
-.console-rail {
-  display: none;
-}
-.console-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  min-height: 58px;
-  gap: 12px;
-  padding: 0 16px 0 4px;
-  border-bottom: 1px solid var(--color-line);
-  background: white;
-  color: var(--color-ink-600);
-  font-size: 14px;
-}
-.console-top strong {
-  color: var(--color-ink-900);
-  font-weight: 600;
-}
-.console-main {
-  width: 100%;
-  max-width: 1800px;
-  margin-inline: auto;
-  padding: 28px 16px 38px;
-  flex: 1;
-}
 
-.console-brand {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid #eef0f2;
-}
 .console-nav {
   min-height: 0;
   flex: 1;
@@ -121,7 +80,7 @@
 .console-nav a[aria-current='page'] svg {
   color: #ba2447;
 }
-.console-rail :focus-visible,
+
 .console-drawer :focus-visible {
   outline: 2px solid #b52646;
   outline-offset: -2px;
@@ -215,6 +174,7 @@
 .console-tabs :focus-visible {
   outline-offset: -3px;
 }
+
 .dashboard-grid {
   display: grid;
   gap: 16px;
@@ -254,64 +214,6 @@
   text-decoration: underline;
 }
 
-.queue-panel .queue-heading {
-  display: flex;
-  align-items: baseline;
-  gap: 9px;
-}
-.queue-heading > span {
-  font-size: 19px;
-  font-weight: 650;
-  color: var(--color-brand-700);
-  font-variant-numeric: tabular-nums;
-}
-.queue-body {
-  margin-top: 12px;
-}
-.queue-panel .dash-row {
-  display: flex;
-  min-height: 57px;
-  gap: 12px;
-  font-size: 15px;
-  padding: 5px 8px;
-  border-radius: 10px;
-}
-.queue-panel .dash-row:hover {
-  background: #f7f8fa;
-}
-.queue-panel .dash-row b {
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-.queue-panel .dash-row small {
-  margin-left: 2px;
-  font-size: 13px;
-  font-weight: 550;
-}
-.queue-panel .dash-row > svg {
-  color: #a0a7af;
-}
-.queue-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 13px;
-  background: #fff0eb;
-  color: #b64535;
-}
-.queue-icon[data-kind='club'] {
-  background: #f1edfc;
-  color: #7855ac;
-}
-.queue-icon[data-kind='reservation'] {
-  background: #e9f1fd;
-  color: #3772b3;
-}
-.queue-icon[data-kind='inquiry'] {
-  background: #fff2da;
-  color: #926311;
-}
 .stats-list li + li,
 .dash-notices li + li {
   border-top: 1px solid #edf0f3;
@@ -442,89 +344,6 @@ a.dash-row:hover {
   font-size: 15px;
   color: var(--color-ink-600);
 }
-@media (min-width: 640px) {
-  .console-main {
-    padding: 32px;
-  }
-  .dash-panel {
-    padding: 24px;
-  }
-  .recent-table .date-col {
-    display: table-cell;
-  }
-  .recent-table .row-date {
-    display: none;
-  }
-}
-@media (min-width: 1024px) {
-  .console-rail {
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    width: 224px;
-    height: 100dvh;
-    flex-shrink: 0;
-    border-right: 1px solid var(--color-line);
-    background: var(--rail);
-  }
-  .console-top {
-    position: sticky;
-    min-height: 56px;
-    padding-inline: 32px;
-  }
-  .dashboard-grid {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    gap: 20px;
-  }
-  .recent-table .date-col {
-    display: none;
-  }
-  .recent-table .row-date {
-    display: block;
-  }
-}
-@media (min-width: 1360px) {
-  .console-main {
-    padding: 40px clamp(36px, 3.2vw, 72px) 52px;
-  }
-  .console-rail {
-    width: 236px;
-  }
-  .dash-panel {
-    padding: 24px 28px;
-  }
-  .recent-table .date-col {
-    display: table-cell;
-  }
-  .recent-table .row-date {
-    display: none;
-  }
-  .console-top {
-    padding-inline: 40px;
-  }
-}
-@media (min-width: 1800px) {
-  .dashboard-grid {
-    gap: 26px;
-  }
-  .dash-panel {
-    padding: 30px 34px;
-  }
-  .dash-row,
-  .stats-list .dash-row {
-    min-height: 52px;
-  }
-  .stats-list .dash-row {
-    min-height: 65px;
-  }
-  .recent-table td {
-    padding-block: 19px;
-  }
-  .dash-notices li {
-    padding-block: 13px;
-  }
-}
 
 .console-search-trigger,
 .console-search-field,
@@ -595,217 +414,5 @@ a.dash-row:hover {
     width: 44px;
     justify-content: center;
     padding: 0;
-  }
-}
-
-.console-top {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.console-main {
-  max-width: 1536px;
-}
-.console-main .page-heading {
-  margin-bottom: 28px;
-  padding-bottom: 2px;
-}
-.console-main .page-heading h1 {
-  font-size: clamp(27px, 3.2vw, 42px);
-  line-height: 1.15;
-  letter-spacing: -0.05em;
-}
-.console-main .page-heading nav {
-  margin-bottom: 12px;
-}
-.console-surface table thead tr,
-.recent-table thead {
-  background: #f7f8fa;
-  color: #647180;
-}
-.console-surface table tbody tr:hover {
-  background: #fafbfd;
-}
-.console-main .console-filters {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
-  margin-bottom: 10px;
-}
-.console-main .console-form {
-  border: 1px solid var(--color-line);
-}
-.console-main .console-tabs {
-  background: #eeefe9;
-  border-radius: 7px;
-}
-.console-main .console-tabs :is([aria-selected='true'], [aria-current='page']) {
-  background: #fff;
-  color: #252721;
-  box-shadow: 0 1px 3px #34382922;
-}
-.console-login {
-  border-top: 0;
-  background: #f5f6f8;
-}
-.console-login .console-surface {
-  padding: clamp(26px, 5vw, 44px);
-  border-radius: 20px;
-  border: 1px solid #e6e8eb;
-}
-.console-login h1 {
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: -0.055em;
-}
-.console-login .auth-form input {
-  background: white;
-}
-.console-main .setting-workbench,
-.console-main .spec-workspace {
-  color: var(--color-ink-900);
-}
-.console-main .setting-workbench > nav {
-  gap: 2px;
-  padding-bottom: 0;
-  border-color: var(--color-line);
-}
-.console-main .setting-workbench > nav button {
-  border-radius: 0;
-  border-bottom: 2px solid transparent;
-}
-.console-main .setting-workbench > nav button[aria-pressed='true'] {
-  color: var(--color-brand-700);
-  background: transparent;
-  border-color: currentColor;
-}
-.console-main .setting-workbench > fieldset {
-  border-color: var(--color-line);
-  border-radius: 8px;
-}
-.console-main .spec-index {
-  padding-inline: 12px;
-  background: #f7f8fa;
-}
-.console-main .spec-index nav button[aria-current] {
-  background: #fff;
-  border-color: #b52646;
-  color: #a2223e;
-}
-.console-main .spec-workspace {
-  border: 1px solid var(--color-line);
-  border-radius: 8px;
-  overflow: clip;
-}
-@media (max-width: 639px) {
-  .console-main {
-    padding: 23px 14px 32px;
-  }
-  .console-nav :is(a, summary) {
-    min-height: 44px;
-  }
-  .console-top {
-    gap: 6px;
-  }
-  .console-main .page-heading {
-    margin-bottom: 18px;
-    padding-bottom: 14px;
-  }
-  .console-top > div:last-child > a {
-    font-size: 12px;
-  }
-}
-
-.console-main .dash-panel {
-  border-color: #eceef1;
-}
-.console-main .page-heading h1 {
-  font-size: clamp(28px, 2.8vw, 38px);
-  font-weight: 740;
-}
-.console-brand {
-  border-bottom: 0;
-  min-height: 76px;
-}
-.console-nav details {
-  border-radius: 10px;
-}
-.console-nav summary {
-  font-size: 12px;
-  min-height: 41px;
-}
-.console-nav a {
-  border-radius: 10px;
-  min-height: 42px;
-}
-.console-login .console-surface {
-  box-shadow: 0 10px 36px #191f2808;
-}
-@media (max-width: 639px) {
-  .console-nav a {
-    min-height: 44px;
-  }
-}
-
-@media (min-width: 900px) {
-  .dashboard-grid {
-    grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
-    gap: 18px;
-    align-items: start;
-  }
-  .queue-panel,
-  .overview-stats {
-    grid-column: 1/-1;
-  }
-  .queue-panel .queue-heading h2,
-  .queue-heading > span {
-    font-size: 24px;
-    letter-spacing: -0.04em;
-  }
-  .queue-legend {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-  }
-  .queue-legend li + li {
-    border-left: 1px solid #edf0f3;
-  }
-  .queue-panel .dash-row {
-    display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) auto;
-    grid-template-areas: 'icon name next' 'icon count next';
-    column-gap: 12px;
-    row-gap: 2px;
-    padding: 9px clamp(6px, 1.3vw, 20px);
-  }
-  .queue-panel .queue-icon {
-    grid-area: icon;
-  }
-  .queue-panel .dash-row .grow {
-    grid-area: name;
-    font-size: 13px;
-    color: #596573;
-  }
-  .queue-panel .dash-row b {
-    grid-area: count;
-    font-size: 26px;
-    line-height: 1.2;
-  }
-  .queue-panel .dash-row > svg {
-    grid-area: next;
-  }
-  .overview-stats {
-    background: transparent;
-    border: 0;
-    padding: 6px 0 10px;
-  }
-  .overview-stats .stats-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
-  }
-  .overview-stats .stats-list li {
-    border-top: 1px solid var(--color-line);
   }
 }

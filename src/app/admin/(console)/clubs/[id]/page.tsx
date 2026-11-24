@@ -56,6 +56,7 @@ function EditClub() {
 export default function AdminClubEditPage() {
   return (
     <AdminPage
+      view="editor"
       title="동아리 수정"
       permission="club.manage"
       breadcrumbs={[{ label: '동아리 관리', href: '/admin/clubs' }, { label: '수정' }]}

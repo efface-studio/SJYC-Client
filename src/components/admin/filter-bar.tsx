@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState, type ReactNode } from 'react';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -35,6 +35,21 @@ export const SORT_OPTIONS: Option[] = [
 export function FilterSelect({ label, param, options }: { label: string; param: string; options: Option[] }) {
   const { get, set } = useListParams();
   const id = useId();
+  if (param === 'status')
+    return (
+      <div className="status-options" role="group" aria-label={label}>
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={get(param) === option.value}
+            onClick={() => set({ [param]: option.value })}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    );
   return (
     <div className="min-w-0 md:w-44">
       <label htmlFor={id} className="mb-1 block text-sm font-semibold text-ink-700">
@@ -94,16 +109,16 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
       <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
         <form
           role="search"
-          className="min-w-0 md:w-72"
+          className="list-search"
           onSubmit={(e) => {
             e.preventDefault();
             set({ q: String(new FormData(e.currentTarget).get('q') ?? '').trim() });
           }}
         >
-          <label htmlFor={searchId} className="mb-1 block text-sm font-semibold text-ink-700">
+          <label htmlFor={searchId} className="sr-only">
             {searchLabel}
           </label>
-          <div className="flex gap-2">
+          <div className="list-search-input">
             <SearchInput
               id={searchId}
               key={q}
@@ -113,11 +128,8 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
               enterKeyHint="search"
               className={inputClass}
             />
-            <button
-              type="submit"
-              className="h-11 shrink-0 rounded-md border border-line-strong bg-surface px-4 text-[15px] font-semibold hover:bg-surface-muted"
-            >
-              검색
+            <button type="submit" aria-label="검색" className="list-search-submit">
+              <Search aria-hidden size={18} />
             </button>
           </div>
         </form>
@@ -128,17 +140,14 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
             aria-expanded={open}
             aria-controls={panelId}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line-strong bg-surface px-4 text-[15px] font-semibold md:hidden"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line-strong bg-surface px-4 text-[15px] font-semibold"
           >
             <SlidersHorizontal aria-hidden className="size-4" />
             필터
           </button>
         )}
         {secondary && (
-          <div
-            id={panelId}
-            className={cn('flex-col gap-3 md:flex md:flex-row md:items-end', open ? 'flex' : 'hidden')}
-          >
+          <div id={panelId} className={cn('w-full flex-wrap items-end gap-3', open ? 'flex' : 'hidden')}>
             {secondary}
           </div>
         )}
