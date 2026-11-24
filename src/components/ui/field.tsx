@@ -77,21 +77,49 @@ export function FieldMessages({
 
 type TextFieldProps = FieldMeta & ComponentProps<'input'>;
 
-export function TextField({ label, error, hint, className, required, ...props }: TextFieldProps) {
+export function TextField({
+  label,
+  error,
+  hint,
+  className,
+  required,
+  trailing,
+  ...props
+}: TextFieldProps & { trailing?: ReactNode }) {
   const ids = useFieldIds(error, hint);
+  const input = (
+    <input
+      id={ids.id}
+      required={required}
+      aria-invalid={!!error || undefined}
+      aria-describedby={ids.describedBy}
+      className={cn(
+        control,
+        'h-12',
+        trailing && 'min-w-0 flex-1 border-0 bg-transparent focus-visible:outline-none',
+      )}
+      {...props}
+    />
+  );
   return (
     <div className={className}>
       <Label htmlFor={ids.id} required={required}>
         {label}
       </Label>
-      <input
-        id={ids.id}
-        required={required}
-        aria-invalid={!!error || undefined}
-        aria-describedby={ids.describedBy}
-        className={cn(control, 'h-12')}
-        {...props}
-      />
+      {trailing ? (
+        <div
+          className={cn(
+            control,
+            'flex items-center gap-1 p-0 pr-2 focus-within:border-brand-700 focus-within:outline-2 focus-within:outline-brand-700/40',
+            error && 'border-danger-700',
+          )}
+        >
+          {input}
+          {trailing}
+        </div>
+      ) : (
+        input
+      )}
       <FieldMessages {...ids} hint={hint} error={error} />
     </div>
   );

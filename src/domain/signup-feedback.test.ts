@@ -1,4 +1,4 @@
-import { birthDateError, confirmFeedback, passwordRules, suggestedEmails } from './signup-feedback';
+import { birthDateError, confirmFeedback, passwordRules, emailWithDomain } from './signup-feedback';
 import { signupSchema } from './schemas';
 
 describe('회원가입 입력', () => {
@@ -33,12 +33,10 @@ describe('회원가입 입력', () => {
     expect(confirmFeedback('abcdefg1', 'abcdefg2')).toContain('일치하지');
     expect(confirmFeedback('abcdefg1', 'abcdefg1')).toBe('일치합니다.');
   });
-  it('도메인 후보는 입력을 덮어쓰지 않고 부분 일치만 제안한다', () => {
-    expect(suggestedEmails('student+1')).toEqual([]);
-    expect(suggestedEmails('student+1@')).toHaveLength(3);
-    expect(suggestedEmails('student+1@')).toContain('student+1@naver.com');
-    expect(suggestedEmails('student@GM')).toEqual(['student@gmail.com']);
-    for (const input of ['', '@', 'a@@g', 'a b', 'student@school.kr', 'me@NAVER.COM'])
-      expect(suggestedEmails(input)).toEqual([]);
+  it('선택한 도메인만 교체하고 직접 입력한 주소와 아이디는 보존한다', () => {
+    expect(emailWithDomain('student+1', 'gmail.com')).toBe('student+1@gmail.com');
+    expect(emailWithDomain('student@nav', 'naver.com')).toBe('student@naver.com');
+    expect(emailWithDomain('student@school.kr', '')).toBe('student@school.kr');
+    expect(emailWithDomain('', 'naver.com')).toBe('');
   });
 });
