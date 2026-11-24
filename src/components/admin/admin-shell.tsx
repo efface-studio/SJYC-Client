@@ -3,6 +3,7 @@
 import {
   ArrowUpRight,
   BookOpen,
+  Braces,
   CalendarCheck,
   CalendarDays,
   CheckSquare,
@@ -83,6 +84,13 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { href: '/admin/settings', label: '사이트 설정', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
       { href: '/admin/audit', label: '감사 로그', icon: FileClock, permission: 'audit.read' },
+      {
+        href: '/admin/specifications/features',
+        label: '기능 명세서',
+        icon: BookOpen,
+        permission: 'admin.access',
+      },
+      { href: '/admin/specifications/api', label: 'API 명세서', icon: Braces, permission: 'admin.access' },
       { href: '/admin/developer', label: '개발자 도구', icon: Settings2, permission: 'developer.access' },
     ],
   },
