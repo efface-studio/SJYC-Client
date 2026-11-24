@@ -18,6 +18,8 @@ import {
 } from '@/domain/site-settings';
 import { SETTINGS_KEY } from '@/features/settings/use-settings';
 import './settings.css';
+import { readBanners } from '@/domain/mobile-banners';
+import { MobileBannersEditor } from './mobile-banners';
 
 function OrderedOptions({
   value,
@@ -76,6 +78,7 @@ function Editor({ record, reload }: { record: SettingsRecord; reload: () => void
   const [tab, setTab] = useState(0),
     [draft, setDraft] = useState<SiteSettings>(record.values),
     [validation, setValidation] = useState('');
+  const [banners, setBanners] = useState(() => readBanners(record.values.mobileBanners));
   const mutation = useMutation({
     mutationFn: api.admin.updateSettings,
     onSuccess: (next) => {
@@ -120,6 +123,17 @@ function Editor({ record, reload }: { record: SettingsRecord; reload: () => void
         {(Object.entries(group.fields) as [SettingKey, string][]).map(([key, label]) => {
           const value = draft[key] ?? DEFAULT_SETTINGS[key];
           const id = 'setting-' + key;
+          if (key === 'mobileBanners')
+            return (
+              <MobileBannersEditor
+                key={key}
+                config={banners}
+                onChange={(next) => {
+                  setBanners(next);
+                  change(key, JSON.stringify(next));
+                }}
+              />
+            );
           if (key === 'navOrder' || key === 'homeOrder')
             return (
               <fieldset key={key} className="setting-collection">

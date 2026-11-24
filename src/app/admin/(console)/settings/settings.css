@@ -112,3 +112,42 @@
     padding-inline: 8px;
   }
 }
+.banner-editor {
+  display: grid;
+  gap: 16px;
+}
+.banner-editor fieldset {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  display: grid;
+  gap: 12px;
+}
+.banner-editor label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.banner-editor input:not([type='checkbox']),
+.banner-editor select {
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid #b9b3b0;
+  border-radius: 6px;
+}
+.banner-editor button {
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 1px solid #b9b3b0;
+  border-radius: 6px;
+}
+.banner-editor button:disabled {
+  opacity: 0.4;
+}
+.banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
