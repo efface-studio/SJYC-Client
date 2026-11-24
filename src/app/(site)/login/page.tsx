@@ -2,22 +2,22 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
 import './login.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useRef, useState } from 'react';
 import { api, errorMessage, isApiError } from '@/api';
-import { Button } from '@/components/ui/button';
+
 import { FormError, PasswordField, TextField } from '@/components/ui/field';
 import { Callout, ListSkeleton } from '@/components/ui/states';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
+import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { PENDING_VERIFY_KEY, SESSION_KEY, useSession } from '@/features/auth/session';
 import { SocialLoginButtons } from '@/features/auth/social-login';
 import { memberRedirect } from '@/lib/safe-redirect';
 
 function LoginForm() {
+  const feedback = useLoginFeedback();
   const params = useSearchParams();
   const router = useRouter();
   const qc = useQueryClient();
@@ -35,12 +35,13 @@ function LoginForm() {
     onSuccess: (s) => {
       qc.setQueryData(SESSION_KEY, s);
       // 이동 경로는 내부 경로만 허용하고, 회원 로그인으로는 관리자 화면에 보내지 않는다
-      router.replace(memberRedirect(next));
+      feedback.finish(() => router.replace(memberRedirect(next)));
     },
     onError: (error, input) => {
       if (isApiError(error, 'FORBIDDEN') && error.message.includes('이메일 인증')) {
         setUnverifiedEmail(input.email);
       }
+      feedback.fail();
       setFormError(errorMessage(error));
       passwordRef.current?.focus();
     },
@@ -66,20 +67,23 @@ function LoginForm() {
 
       <form
         noValidate
+        onChange={feedback.edit}
         onSubmit={(e) => {
           e.preventDefault();
-          if (login.isPending) return;
+          if (login.isPending || feedback.phase === 'success') return;
           setFormError(null);
           setUnverifiedEmail(null);
           const parsed = parseForm(loginSchema, new FormData(e.currentTarget));
           if (!parsed.ok) {
+            feedback.fail();
             setErrors(parsed.errors);
             return;
           }
           setErrors({});
+          feedback.start();
           login.mutate(parsed.data);
         }}
-        className="space-y-4"
+        className="auth-form space-y-4"
       >
         <TextField
           ref={emailRef}
@@ -110,34 +114,14 @@ function LoginForm() {
             인증 메일 다시 받기
           </Link>
         )}
-        <Button type="submit" size="lg" block loading={login.isPending}>
-          로그인
-        </Button>
+        <LoginSubmit phase={feedback.phase} attempt={feedback.attempt} title="로그인" />
       </form>
 
-      <div className="mt-4 flex items-center justify-center gap-1 text-[15px]">
-        <Link
-          href="/password/forgot"
-          className="flex min-h-11 items-center px-2 text-ink-700 hover:underline"
-        >
-          비밀번호 찾기
-        </Link>
-        <span aria-hidden className="text-line-strong">
-          |
-        </span>
-        <Link
-          href="/signup"
-          className="flex min-h-11 items-center px-2 font-semibold text-brand-700 hover:underline"
-        >
-          회원가입
-        </Link>
-      </div>
-
-      <div className="my-6 flex items-center gap-3 text-sm text-ink-600">
-        <span className="h-px flex-1 bg-line" />
-        또는 소셜 계정으로 로그인
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      <nav className="login-help" aria-label="계정 도움말">
+        <Link href="/password/forgot">비밀번호 찾기</Link>
+        <Link href="/signup">회원가입</Link>
+      </nav>
+      <p className="login-alternatives">간편 로그인</p>
       <SocialLoginButtons next={next} />
     </>
   );
@@ -147,36 +131,15 @@ export default function LoginPage() {
   return (
     <div className="member-login">
       <title>로그인 | 중구청소년센터</title>
-      <div className="login-layout">
-        <aside className="login-art" aria-label="중구청소년센터">
-          <Image
-            src="/media/center-exterior.webp"
-            width={910}
-            height={514}
-            sizes="(min-width:800px) 40vw, 1px"
-            alt="중구청소년센터 정문"
-            priority
-          />
-          <div>
-            <span>중구청소년센터</span>
-            <p>
-              프로그램 신청부터
-              <br />
-              공간 예약까지
-            </p>
-          </div>
-        </aside>
-        <section className="login-fields" aria-labelledby="login-heading">
-          <h1 id="login-heading">로그인</h1>
-          <Suspense fallback={<ListSkeleton rows={2} />}>
-            <LoginForm />
-          </Suspense>
-          <Link href="/" className="login-back">
-            <ArrowLeft aria-hidden size={16} />
-            로그인 없이 둘러보기
-          </Link>
-        </section>
-      </div>
+      <section className="login-fields" aria-labelledby="login-heading">
+        <h1 id="login-heading">로그인</h1>
+        <Suspense fallback={<ListSkeleton rows={2} />}>
+          <LoginForm />
+        </Suspense>
+        <Link href="/" className="login-back">
+          로그인 없이 둘러보기
+        </Link>
+      </section>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 .club-page {
-  --club-ink: #39265f;
-  --club-paper: #ebe6f6;
+  --club-ink: var(--sjyc-ink);
+  --club-paper: var(--sjyc-blush);
   padding-block: clamp(20px, 3vw, 44px) clamp(48px, 6vw, 80px);
 }
 .club-cover,
@@ -12,7 +12,7 @@
 }
 .club-cover {
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.88fr);
-  background: #403063;
+  background: var(--sjyc-deep);
   color: #fff;
 }
 .club-cover > div,
@@ -28,7 +28,7 @@
 .club-cover p {
   margin-top: 14px;
   font-size: clamp(15px, 1.5vw, 20px);
-  color: #f2eafc;
+  color: var(--sjyc-blush);
 }
 .club-cover img {
   width: 100%;
@@ -56,7 +56,7 @@
 }
 .club-list-tools h2 span {
   margin-left: 5px;
-  color: #705982;
+  color: var(--color-brand-700);
   font-size: 16px;
 }
 .club-list-tools label {
@@ -79,7 +79,7 @@
 }
 .clubs-index > li {
   min-width: 0;
-  border-bottom: 1px solid #d7cfd9;
+  border-bottom: 1px solid var(--sjyc-line);
 }
 .club-list-link {
   display: grid;
@@ -95,7 +95,7 @@
   overflow: hidden;
   background: var(--club-paper);
   border-radius: 9px;
-  color: #8a789e;
+  color: var(--sjyc-rule);
 }
 .club-visual img {
   width: 100%;
@@ -114,7 +114,7 @@
   min-width: 0;
 }
 .club-field {
-  color: #725881;
+  color: var(--color-brand-700);
   font-size: 13px;
   font-weight: 650;
 }
@@ -134,7 +134,7 @@
 .club-open {
   align-self: start;
   margin-top: 3px;
-  color: #6d5b77;
+  color: var(--sjyc-muted);
 }
 .club-list-link:hover h3,
 .club-list-link:focus-visible h3,
@@ -169,14 +169,14 @@
 .club-profile p {
   max-width: 58ch;
   font-size: clamp(15px, 1.45vw, 18px);
-  color: #51455b;
+  color: var(--sjyc-muted);
   line-height: 1.55;
 }
 .club-profile > .club-visual {
   margin: 16px;
   height: clamp(165px, 19vw, 245px);
   padding: 12px;
-  background: #ded5ec;
+  background: var(--sjyc-blush);
 }
 .club-detail-layout {
   display: grid;

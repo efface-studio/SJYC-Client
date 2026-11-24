@@ -12,15 +12,15 @@ const icons = { naver: siNaver, apple: siApple };
 function ProviderMark({ provider }: { provider: OAuthProvider }) {
   if (provider === 'kakao') {
     return (
-      <svg width="20" height="20" viewBox="60 15 16 16" fill="#000000" aria-hidden>
+      <svg width="22" height="22" viewBox="61.4 16.4 13.2 13.2" fill="#000000" aria-hidden>
         <path d="M68.001 16.5225C64.4222 16.5225 61.5225 19.0037 61.5225 22.0641C61.5225 24.0312 62.7219 25.7596 64.5292 26.7423L63.9181 29.2113C63.8954 29.285 63.9132 29.364 63.9619 29.4184C63.9975 29.457 64.0461 29.478 64.0931 29.478C64.1337 29.478 64.1742 29.464 64.2082 29.4341L66.834 27.5144C67.2117 27.5723 67.6007 27.6039 67.9994 27.6039C71.5767 27.6039 74.478 25.1226 74.478 22.0623C74.478 19.002 71.5783 16.5225 68.001 16.5225Z" />
       </svg>
     );
   }
   if (provider === 'google')
-    return <Image src="/brand/google-signin.png" width={20} height={20} alt="" unoptimized />;
+    return <Image src="/brand/google-signin.png" width={22} height={22} alt="" unoptimized />;
   return (
-    <svg width="20" height="20" aria-hidden viewBox="0 0 24 24" fill="currentColor">
+    <svg width="22" height="22" aria-hidden viewBox="0 0 24 24" fill="currentColor">
       <path d={icons[provider].path} />
     </svg>
   );
@@ -56,19 +56,21 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
                 window.location.assign(oauthStartUrl(provider, next));
               }}
               className={cn(
-                'relative flex min-h-12 w-full items-center justify-center rounded-md px-4 text-[15px] font-semibold',
+                'min-h-12 w-full rounded-md text-[15px] font-semibold',
                 STYLE[provider].className,
                 'oauth-button',
               )}
             >
-              <ProviderMark provider={provider} />
-              <span>{STYLE[provider].text}</span>
+              <span className="oauth-mark">
+                <ProviderMark provider={provider} />
+              </span>
+              <span className="oauth-label">{STYLE[provider].text}</span>
               {!enabled && <span className="oauth-status">설정 필요</span>}
             </button>
           </li>
         ))}
       </ul>
-      <p role="status" aria-live="polite" className="mt-2 min-h-5 text-sm text-ink-700">
+      <p role="status" aria-live="polite" className="login-social-note">
         {notice ?? (!anyEnabled ? '현재 이메일 로그인을 이용할 수 있어요.' : '')}
       </p>
     </div>

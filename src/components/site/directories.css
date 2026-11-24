@@ -1,26 +1,26 @@
 .directory-programs {
-  --dir-ink: #573b24;
-  --dir-accent: #834e21;
+  --dir-ink: var(--sjyc-ink);
+  --dir-accent: var(--sjyc-ochre);
   --dir-bg: #f4ecdb;
   --dir-line: #dfd1bb;
 }
 .directory-spaces {
-  --dir-ink: #173e48;
-  --dir-accent: #21616a;
-  --dir-bg: #deedeb;
-  --dir-line: #c4d9d4;
+  --dir-ink: var(--sjyc-ink);
+  --dir-accent: var(--color-brand-700);
+  --dir-bg: var(--sjyc-cream);
+  --dir-line: var(--sjyc-line);
 }
 .directory-clubs {
-  --dir-ink: #39254e;
-  --dir-accent: #694f80;
-  --dir-bg: #ede6f0;
-  --dir-line: #ddcfe1;
+  --dir-ink: var(--sjyc-ink);
+  --dir-accent: var(--color-brand-700);
+  --dir-bg: var(--sjyc-blush);
+  --dir-line: var(--sjyc-line);
 }
 .directory-notices {
-  --dir-ink: #263c53;
-  --dir-accent: #3b5975;
-  --dir-bg: #e5ebf1;
-  --dir-line: #cdd9e3;
+  --dir-ink: var(--sjyc-ink);
+  --dir-accent: var(--color-brand-700);
+  --dir-bg: var(--sjyc-cream);
+  --dir-line: var(--sjyc-line);
 }
 .directory-page,
 .directory-detail {
@@ -222,7 +222,7 @@
 .reserve-panel {
   padding: clamp(16px, 3vw, 32px);
   border-radius: 18px;
-  background: #f0f5f1;
+  background: var(--sjyc-cream);
 }
 .reserve-panel h2 {
   font-size: 25px;
