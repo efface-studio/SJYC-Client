@@ -82,16 +82,16 @@ export function LoginSubmit({
           {phase === 'success' && (
             <svg
               aria-hidden
-              viewBox="0 0 24 24"
+              viewBox="0 0 20 20"
               width="20"
               height="20"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth="2.25"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path pathLength="1" d="m5 12 5 5 9-10" />
+              <path d="M3.5 10.25 8 14.5 16.5 5.75" />
             </svg>
           )}
           {label}
