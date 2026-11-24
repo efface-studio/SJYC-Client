@@ -35,6 +35,7 @@ import { canManageAttendance, managesAnyClub, primaryRole, ROLE_LABEL } from '@/
 import type { User } from '@/domain/types';
 import { allows, type Access } from '@/features/auth/guards';
 import { useLogout, useSession } from '@/features/auth/session';
+import { ConsoleSearch } from './console-search';
 import './admin-console.css';
 
 interface NavItem {
@@ -202,10 +203,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <ChevronRight size={14} aria-hidden />
               <strong className="truncate">{active?.label ?? '관리'}</strong>
             </div>
-            <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
-              사용자 화면
-              <ArrowUpRight size={15} aria-hidden />
-            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <ConsoleSearch user={user} menus={ALL_ITEMS.filter((i) => allows(user, i.permission))} />
+              <Link href="/" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 hover:underline">
+                사용자 화면
+                <ArrowUpRight size={15} aria-hidden />
+              </Link>
+            </div>
           </header>
           <main id="main" tabIndex={-1} className="console-main focus:outline-none">
             {children}

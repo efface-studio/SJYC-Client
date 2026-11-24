@@ -34,6 +34,9 @@
   font-weight: 750;
   margin-bottom: 14px;
 }
+.setting-workbench > fieldset > legend + * {
+  clear: both;
+}
 .setting-field {
   clear: both;
   display: grid;
