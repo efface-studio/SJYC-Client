@@ -41,6 +41,7 @@ import type {
   MyAttendance,
   MyClub,
   Notification,
+  OAuthProvider,
   PolicyDoc,
   PolicyKey,
   Space,
@@ -97,6 +98,8 @@ export interface ApiClient {
   auth: {
     /** 세션이 없거나 만료면 null */
     me(): Promise<Session | null>;
+    socialProviders(): Promise<OAuthProvider[]>;
+    startWebLink(provider: OAuthProvider): Promise<{ url: string }>;
     login(input: LoginInput): Promise<Session>;
     logout(): Promise<void>;
     signup(input: SignupInput): Promise<{ requiresEmailVerification: boolean }>;

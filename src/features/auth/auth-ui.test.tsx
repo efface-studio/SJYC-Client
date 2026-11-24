@@ -37,16 +37,21 @@ const memberSession: Session = {
 };
 
 describe('소셜 로그인 — 설정 전에는 성공을 흉내 내지 않는다', () => {
-  it('모든 공급자를 "설정 필요"로 표시하고, 눌러도 이동하지 않고 안내만 한다', async () => {
-    const assign = vi.fn();
-    vi.stubGlobal('location', { ...window.location, assign });
-    render(<SocialLoginButtons next="/my" />);
-
-    expect(screen.getAllByText('설정 필요')).toHaveLength(4);
-    await userEvent.click(screen.getByRole('button', { name: /카카오 로그인/ }));
-    expect(screen.getByRole('status')).toHaveTextContent('설정이 필요합니다');
-    expect(assign).not.toHaveBeenCalled();
-    vi.unstubAllGlobals();
+  it('Google은 서버 응답에 포함되어도 비활성이며, 설정한 공급자만 클릭할 수 있다', async () => {
+    const qc = new QueryClient();
+    qc.setQueryData(['social-providers'], ['kakao', 'naver', 'google']);
+    render(
+      <QueryClientProvider client={qc}>
+        <SocialLoginButtons next="/my" />
+      </QueryClientProvider>,
+    );
+    expect(screen.getByRole('button', { name: /카카오 로그인/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /네이버 로그인/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Apple로 로그인/ })).toBeDisabled();
+    const google = screen.getByRole('button', { name: /Google 계정으로 로그인/ });
+    expect(google).toBeDisabled();
+    expect(google).toHaveTextContent('준비 중');
+    await userEvent.click(google);
   });
 });
 

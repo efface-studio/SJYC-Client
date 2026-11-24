@@ -15,6 +15,7 @@ import { Select } from '@/components/ui/select';
 import { Callout, EmptyState } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { API_BASE_URL, API_MODE, IS_MOCK } from '@/config/env';
+import { useSocialProviders } from '@/features/auth/use-social-providers';
 import { providerStates } from '@/config/oauth';
 import { USER_STATUS } from '@/domain/labels';
 import { can, PERMISSION_LABEL, PERMISSIONS, ROLE_LABEL, ROLE_ORDER } from '@/domain/permissions';
@@ -76,6 +77,7 @@ const time = (iso: string) =>
 /* ---------- 환경 ---------- */
 
 function useEnvironment(): [string, string][] | null {
+  const available = useSocialProviders();
   const [rows, setRows] = useState<[string, string][] | null>(null);
   // 브라우저 값은 마운트 후에 읽는다 (서버 렌더링과 불일치 방지)
   useEffect(() => {
@@ -84,7 +86,7 @@ function useEnvironment(): [string, string][] | null {
       ['API 주소', API_BASE_URL || '없음 (mock)'],
       [
         '소셜 로그인',
-        providerStates()
+        providerStates(available)
           .map((p) => `${p.label} ${p.enabled ? '사용' : '설정 필요'}`)
           .join(' · '),
       ],
@@ -95,7 +97,7 @@ function useEnvironment(): [string, string][] | null {
       ['네트워크', navigator.onLine ? '온라인' : '오프라인'],
       ['확인 시각', formatDateTime(new Date().toISOString())],
     ]);
-  }, []);
+  }, [available]);
   return rows;
 }
 

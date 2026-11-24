@@ -92,6 +92,8 @@ const enc = encodeURIComponent;
 
 export const httpClient: ApiClient = {
   auth: {
+    socialProviders: () => request('GET', '/auth/social/providers'),
+    startWebLink: (provider) => request('POST', '/me/social/' + provider + '/web-start'),
     async me() {
       try {
         return await request('GET', '/auth/session');
