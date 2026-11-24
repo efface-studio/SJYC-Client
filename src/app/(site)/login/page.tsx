@@ -2,8 +2,6 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
 import './login.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useRef, useState } from 'react';
@@ -115,29 +113,11 @@ function LoginForm() {
         </Button>
       </form>
 
-      <div className="mt-4 flex items-center justify-center gap-1 text-[15px]">
-        <Link
-          href="/password/forgot"
-          className="flex min-h-11 items-center px-2 text-ink-700 hover:underline"
-        >
-          비밀번호 찾기
-        </Link>
-        <span aria-hidden className="text-line-strong">
-          |
-        </span>
-        <Link
-          href="/signup"
-          className="flex min-h-11 items-center px-2 font-semibold text-brand-700 hover:underline"
-        >
-          회원가입
-        </Link>
-      </div>
-
-      <div className="my-6 flex items-center gap-3 text-sm text-ink-600">
-        <span className="h-px flex-1 bg-line" />
-        또는 소셜 계정으로 로그인
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      <nav className="login-help" aria-label="계정 도움말">
+        <Link href="/password/forgot">비밀번호 찾기</Link>
+        <Link href="/signup">회원가입</Link>
+      </nav>
+      <p className="login-alternatives">간편 로그인</p>
       <SocialLoginButtons next={next} />
     </>
   );
@@ -147,36 +127,15 @@ export default function LoginPage() {
   return (
     <div className="member-login">
       <title>로그인 | 중구청소년센터</title>
-      <div className="login-layout">
-        <aside className="login-art" aria-label="중구청소년센터">
-          <Image
-            src="/media/center-exterior.webp"
-            width={910}
-            height={514}
-            sizes="(min-width:800px) 40vw, 1px"
-            alt="중구청소년센터 정문"
-            priority
-          />
-          <div>
-            <span>중구청소년센터</span>
-            <p>
-              프로그램 신청부터
-              <br />
-              공간 예약까지
-            </p>
-          </div>
-        </aside>
         <section className="login-fields" aria-labelledby="login-heading">
           <h1 id="login-heading">로그인</h1>
           <Suspense fallback={<ListSkeleton rows={2} />}>
             <LoginForm />
           </Suspense>
           <Link href="/" className="login-back">
-            <ArrowLeft aria-hidden size={16} />
             로그인 없이 둘러보기
           </Link>
         </section>
-      </div>
     </div>
   );
 }

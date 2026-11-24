@@ -6,7 +6,6 @@ import { siNaver, siApple } from 'simple-icons';
 import { oauthStartUrl, providerStates } from '@/config/oauth';
 import { OAUTH_PROVIDER_LABEL } from '@/domain/labels';
 import type { OAuthProvider } from '@/domain/types';
-import { cn } from '@/lib/cn';
 
 const icons = { naver: siNaver, apple: siApple };
 function ProviderMark({ provider }: { provider: OAuthProvider }) {
@@ -26,11 +25,11 @@ function ProviderMark({ provider }: { provider: OAuthProvider }) {
   );
 }
 
-const STYLE: Record<OAuthProvider, { className: string; text: string }> = {
-  kakao: { className: 'bg-[#FEE500] text-black/85', text: '카카오 로그인' },
-  naver: { className: 'bg-[#03C75A] text-white', text: '네이버 로그인' },
-  apple: { className: 'bg-black text-white', text: 'Apple로 로그인' },
-  google: { className: 'border border-[#747775] bg-white text-[#1F1F1F]', text: 'Google 계정으로 로그인' },
+const STYLE: Record<OAuthProvider, { className: string; text: string; name: string }> = {
+  kakao: { className: 'bg-[#FEE500] text-black/85', name: '카카오', text: '카카오 로그인' },
+  naver: { className: 'bg-[#03C75A] text-white', name: '네이버', text: '네이버 로그인' },
+  apple: { className: 'bg-black text-white', name: 'Apple', text: 'Apple로 로그인' },
+  google: { className: 'border border-[#747775] bg-white text-[#1F1F1F]', name: 'Google', text: 'Google 계정으로 로그인' },
 };
 
 export function SocialLoginButtons({ next }: { next: string | null }) {
@@ -40,7 +39,7 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
 
   return (
     <div>
-      <ul className="social-auth-grid grid gap-2">
+      <ul className="social-auth-grid">
         {providers.map(({ provider, enabled }) => (
           <li key={provider}>
             <button
@@ -55,20 +54,17 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
                 }
                 window.location.assign(oauthStartUrl(provider, next));
               }}
-              className={cn(
-                'relative flex min-h-12 w-full items-center justify-center rounded-md px-4 text-[15px] font-semibold',
-                STYLE[provider].className,
-                'oauth-button',
-              )}
+              aria-label={STYLE[provider].text}
+              className="oauth-button"
             >
-              <ProviderMark provider={provider} />
-              <span>{STYLE[provider].text}</span>
-              {!enabled && <span className="oauth-status">설정 필요</span>}
+              <span className={'oauth-mark ' + STYLE[provider].className}><ProviderMark provider={provider} /></span>
+              <span>{STYLE[provider].name}</span>
+              {!enabled && <span className="sr-only">설정 필요</span>}
             </button>
           </li>
         ))}
       </ul>
-      <p role="status" aria-live="polite" className="mt-2 min-h-5 text-sm text-ink-700">
+      <p role="status" aria-live="polite" className="login-social-note">
         {notice ?? (!anyEnabled ? '현재 이메일 로그인을 이용할 수 있어요.' : '')}
       </p>
     </div>
