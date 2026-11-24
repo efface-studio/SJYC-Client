@@ -30,7 +30,7 @@
 | 그림자 | 모달·토스트, 관리자 사이드바와 작업 영역                                                                                                                                            |
 | 서체   | Pretendard Variable, 제목 자간 -0.025em, 숫자는 `tabular-nums`                                                                                                                      |
 | 간격   | Tailwind 기본 4px 단위, 페이지 좌우 16px(모바일)/24px                                                                                                                               |
-| 레이어 | 헤더·탭바 30, 모달 dialog(top layer), 토스트 50                                                                                                                                     |
+| 레이어 | 헤더 30, 모달 dialog(top layer), 토스트 50                                                                                                                                          |
 
 ## 컴포넌트 (`src/components/ui`)
 
@@ -43,14 +43,14 @@
 | FormError                                                                               | 서버 오류 요약, role="alert"                                                                                                                                                      |
 | Badge                                                                                   | 색 띠 + 굵은 텍스트(색만으로 상태 전달 금지)                                                                                                                                      |
 | Modal / ConfirmDialog                                                                   | 네이티브 `<dialog>` — 포커스 가두기·Esc·포커스 복원, 모바일 85dvh 내부 스크롤, drawer 변형                                                                                        |
-| Toast                                                                                   | aria-live polite, 모바일은 탭바 위                                                                                                                                                |
+| Toast                                                                                   | aria-live polite, 모바일은 하단 안전 영역 또는 신청 버튼 위                                                                                                                       |
 | Skeleton, ListSkeleton, EmptyState, ErrorState(재시도), ForbiddenState, Callout         | 모든 데이터 화면의 로딩·빈·오류·권한 없음 상태                                                                                                                                    |
 | Pagination, PageHeader(breadcrumb)                                                      | aria-current, 44px 터치                                                                                                                                                           |
 
 ## 패턴
 
 - 목록 상태 표시: 상단 밑줄 탭(모집 상태·분류), 검색은 `role="search"` 폼.
-- 상세 화면 행동 버튼: 모바일은 하단 탭바 위에 고정, 데스크톱은 우측 고정 영역.
+- 상세 화면 행동 버튼: 모바일은 하단 안전 영역에 고정, 데스크톱은 우측 고정 영역.
 - 폼: `noValidate` + Zod, 필드 아래 오류, 상단 FormError, 개인정보 동의는 항목·목적·보유기간을 함께 표시.
 - 개발용 샘플 데이터 안내와 개발 도구는 푸터에 표시한다.
 

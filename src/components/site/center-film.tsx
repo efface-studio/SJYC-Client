@@ -3,43 +3,56 @@
 import { ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { CENTER } from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
 
-const MOVIE = '/media/center-film.mp4';
 const PLAYBACK_RATE = 1.2;
-const POSTER = '/media/center-film-poster.webp';
 
 export function CenterFilm() {
+  const settings = useSiteSettings();
+  return <Film key={settings.film} movie={settings.film} settings={settings} />;
+}
+
+function Film({ movie, settings }: { movie: string; settings: ReturnType<typeof useSiteSettings> }) {
   const film = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  const [preference, setPreference] = useState<'auto' | 'play' | 'pause'>('auto');
+
   useEffect(() => {
     const video = film.current;
-    if (!video) return;
+    if (!video || failed) return;
     video.defaultPlaybackRate = PLAYBACK_RATE;
     video.playbackRate = PLAYBACK_RATE;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const followPreference = () => {
-      if (motion.matches) video.pause();
-      else {
-        if (!video.src) video.src = MOVIE;
-        void video.play().catch(() => {});
+    let visible = false;
+    const syncPlayback = () => {
+      if (
+        !visible ||
+        document.hidden ||
+        preference === 'pause' ||
+        (preference === 'auto' && motion.matches)
+      ) {
+        video.pause();
+        return;
       }
-    };
-    followPreference();
-    motion.addEventListener('change', followPreference);
-    return () => motion.removeEventListener('change', followPreference);
-  }, []);
-
-  function toggle() {
-    const video = film.current;
-    if (!video) return;
-    if (video.paused) {
-      if (!video.src) video.src = MOVIE;
+      if (video.getAttribute('src') !== movie) video.src = movie;
       void video.play().catch(() => {});
-    } else video.pause();
-  }
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry?.isIntersecting ?? false;
+      syncPlayback();
+    });
+    observer.observe(video);
+    document.addEventListener('visibilitychange', syncPlayback);
+    motion.addEventListener('change', syncPlayback);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', syncPlayback);
+      motion.removeEventListener('change', syncPlayback);
+      video.pause();
+    };
+  }, [failed, movie, preference]);
 
   return (
     <section className="center-film" aria-labelledby="film-title">
@@ -49,7 +62,7 @@ export function CenterFilm() {
         playsInline
         loop
         preload="none"
-        poster={POSTER}
+        poster={settings.poster}
         aria-hidden="true"
         onPlaying={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -58,10 +71,10 @@ export function CenterFilm() {
       />
       <h1 id="film-title">
         <Image
-          src="/brand/logo-on-dark.png"
-          alt={CENTER.formalName}
-          width={300}
-          height={50}
+          src={settings.heroLogo}
+          alt={settings.formalName}
+          width={474}
+          height={75}
           unoptimized
           priority
         />
@@ -70,7 +83,11 @@ export function CenterFilm() {
         <ArrowDown size={24} strokeWidth={1.5} />
       </span>
       {!failed && (
-        <button type="button" className="film-playback sr-only" onClick={toggle}>
+        <button
+          type="button"
+          className="film-playback sr-only"
+          onClick={() => setPreference(film.current?.paused ? 'play' : 'pause')}
+        >
           {playing ? '배경 영상 일시정지' : '배경 영상 재생'}
         </button>
       )}

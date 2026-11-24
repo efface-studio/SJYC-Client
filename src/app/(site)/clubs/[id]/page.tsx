@@ -8,11 +8,11 @@ import { api, errorMessage, isApiError } from '@/api';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonClass } from '@/components/ui/button';
 import { CheckboxField, FormError, TextAreaField } from '@/components/ui/field';
-import { PageHeader } from '@/components/ui/page-header';
+import { ArrowLeft } from 'lucide-react';
+import { ClubVisual } from '@/components/site/club-visual';
+import '../clubs.css';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
-import { REFERENCE_COLLECTED_AT } from '@/api/mock/research';
-import { DEMO_DATA } from '@/config/env';
 import { CLUB_APPLICATION_STATUS } from '@/domain/labels';
 import { clubApplySchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import type { Club, ClubRole } from '@/domain/types';
@@ -134,7 +134,7 @@ function JoinArea({ club }: { club: Club }) {
     },
   });
 
-  if (!session) {
+  if (!session && club.recruiting) {
     return (
       <Link
         href={`/login?next=${encodeURIComponent(`/clubs/${club.id}`)}`}
@@ -172,7 +172,6 @@ function JoinArea({ club }: { club: Club }) {
       }}
       className="space-y-4"
     >
-      <h2 className="text-lg font-bold">가입 신청</h2>
       <TextAreaField
         label="가입 동기"
         name="motivation"
@@ -197,47 +196,26 @@ function JoinArea({ club }: { club: Club }) {
 
 /** 센터 공식 채널에서 가져온 사진 — 캡션과 출처를 함께 표시한다 */
 function ClubPhotos({ club }: { club: Club }) {
-  if (club.photos.length === 0) return null;
-  const [cover, ...rest] = club.photos;
+  if (!club.photos.length) return null;
   return (
-    <section aria-label="활동 사진" className="mb-6">
-      {cover && (
-        <figure>
-          <img
-            src={cover.url}
-            alt={cover.caption}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            className="aspect-[16/9] w-full rounded-md bg-surface-muted object-cover"
-          />
-          <figcaption className="mt-1.5 text-sm text-ink-600">
-            {cover.caption}
-            {cover.date && ` · ${cover.date}`} ·{' '}
-            <a href={cover.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline">
-              출처
-              <span className="sr-only">(새 창)</span>
-            </a>
-          </figcaption>
-        </figure>
-      )}
-      {rest.length > 0 && (
-        <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {rest.map((p) => (
-            <li key={p.url}>
-              <a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" title={p.caption}>
-                <img
-                  src={p.url}
-                  alt={p.caption}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="aspect-[4/3] w-full rounded-sm bg-surface-muted object-cover"
-                />
-                <span className="sr-only">{p.caption} 출처 (새 창)</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+    <section className="club-gallery" aria-labelledby="club-photos-title">
+      <h2 id="club-photos-title">활동 자료</h2>
+      <ul>
+        {club.photos.map((photo) => (
+          <li key={photo.url}>
+            <figure>
+              <ClubVisual photo={photo} field={club.field} />
+              <figcaption>
+                <a href={photo.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {photo.caption}
+                  <span className="sr-only"> 출처 (새 창)</span>
+                </a>
+                {photo.date && <span>{photo.date}</span>}
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -297,72 +275,73 @@ export default function ClubDetailPage() {
   const { data: session } = useSession();
   const myClubs = useQuery({ queryKey: ['my-clubs'], queryFn: () => api.me.clubs(), enabled: !!session });
   const membership = myClubs.data?.find((m) => m.club.id === id);
+  const introduction = club.data?.description.startsWith(club.data.summary)
+    ? club.data.description.slice(club.data.summary.length).trim()
+    : club.data?.description;
 
   return (
-    <div className="container-page py-6 md:py-10">
-      <div className="mx-auto max-w-3xl">
-        {club.isPending ? (
-          <ListSkeleton rows={2} />
-        ) : club.isError ? (
-          isApiError(club.error, 'NOT_FOUND') ? (
-            <EmptyState title="동아리를 찾을 수 없습니다" />
-          ) : (
-            <ErrorState error={club.error} onRetry={() => void club.refetch()} />
-          )
+    <div className="club-page container-page">
+      <Link href="/clubs" className="club-back">
+        <ArrowLeft aria-hidden size={16} />
+        동아리 목록
+      </Link>
+      {club.isPending ? (
+        <ListSkeleton rows={2} />
+      ) : club.isError ? (
+        isApiError(club.error, 'NOT_FOUND') ? (
+          <EmptyState title="동아리를 찾을 수 없습니다" />
         ) : (
-          <>
-            <title>{`${club.data.name} | 중구청소년센터`}</title>
-            <PageHeader
-              breadcrumbs={[{ label: '동아리', href: '/clubs' }, { label: club.data.field }]}
-              title={club.data.name}
-              description={club.data.summary}
-            />
-            {DEMO_DATA &&
-              (club.data.sourceUrls.length === 0 ? (
-                <Callout tone="warning" className="mb-4">
-                  개발용 샘플 동아리입니다.
-                </Callout>
-              ) : (
-                <Callout className="mb-4">
-                  소개·사진·활동은 센터 공식 채널에서 수집한 참고 정보입니다 (수집일 {REFERENCE_COLLECTED_AT}
-                  ). 인원·가입 신청·동아리원 소식은 데모입니다. 실제 가입은 센터에 문의해 주세요.
-                </Callout>
-              ))}
-            <ClubPhotos club={club.data} />
-            <dl className="grid grid-cols-[88px_1fr] gap-y-2 border-y border-line py-4 text-[15px]">
-              <dt className="font-semibold text-ink-600">활동 분야</dt>
-              <dd>{club.data.field}</dd>
-              {club.data.target && (
-                <>
-                  <dt className="font-semibold text-ink-600">대상</dt>
-                  <dd>{club.data.target}</dd>
-                </>
-              )}
-              <dt className="font-semibold text-ink-600">모임 안내</dt>
-              <dd>{club.data.meetingInfo}</dd>
-              <dt className="font-semibold text-ink-600">인원</dt>
-              <dd>
-                {club.data.memberCount}명{DEMO_DATA && <span className="text-ink-600"> (데모)</span>}
-              </dd>
-            </dl>
-            <p className="mt-6 text-base leading-relaxed whitespace-pre-line text-ink-700">
-              {club.data.description}
-            </p>
-            <ClubActivities club={club.data} />
-
-            <div className="mt-8">
-              {membership ? (
-                <>
-                  <Callout tone="brand">{ROLE_LABEL[membership.role]}(으)로 활동 중인 동아리입니다.</Callout>
-                  <MemberArea clubId={id} />
-                </>
-              ) : (
-                <JoinArea club={club.data} />
-              )}
+          <ErrorState error={club.error} onRetry={() => void club.refetch()} />
+        )
+      ) : (
+        <>
+          <title>{`${club.data.name} | 중구청소년센터`}</title>
+          <header className="club-profile">
+            <div>
+              <span className="club-field">{club.data.field}</span>
+              <h1>{club.data.name}</h1>
+              <p>{club.data.summary}</p>
             </div>
-          </>
-        )}
-      </div>
+            <ClubVisual key={id} photo={club.data.photos[0]} field={club.data.field} />
+          </header>
+          <div className="club-detail-layout">
+            <section className="club-participate" aria-labelledby="club-participate-title">
+              <h2 id="club-participate-title">참여 안내</h2>
+              <dl>
+                {club.data.target && (
+                  <>
+                    <dt>활동 대상</dt>
+                    <dd>{club.data.target}</dd>
+                  </>
+                )}
+                <dt>모임 안내</dt>
+                <dd>{club.data.meetingInfo}</dd>
+                <dt>활동 인원</dt>
+                <dd>{club.data.memberCount}명</dd>
+              </dl>
+              {membership ? (
+                <Callout tone="brand">{ROLE_LABEL[membership.role]}(으)로 활동 중인 동아리입니다.</Callout>
+              ) : (
+                <div className="club-join">
+                  <h3>가입 신청</h3>
+                  <JoinArea club={club.data} />
+                </div>
+              )}
+            </section>
+            <div className="club-story">
+              {introduction && (
+                <section aria-labelledby="club-intro-title">
+                  <h2 id="club-intro-title">동아리 소개</h2>
+                  <p className="whitespace-pre-line">{introduction}</p>
+                </section>
+              )}
+              <ClubActivities club={club.data} />
+              <ClubPhotos club={club.data} />
+              {membership && <MemberArea clubId={id} />}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
