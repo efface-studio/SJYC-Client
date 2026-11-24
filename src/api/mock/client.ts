@@ -287,7 +287,14 @@ export const mockClient: ApiClient = {
       }),
     signup: (input) =>
       respond((db) => {
-        if (db.users.some((x) => x.email.toLowerCase() === input.email.toLowerCase())) {
+        const registered = db.users.find((x) => x.email.toLowerCase() === input.email.toLowerCase());
+        if (registered) {
+          if (
+            registered.status === 'active' &&
+            !registered.emailVerified &&
+            registered.password === input.password
+          )
+            return { requiresEmailVerification: true };
           throw new ApiError('CONFLICT', '이미 가입된 이메일입니다.', {
             reason: 'EMAIL_TAKEN',
             fieldErrors: { email: '이미 가입된 이메일입니다.' },
