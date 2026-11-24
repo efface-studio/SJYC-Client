@@ -61,56 +61,32 @@ function DrillDown({ href, allowed, children }: { href: string; allowed: boolean
 
 function WorkQueue({ data, user }: { data: DashboardSummary; user: User | undefined }) {
   const total = QUEUES.reduce((sum, q) => sum + data[q.key], 0);
-  let offset = 0;
   return (
-    <section className="dash-panel" aria-labelledby="queue-heading">
-      <h2 id="queue-heading">처리 대기 업무</h2>
+    <section className="dash-panel queue-panel" aria-labelledby="queue-heading">
+      <div className="queue-heading">
+        <h2 id="queue-heading">처리 대기 업무</h2>
+        <span>
+          총 <b>{total.toLocaleString('ko-KR')}</b>건
+        </span>
+      </div>
       <div className="queue-body">
-        <div className="queue-chart">
-          <svg aria-hidden="true" viewBox="0 0 112 112">
-            <circle cx="56" cy="56" r="48" fill="none" stroke="#e9edf2" strokeWidth="10" />
-            {total > 0 &&
-              QUEUES.map((q) => {
-                const share = (data[q.key] / total) * 100;
-                const start = offset;
-                offset += share;
-                if (share === 0) return null;
-                const gap = share === 100 ? 0 : Math.min(1.4, share / 4);
-                return (
-                  <circle
-                    key={q.key}
-                    cx="56"
-                    cy="56"
-                    r="48"
-                    pathLength="100"
-                    fill="none"
-                    stroke={q.color}
-                    strokeWidth="10"
-                    strokeDasharray={`${share - gap} ${100 - share + gap}`}
-                    strokeDashoffset={-start}
-                    transform="rotate(-90 56 56)"
-                  />
-                );
-              })}
-          </svg>
-          <div className="queue-total">
-            <span>전체 대기</span>
-            <strong>
-              {total.toLocaleString('ko-KR')}
-              <small>건</small>
-            </strong>
-          </div>
-        </div>
         <ul className="queue-legend">
           {QUEUES.map((q) => (
             <li key={q.key}>
               <DrillDown href={q.href} allowed={can(user, q.permission)}>
-                <span className="queue-dot" aria-hidden style={{ backgroundColor: q.color }} />
                 <span className="grow">{q.label}</span>
                 <b>
                   {data[q.key].toLocaleString('ko-KR')}
                   <small>건</small>
                 </b>
+                <span className="queue-track" aria-hidden>
+                  <i
+                    style={{
+                      width: (total ? (data[q.key] / total) * 100 : 0) + '%',
+                      backgroundColor: q.color,
+                    }}
+                  />
+                </span>
               </DrillDown>
             </li>
           ))}

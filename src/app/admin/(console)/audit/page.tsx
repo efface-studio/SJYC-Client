@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
-import { FileClock } from 'lucide-react';
+import { ChevronDown, Fingerprint } from 'lucide-react';
 import '@/features/developer/operations.css';
 import { FilterBar } from '@/components/admin/filter-bar';
 import { ADMIN_PAGE_SIZE, useListParams } from '@/components/admin/list-params';
@@ -24,11 +24,6 @@ function AuditList() {
   return (
     <>
       <div className="audit-workspace">
-        <header className="operations-heading">
-          <FileClock size={23} />
-          <strong>Audit trail</strong>
-          <span>관리자 작업 이력</span>
-        </header>
         <FilterBar
           searchLabel="감사 로그 검색"
           placeholder="내용, 처리자로 검색"
@@ -41,6 +36,11 @@ function AuditList() {
         >
           {(d) => (
             <>
+              <div className="audit-columns" aria-hidden>
+                <span>기록 시각</span>
+                <span>작업 내용</span>
+                <span>처리자</span>
+              </div>
               <ol className="audit-stream">
                 {d.items.map((e) => (
                   <li key={e.id}>
@@ -48,13 +48,16 @@ function AuditList() {
                       <summary>
                         <time dateTime={e.at}>{formatDateTime(e.at)}</time>
                         <div>
-                          <code>{e.action}</code>
                           <strong>{e.summary}</strong>
+                          <code>{e.action}</code>
                         </div>
-                        <span>{e.actorName}</span>
+                        <span className="audit-actor">{e.actorName}</span>
+                        <ChevronDown className="audit-toggle" size={16} aria-hidden />
                       </summary>
                       <dl>
-                        <dt>이벤트 ID</dt>
+                        <dt>
+                          <Fingerprint size={14} aria-hidden /> 이벤트 ID
+                        </dt>
                         <dd>{e.id}</dd>
                         <dt>대상</dt>
                         <dd>

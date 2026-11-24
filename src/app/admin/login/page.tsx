@@ -165,7 +165,7 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="admin-console flex min-h-dvh flex-col">
+    <div className="admin-console console-login flex min-h-dvh flex-col">
       <AdminTitle>로그인</AdminTitle>
       <main
         id="main"

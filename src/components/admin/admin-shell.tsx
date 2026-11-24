@@ -7,7 +7,9 @@ import {
   CalendarCheck,
   CalendarDays,
   CheckSquare,
+  ChevronDown,
   ChevronRight,
+  Terminal,
   CircleHelp,
   ClipboardList,
   FileClock,
@@ -18,7 +20,7 @@ import {
   Megaphone,
   Menu,
   MessagesSquare,
-  PanelLeft,
+  PanelsTopLeft,
   Settings2,
   UserRound,
   Users,
@@ -47,7 +49,7 @@ interface NavItem {
 }
 const NAV: { group: string; items: NavItem[] }[] = [
   {
-    group: '운영',
+    group: '업무 처리',
     items: [
       { href: '/admin', label: '대시보드', icon: LayoutDashboard, permission: 'admin.access' },
       {
@@ -62,7 +64,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     ],
   },
   {
-    group: '콘텐츠',
+    group: '콘텐츠 관리',
     items: [
       { href: '/admin/notices', label: '공지', icon: Megaphone, permission: 'notice.write' },
       { href: '/admin/programs', label: '프로그램', icon: CalendarDays, permission: 'program.write' },
@@ -83,6 +85,11 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { href: '/admin/settings', label: '사이트 설정', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
+    ],
+  },
+  {
+    group: '기술·기록',
+    items: [
       { href: '/admin/audit', label: '감사 로그', icon: FileClock, permission: 'audit.read' },
       {
         href: '/admin/specifications/features',
@@ -91,7 +98,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
         permission: 'admin.access',
       },
       { href: '/admin/specifications/api', label: 'API 명세서', icon: Braces, permission: 'admin.access' },
-      { href: '/admin/developer', label: '개발자 도구', icon: Settings2, permission: 'developer.access' },
+      { href: '/admin/developer', label: '개발자 도구', icon: Terminal, permission: 'developer.access' },
     ],
   },
 ];
@@ -121,8 +128,11 @@ function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; 
         const items = group.items.filter((i) => allows(user, i.permission));
         if (!items.length) return null;
         return (
-          <div key={group.group}>
-            <p id={uid + index}>{group.group}</p>
+          <details key={group.group} open={index === 0 || items.some((item) => item.href === active?.href)}>
+            <summary id={uid + index}>
+              {group.group}
+              <ChevronDown size={14} aria-hidden />
+            </summary>
             <ul aria-labelledby={uid + index}>
               {items.map(({ href, label, icon: Icon }) => (
                 <li key={href}>
@@ -137,7 +147,7 @@ function NavLinks({ user, active, onNavigate }: { user: User; active?: NavItem; 
                 </li>
               ))}
             </ul>
-          </div>
+          </details>
         );
       })}
     </nav>
@@ -189,7 +199,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <div className="console-frame">
         <aside className="console-rail">
           <div className="console-brand">
-            <Logo onDark className="[&_img]:h-6 md:[&_img]:h-6" />
+            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>
           <NavLinks user={user} active={active} />
           <UserBlock user={user} />
@@ -206,10 +216,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
               >
                 <Menu aria-hidden size={21} />
               </button>
-              <PanelLeft aria-hidden size={17} className="hidden lg:block" />
-              <span>관리자 센터</span>
+              <PanelsTopLeft aria-hidden size={17} className="hidden lg:block" />
+              <span>센터 운영</span>
               <ChevronRight size={14} aria-hidden />
-              <strong className="truncate">{active?.label ?? '관리'}</strong>
+              <strong className="truncate">
+                {NAV.find((g) => g.items.some((item) => item.href === active?.href))?.group ?? '관리'}
+              </strong>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <ConsoleSearch user={user} menus={ALL_ITEMS.filter((i) => allows(user, i.permission))} />
