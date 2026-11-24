@@ -43,11 +43,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      {/* 모바일에서는 하단 탭바 위, 데스크톱에서는 우하단 */}
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(76px+env(safe-area-inset-bottom))] z-50 flex flex-col items-center gap-2 px-4 md:bottom-6 md:items-end md:px-6"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--mobile-toast-gap,76px)+env(safe-area-inset-bottom))] z-50 flex flex-col items-center gap-2 px-4 md:bottom-6 md:items-end md:px-6"
       >
         {items.map((t) => (
           <div

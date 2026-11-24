@@ -13,8 +13,6 @@ import { ClubVisual } from '@/components/site/club-visual';
 import '../clubs.css';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
-import { REFERENCE_COLLECTED_AT } from '@/api/mock/research';
-import { DEMO_DATA } from '@/config/env';
 import { CLUB_APPLICATION_STATUS } from '@/domain/labels';
 import { clubApplySchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import type { Club, ClubRole } from '@/domain/types';
@@ -319,9 +317,7 @@ export default function ClubDetailPage() {
                 <dt>모임 안내</dt>
                 <dd>{club.data.meetingInfo}</dd>
                 <dt>활동 인원</dt>
-                <dd>
-                  {club.data.memberCount}명{DEMO_DATA && ' (데모)'}
-                </dd>
+                <dd>{club.data.memberCount}명</dd>
               </dl>
               {membership ? (
                 <Callout tone="brand">{ROLE_LABEL[membership.role]}(으)로 활동 중인 동아리입니다.</Callout>
@@ -342,16 +338,6 @@ export default function ClubDetailPage() {
               <ClubActivities club={club.data} />
               <ClubPhotos club={club.data} />
               {membership && <MemberArea clubId={id} />}
-              {DEMO_DATA &&
-                (club.data.sourceUrls.length === 0 ? (
-                  <Callout tone="warning">개발용 샘플 동아리입니다.</Callout>
-                ) : (
-                  <Callout>
-                    소개·사진·활동은 센터 공식 채널에서 수집한 참고 정보입니다 (수집일{' '}
-                    {REFERENCE_COLLECTED_AT}). 인원·가입 신청·동아리원 소식은 데모입니다. 실제 가입은 센터에
-                    문의해 주세요.
-                  </Callout>
-                ))}
             </div>
           </div>
         </>

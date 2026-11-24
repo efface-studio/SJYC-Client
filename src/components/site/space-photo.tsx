@@ -12,7 +12,11 @@ export function SpacePhoto({ space, thumbnail = false }: { space: Space; thumbna
         src={`/media/spaces/${photo.key}.webp`}
         alt={thumbnail ? '' : photo.alt}
         fill
-        sizes={thumbnail ? '(max-width: 639px) 88px, 156px' : '(max-width: 719px) 94vw, 672px'}
+        sizes={
+          thumbnail
+            ? '(max-width: 639px) 92vw, (max-width: 900px) 44vw, 360px'
+            : '(max-width: 719px) 94vw, 672px'
+        }
       />
       {photo.key === 'media' && <figcaption>공간 예시 이미지</figcaption>}
     </figure>
