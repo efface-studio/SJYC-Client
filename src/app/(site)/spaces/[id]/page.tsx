@@ -14,6 +14,7 @@ import {
   TextAreaField,
   TextField,
 } from '@/components/ui/field';
+import '@/components/site/directories.css';
 import { SpacePhoto } from '@/components/site/space-photo';
 import { PageHeader } from '@/components/ui/page-header';
 import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
@@ -235,8 +236,8 @@ export default function SpaceDetailPage() {
   const space = useQuery({ queryKey: ['space', id], queryFn: () => api.spaces.get(id) });
 
   return (
-    <div className="container-page py-6 md:py-10">
-      <div className="mx-auto max-w-2xl">
+    <div className="directory-detail directory-spaces">
+      <div className="directory-content">
         {space.isPending ? (
           <ListSkeleton rows={2} />
         ) : space.isError ? (
@@ -253,14 +254,19 @@ export default function SpaceDetailPage() {
               title={space.data.name}
               description={`${space.data.floor} · 최대 ${space.data.capacity}명 · ${space.data.description}`}
             />
-            <SpacePhoto space={space.data} />
-            {space.data.reservable ? (
-              <ReservationForm space={space.data} />
-            ) : (
-              <Callout tone="warning" title="현재 예약을 받지 않는 공간입니다">
-                시설 점검 등으로 예약이 중지되었습니다. 자세한 내용은 공지사항을 확인해 주세요.
-              </Callout>
-            )}
+            <div className="reserve-layout">
+              <SpacePhoto space={space.data} />
+              <section className="reserve-panel" aria-label="예약 신청">
+                <h2>예약 신청</h2>
+                {space.data.reservable ? (
+                  <ReservationForm space={space.data} />
+                ) : (
+                  <Callout tone="warning" title="현재 예약을 받지 않는 공간입니다">
+                    시설 점검 등으로 예약이 중지되었습니다. 자세한 내용은 공지사항을 확인해 주세요.
+                  </Callout>
+                )}
+              </section>
+            </div>
           </>
         )}
       </div>

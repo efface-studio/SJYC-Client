@@ -1,17 +1,31 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
+import { siNaver, siApple } from 'simple-icons';
 import { oauthStartUrl, providerStates } from '@/config/oauth';
 import { OAUTH_PROVIDER_LABEL } from '@/domain/labels';
 import type { OAuthProvider } from '@/domain/types';
 import { cn } from '@/lib/cn';
 
-/**
- * 공급자별 버튼 색·문구는 각 사 브랜드 가이드의 기본값을 따른다.
- * TODO: 공식 리소스 키트의 로고 심볼을 받아 적용 (임의로 다시 그린 로고는 쓰지 않는다)
- *  - 카카오: developers.kakao.com 디자인 가이드 / 네이버: developers.naver.com 로그인 버튼 가이드
- *  - Apple: Sign in with Apple HIG / Google: Sign in with Google 브랜딩 가이드
- */
+const icons = { naver: siNaver, apple: siApple };
+function ProviderMark({ provider }: { provider: OAuthProvider }) {
+  if (provider === 'kakao') {
+    return (
+      <svg width="20" height="20" viewBox="60 15 16 16" fill="#000000" aria-hidden>
+        <path d="M68.001 16.5225C64.4222 16.5225 61.5225 19.0037 61.5225 22.0641C61.5225 24.0312 62.7219 25.7596 64.5292 26.7423L63.9181 29.2113C63.8954 29.285 63.9132 29.364 63.9619 29.4184C63.9975 29.457 64.0461 29.478 64.0931 29.478C64.1337 29.478 64.1742 29.464 64.2082 29.4341L66.834 27.5144C67.2117 27.5723 67.6007 27.6039 67.9994 27.6039C71.5767 27.6039 74.478 25.1226 74.478 22.0623C74.478 19.002 71.5783 16.5225 68.001 16.5225Z" />
+      </svg>
+    );
+  }
+  if (provider === 'google')
+    return <Image src="/brand/google-signin.png" width={20} height={20} alt="" unoptimized />;
+  return (
+    <svg width="20" height="20" aria-hidden viewBox="0 0 24 24" fill="currentColor">
+      <path d={icons[provider].path} />
+    </svg>
+  );
+}
+
 const STYLE: Record<OAuthProvider, { className: string; text: string }> = {
   kakao: { className: 'bg-[#FEE500] text-black/85', text: '카카오 로그인' },
   naver: { className: 'bg-[#03C75A] text-white', text: '네이버 로그인' },
@@ -26,12 +40,7 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
 
   return (
     <div>
-      {!anyEnabled && (
-        <p className="mb-3 rounded-md bg-surface-muted p-3 text-sm text-ink-700">
-          소셜 로그인은 서버 연동 설정이 끝나지 않아 아직 사용할 수 없습니다. 이메일로 로그인해 주세요.
-        </p>
-      )}
-      <ul className="grid gap-2">
+      <ul className="social-auth-grid grid gap-2">
         {providers.map(({ provider, enabled }) => (
           <li key={provider}>
             <button
@@ -49,21 +58,18 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
               className={cn(
                 'relative flex min-h-12 w-full items-center justify-center rounded-md px-4 text-[15px] font-semibold',
                 STYLE[provider].className,
-                !enabled && 'opacity-45',
+                'oauth-button',
               )}
             >
-              {STYLE[provider].text}
-              {!enabled && (
-                <span className="absolute right-3 rounded-sm bg-white/90 px-1.5 py-0.5 text-xs font-semibold text-ink-700">
-                  설정 필요
-                </span>
-              )}
+              <ProviderMark provider={provider} />
+              <span>{STYLE[provider].text}</span>
+              {!enabled && <span className="oauth-status">설정 필요</span>}
             </button>
           </li>
         ))}
       </ul>
       <p role="status" aria-live="polite" className="mt-2 min-h-5 text-sm text-ink-700">
-        {notice}
+        {notice ?? (!anyEnabled ? '현재 이메일 로그인을 이용할 수 있어요.' : '')}
       </p>
     </div>
   );

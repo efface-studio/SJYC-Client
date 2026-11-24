@@ -1,3 +1,5 @@
+'use client';
+import { useSiteSettings } from '@/features/settings/use-settings';
 import Image from 'next/image';
 import Link from 'next/link';
 import { siFacebook, siInstagram, siNaver, siYoutube, type SimpleIcon } from 'simple-icons';
@@ -53,6 +55,7 @@ interface FooterLink {
   strong?: boolean;
   external?: boolean;
   icon?: SimpleIcon;
+  channel?: (typeof OFFICIAL_CHANNELS)[number]['key'];
 }
 
 const GROUPS: { title: string; links: FooterLink[] }[] = [
@@ -90,6 +93,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
       label: c.label,
       external: true,
       icon: CHANNEL_ICON[c.key],
+      channel: c.key,
     })),
   },
 ];
@@ -113,13 +117,14 @@ function InfoLine({ items }: { items: string[] }) {
 }
 
 function CenterContactDetails() {
+  const center = useSiteSettings();
   return (
     <div className="space-y-1">
-      <InfoLine items={[`(${CENTER.postalCode}) ${CENTER.address}`, `관장 ${CENTER.director}`]} />
+      <InfoLine items={[`(${center.postalCode}) ${center.address}`, `관장 ${center.director}`]} />
       <InfoLine
-        items={[`사업자등록번호 ${CENTER.businessNumber}`, `통신판매업신고 ${CENTER.mailOrderNumber}`]}
+        items={[`사업자등록번호 ${center.businessNumber}`, `통신판매업신고 ${center.mailOrderNumber}`]}
       />
-      <InfoLine items={[`Tel ${CENTER.telDisplay}`, `Fax ${CENTER.fax}`]} />
+      <InfoLine items={[`Tel ${center.telDisplay}`, `Fax ${center.fax}`]} />
     </div>
   );
 }
@@ -129,16 +134,17 @@ function CenterContactDetails() {
  * 기관 정보는 공식 홈페이지 기준이며 src/config/center.ts 한 곳에서 관리한다.
  */
 export function SiteFooter({ compact = false }: { compact?: boolean }) {
+  const center = useSiteSettings();
   if (compact)
     return (
       <footer className="border-t border-line bg-white px-4 py-4 text-xs text-ink-600 md:px-8">
         <div className="mx-auto flex max-w-[1700px] flex-wrap items-start justify-between gap-3">
           <details>
-            <summary className="cursor-pointer py-1 font-semibold">{CENTER.formalName} 기관 정보</summary>
+            <summary className="cursor-pointer py-1 font-semibold">{center.formalName} 기관 정보</summary>
             <address className="mt-2 space-y-1 not-italic">
               <CenterContactDetails />
               <p>
-                Copyright © {CENTER.copyrightSince} {CENTER.englishName}. All rights reserved.
+                Copyright © {CENTER.copyrightSince} {center.englishName}. All rights reserved.
               </p>
             </address>
           </details>
@@ -152,13 +158,14 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         <div id="contact" className="mb-8 scroll-mt-24">
           <p className="text-[13px] font-semibold text-ink-700">대표전화</p>
           <a
-            href={`tel:${CENTER.tel}`}
+            href={`tel:${center.tel}`}
             className="mt-0.5 inline-block text-[22px] font-bold tracking-tight text-ink-900 tabular-nums"
           >
-            {CENTER.telDisplay}
+            {center.telDisplay}
           </a>
           <p className="mt-1">
-            평일 06:00–22:00 · 토 06:00–21:00 · 일 06:00–18:00 (매월 둘째 주 일요일 휴관)
+            평일 {center.weekdayHours} · 토 {center.saturdayHours} · 일 {center.sundayHours}{' '}
+            {center.closedSunday === 'second' && '(매월 둘째 주 일요일 휴관)'}
           </p>
         </div>
 
@@ -171,7 +178,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
                   <li key={l.href}>
                     {l.external ? (
                       <a
-                        href={l.href}
+                        href={l.channel ? center[l.channel] : l.href}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 hover:text-ink-900"
@@ -199,9 +206,9 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
 
         <address className="mt-10 border-t border-line pt-8 not-italic">
           <Image
-            src="/brand/logo-on-dark.png"
+            src={center.footerLogo}
             unoptimized
-            alt={CENTER.formalName}
+            alt={center.formalName}
             width={300}
             height={50}
             className="footer-logo mb-4"
@@ -210,7 +217,7 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         </address>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Copyright © {CENTER.copyrightSince} {CENTER.englishName}. All rights reserved.
+            Copyright © {CENTER.copyrightSince} {center.englishName}. All rights reserved.
           </p>
           <MakerCredit />
         </div>

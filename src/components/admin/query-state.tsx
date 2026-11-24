@@ -10,12 +10,21 @@ interface QueryStateProps<T> {
   empty?: ReactNode;
   notFound?: string;
   rows?: number;
+  loading?: ReactNode;
   children: (data: T) => ReactNode;
 }
 
 /** 로딩 · 오류(재시도) · 404 · 빈 상태를 한 곳에서 처리한다 */
-export function QueryState<T>({ query, isEmpty, empty, notFound, rows = 4, children }: QueryStateProps<T>) {
-  if (query.isPending) return <ListSkeleton rows={rows} />;
+export function QueryState<T>({
+  query,
+  isEmpty,
+  empty,
+  notFound,
+  rows = 4,
+  loading,
+  children,
+}: QueryStateProps<T>) {
+  if (query.isPending) return loading ?? <ListSkeleton rows={rows} />;
   if (query.isError) {
     if (notFound && isApiError(query.error, 'NOT_FOUND')) return <EmptyState title={notFound} />;
     return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
