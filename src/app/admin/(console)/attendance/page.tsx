@@ -46,7 +46,7 @@ function CreateSessionForm({ target, count }: { target: AttendanceTargetSummary;
   return (
     <form
       noValidate
-      className="grid gap-4 border border-line bg-surface p-4 sm:grid-cols-[220px_1fr_auto] sm:items-start"
+      className="console-surface grid gap-4 p-4 sm:grid-cols-[220px_1fr_auto] sm:items-start"
       onSubmit={(e) => {
         e.preventDefault();
         if (create.isPending) return;
@@ -122,7 +122,7 @@ function StatsTable({ target }: { target: AttendanceTarget }) {
         rows.length === 0 ? (
           <EmptyState title="통계가 없습니다" description="출석을 체크하면 회원별로 누적됩니다." />
         ) : (
-          <div className="overflow-x-auto border border-line bg-surface">
+          <div className="console-surface overflow-x-auto">
             <table className="w-full min-w-[480px] text-[15px]">
               <caption className="sr-only">회원별 출석 통계</caption>
               <thead className="bg-surface-admin text-left text-sm">
@@ -186,7 +186,7 @@ function TargetPanel({ target }: { target: AttendanceTargetSummary }) {
                   description="날짜와 회차 이름으로 첫 출석부를 만드세요."
                 />
               ) : (
-                <ul className="divide-y divide-line border-y border-line bg-surface">
+                <ul className="console-surface divide-y divide-line">
                   {list.map((s) => (
                     <SessionRow key={s.id} s={s} />
                   ))}

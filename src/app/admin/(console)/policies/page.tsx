@@ -120,7 +120,7 @@ function Policies() {
         const doc = d.find((x) => x.key === selected);
         return (
           <>
-            <ul className="max-w-4xl divide-y divide-line border-y border-line bg-surface">
+            <ul className="console-surface max-w-4xl divide-y divide-line">
               {d.map((x) => (
                 <li
                   key={x.key}

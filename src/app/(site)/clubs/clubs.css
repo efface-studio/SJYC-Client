@@ -1,0 +1,303 @@
+.club-page {
+  --club-ink: #39265f;
+  --club-paper: #ebe6f6;
+  padding-block: clamp(20px, 3vw, 44px) clamp(48px, 6vw, 80px);
+}
+.club-cover,
+.club-profile {
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 22px;
+}
+.club-cover {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.88fr);
+  background: #403063;
+  color: #fff;
+}
+.club-cover > div,
+.club-profile > div:first-child {
+  padding: clamp(24px, 4vw, 56px);
+}
+.club-cover h1 {
+  font-size: clamp(44px, 6vw, 82px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+}
+.club-cover p {
+  margin-top: 14px;
+  font-size: clamp(15px, 1.5vw, 20px);
+  color: #f2eafc;
+}
+.club-cover img {
+  width: 100%;
+  height: clamp(174px, 20vw, 262px);
+  object-fit: cover;
+  object-position: 52% 43%;
+  border-radius: 125px 0 0 10px;
+}
+.club-list-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: clamp(28px, 4vw, 50px);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--club-ink);
+}
+.club-list-tools h2,
+.club-story h2,
+.club-participate h2 {
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.3;
+  font-weight: 750;
+}
+.club-list-tools h2 span {
+  margin-left: 5px;
+  color: #705982;
+  font-size: 16px;
+}
+.club-list-tools label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.club-list-tools input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--club-ink);
+}
+.clubs-index {
+  display: grid;
+  column-gap: clamp(24px, 4vw, 56px);
+}
+.clubs-index > li {
+  min-width: 0;
+  border-bottom: 1px solid #d7cfd9;
+}
+.club-list-link {
+  display: grid;
+  grid-template-columns: clamp(100px, 10vw, 138px) minmax(0, 1fr) auto;
+  gap: clamp(12px, 1.6vw, 22px);
+  height: 100%;
+  padding-block: 22px;
+  align-items: center;
+}
+.club-visual {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--club-paper);
+  border-radius: 9px;
+  color: #8a789e;
+}
+.club-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.club-visual-mark {
+  width: 36%;
+  height: 36%;
+}
+.club-list-link > .club-visual {
+  aspect-ratio: 5/6;
+  padding: 8px;
+}
+.club-list-copy {
+  min-width: 0;
+}
+.club-field {
+  color: #725881;
+  font-size: 13px;
+  font-weight: 650;
+}
+.club-list-copy h3 {
+  margin-top: 4px;
+  font-size: clamp(19px, 1.75vw, 25px);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.25;
+}
+.club-list-copy p {
+  margin: 7px 0 9px;
+  color: var(--color-ink-600);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.club-open {
+  align-self: start;
+  margin-top: 3px;
+  color: #6d5b77;
+}
+.club-list-link:hover h3,
+.club-list-link:focus-visible h3,
+.club-back:hover {
+  color: var(--club-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.club-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 8px;
+  color: var(--club-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+.club-profile {
+  grid-template-columns: minmax(0, 1fr) minmax(165px, 29%);
+  background: var(--club-paper);
+  color: var(--club-ink);
+}
+.club-profile h1 {
+  margin-block: 10px 14px;
+  max-width: 20ch;
+  font-size: clamp(30px, 3.8vw, 54px);
+  line-height: 1.14;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+}
+.club-profile p {
+  max-width: 58ch;
+  font-size: clamp(15px, 1.45vw, 18px);
+  color: #51455b;
+  line-height: 1.55;
+}
+.club-profile > .club-visual {
+  margin: 16px;
+  height: clamp(165px, 19vw, 245px);
+  padding: 12px;
+  background: #ded5ec;
+}
+.club-detail-layout {
+  display: grid;
+  align-items: start;
+  gap: clamp(26px, 5vw, 72px);
+  margin-top: clamp(24px, 4vw, 44px);
+}
+.club-story {
+  min-width: 0;
+}
+.club-story > * + * {
+  margin-top: 30px;
+}
+.club-story section > h2 {
+  margin-bottom: 14px;
+}
+.club-story section > p {
+  color: var(--color-ink-700);
+  line-height: 1.75;
+}
+.club-participate {
+  min-width: 0;
+  padding: clamp(18px, 2.2vw, 30px);
+  background: #f0ece6;
+  border-radius: 16px;
+}
+.club-participate dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 16px;
+  margin: 18px 0;
+  font-size: 15px;
+}
+.club-participate dt {
+  color: var(--color-ink-600);
+}
+.club-join {
+  border-top: 1px solid #d5cbc5;
+  padding-top: 16px;
+}
+.club-join h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.club-gallery ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 175px), 1fr));
+  gap: 16px;
+}
+.club-gallery .club-visual {
+  height: 190px;
+  padding: 9px;
+  background: #f1ece8;
+}
+.club-gallery figcaption {
+  margin-top: 7px;
+  color: var(--color-ink-600);
+  font-size: 14px;
+}
+.club-gallery figcaption a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.club-gallery figcaption span:not(.sr-only) {
+  display: block;
+  margin-top: 3px;
+}
+@media (min-width: 860px) {
+  .clubs-index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .club-detail-layout {
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+  .club-story,
+  .club-participate {
+    grid-row: 1;
+  }
+  .club-story {
+    grid-column: 1;
+  }
+  .club-participate {
+    grid-column: 2;
+  }
+}
+@media (max-width: 599px) {
+  .club-cover {
+    grid-template-columns: minmax(0, 1fr) 36%;
+    border-radius: 15px;
+  }
+  .club-cover > div {
+    padding: 24px 16px;
+  }
+  .club-cover img {
+    height: 100%;
+    min-height: 148px;
+    border-radius: 58px 0 0 4px;
+  }
+  .club-list-link {
+    grid-template-columns: 80px minmax(0, 1fr) 16px;
+    gap: 10px;
+    padding-block: 15px;
+  }
+  .club-list-link > .club-visual {
+    padding: 4px;
+  }
+  .club-list-copy p {
+    margin-block: 5px;
+  }
+  .club-list-copy .club-field {
+    font-size: 12px;
+  }
+  .club-profile {
+    grid-template-columns: 1fr;
+  }
+  .club-profile > div:first-child {
+    padding: 22px 20px 12px;
+  }
+  .club-profile > .club-visual {
+    height: 158px;
+    margin: 0 16px 16px;
+  }
+}

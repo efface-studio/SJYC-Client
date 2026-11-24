@@ -1,5 +1,7 @@
 'use client';
 
+import '@/components/admin/admin-console.css';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -153,19 +155,21 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="flex min-h-dvh flex-col bg-surface-admin">
+    <div className="admin-console flex min-h-dvh flex-col">
       <AdminTitle>로그인</AdminTitle>
       <main
         id="main"
         tabIndex={-1}
         className="flex flex-1 items-start justify-center px-4 py-10 focus:outline-none md:items-center"
       >
-        <div className="w-full max-w-sm border border-line bg-surface p-6">
+        <div className="console-surface w-full max-w-md p-6 sm:p-9">
           <div className="flex items-center gap-2">
             <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
           </div>
-          <h1 className="mt-5 text-xl font-bold">관리자 로그인</h1>
-          <p className="mt-1 mb-5 text-sm text-ink-600">센터 직원·관리자 계정만 이용할 수 있습니다.</p>
+          <h1 className="mt-7 text-[28px] font-bold">관리자 로그인</h1>
+          <p className="mt-1 mb-5 text-sm text-ink-600">
+            센터 직원·관리자·동아리 담당자 계정으로 로그인해 주세요.
+          </p>
           <Suspense fallback={<ListSkeleton rows={2} />}>
             <AdminLoginForm />
           </Suspense>

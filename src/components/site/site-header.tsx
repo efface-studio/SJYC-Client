@@ -1,26 +1,20 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Bell, LogIn, Menu, UserRound } from 'lucide-react';
+import { Bell, Menu, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { api } from '@/api';
 import { buttonClass } from '@/components/ui/button';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
-import { CENTER } from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
+import { NAV_LINKS } from '@/domain/site-settings';
+import { orderedKeys } from '@/config/site-settings';
 import { useLogout, useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
-
-export const SITE_NAV = [
-  { href: '/programs', label: '프로그램' },
-  { href: '/spaces', label: '공간 예약' },
-  { href: '/clubs', label: '동아리' },
-  { href: '/notices', label: '공지사항' },
-  { href: '/about', label: '센터 안내' },
-] as const;
 
 const MORE = [
   { href: '/gallery', label: '센터 소식·갤러리' },
@@ -34,13 +28,13 @@ export function isActive(pathname: string, href: string): boolean {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, onDark = false }: { className?: string; onDark?: boolean }) {
+  const settings = useSiteSettings();
   return (
     <Link href="/" className={cn('inline-flex shrink-0 items-center', className)}>
-      {/* 공식 로고 원본(300×50 JPG, 흰 배경) — docs/brand-audit.md */}
       <Image
-        src="/brand/logo-horizontal.jpg"
-        alt={`${CENTER.formalName} 홈`}
+        src={onDark ? settings.heroLogo : settings.headerLogo}
+        alt={`${settings.formalName} 홈`}
         width={300}
         height={50}
         priority
@@ -79,8 +73,40 @@ function NotificationBell() {
   );
 }
 
+function watchPosition(update: () => void) {
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  window.addEventListener('pageshow', update);
+  const resize = new ResizeObserver(update);
+  const film = document.querySelector('.center-film');
+  if (film) resize.observe(film);
+  return () => {
+    resize.disconnect();
+    window.removeEventListener('scroll', update);
+    window.removeEventListener('resize', update);
+    window.removeEventListener('pageshow', update);
+  };
+}
+
 export function SiteHeader() {
+  const settings = useSiteSettings();
+  const nav = orderedKeys(settings.navOrder, NAV_LINKS).map((key) => ({
+    href: '/' + key,
+    label: NAV_LINKS[key],
+  }));
   const pathname = usePathname();
+  const home = pathname === '/';
+  const readPosition = useCallback(() => {
+    if (window.scrollY <= 24) return 'top';
+    if (home) {
+      const film = document.querySelector('.center-film');
+      const bar = document.querySelector('.site-header > .container-page');
+      if (film && bar && film.getBoundingClientRect().bottom >= bar.clientHeight) return 'film';
+    }
+    return 'content';
+  }, [home]);
+  const position = useSyncExternalStore(watchPosition, readPosition, () => 'initial');
+  const onFilm = home && position !== 'content';
   const router = useRouter();
   const toast = useToast();
   const { data: session } = useSession();
@@ -97,13 +123,20 @@ export function SiteHeader() {
     });
 
   return (
-    <header className="sticky top-0 z-30 border-t-[3px] border-b border-t-brand-500 border-b-line bg-surface">
+    <header
+      className={cn(
+        'site-header sticky top-0 z-30',
+        home && 'over-film',
+        onFilm && 'on-film',
+        (position === 'film' || position === 'content') && 'is-scrolled',
+      )}
+    >
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
-        <Logo />
+        <Logo onDark={onFilm} />
 
-        <nav aria-label="주 메뉴" className="hidden md:block">
+        <nav aria-label="주 메뉴" className="full-navigation hidden lg:block">
           <ul className="flex items-center gap-1">
-            {SITE_NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -122,7 +155,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1">
           {session && <NotificationBell />}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="full-navigation hidden items-center gap-2 lg:flex">
             {session ? (
               <>
                 <Link href="/my" className={buttonClass({ variant: 'secondary', size: 'sm' })}>
@@ -142,63 +175,74 @@ export function SiteHeader() {
                 <Link href="/login" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
                   로그인
                 </Link>
-                <Link href="/signup" className={buttonClass({ variant: 'primary', size: 'sm' })}>
+                <Link
+                  href="/signup"
+                  className="inline-flex min-h-11 items-center rounded-md bg-ink-900 px-4 text-sm font-semibold text-white hover:bg-ink-700"
+                >
                   회원가입
                 </Link>
               </>
             )}
           </div>
 
-          {/* 모바일: 로그인 바로가기 + 전체 메뉴 (주요 이동은 하단 탭바) */}
-          {!session && (
-            <Link
-              href="/login"
-              className="flex h-11 items-center gap-1 rounded-md px-2 text-[15px] font-semibold text-ink-700 md:hidden"
-            >
-              <LogIn aria-hidden className="size-5" />
-              로그인
-            </Link>
-          )}
+          <Link
+            href={session ? '/my' : '/login'}
+            aria-label={session ? '마이페이지' : '로그인'}
+            className="compact-navigation grid size-11 place-items-center rounded-full lg:hidden"
+          >
+            <UserRound aria-hidden className="size-6" />
+          </Link>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
+            disabled={position === 'initial'}
             aria-label="전체 메뉴 열기"
             aria-expanded={menuOpen}
-            className="flex size-11 items-center justify-center rounded-md text-ink-900 hover:bg-surface-muted md:hidden"
+            className="compact-navigation flex size-11 items-center justify-center rounded-full lg:hidden"
           >
             <Menu aria-hidden className="size-6" />
           </button>
         </div>
       </div>
 
-      <Modal open={menuOpen} onClose={() => setMenuOpen(false)} title="전체 메뉴" variant="drawer">
+      <Modal
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title="전체 메뉴"
+        variant="drawer"
+        className="site-menu-sheet"
+        bodyClassName="site-menu-body"
+      >
         <nav aria-label="전체 메뉴">
-          <ul className="-mx-2">
+          <ul className="site-menu-main">
             {[
               { href: '/', label: '홈' },
-              ...SITE_NAV,
+              ...nav,
               { href: '/my', label: '마이페이지' },
-              ...(session ? [{ href: '/notifications', label: '알림' }] : []),
+              ...(session
+                ? [{ href: '/notifications', label: '알림' }]
+                : [{ href: '/signup', label: '회원가입' }]),
             ].map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                   aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-                  className="flex min-h-12 items-center rounded-md px-2 text-base font-semibold hover:bg-surface-muted aria-[current=page]:text-brand-700"
+                  className="site-menu-link"
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
-          <ul className="-mx-2 mt-4 border-t border-line pt-4">
+          <ul className="site-menu-more">
             {MORE.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex min-h-12 items-center rounded-md px-2 text-[15px] text-ink-700 hover:bg-surface-muted"
+                  aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+                  className="site-menu-link"
                 >
                   {item.label}
                 </Link>

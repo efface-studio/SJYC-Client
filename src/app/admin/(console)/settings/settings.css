@@ -1,0 +1,114 @@
+.setting-workbench {
+  max-width: 1080px;
+  color: #292b33;
+}
+.setting-workbench > nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #c7cbd2;
+  padding-bottom: 12px;
+}
+.setting-workbench > nav button {
+  min-height: 42px;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-weight: 650;
+}
+.setting-workbench > nav button[aria-pressed='true'] {
+  background: #233e40;
+  color: white;
+}
+.setting-workbench > fieldset {
+  margin: 18px 0;
+  background: white;
+  padding: clamp(16px, 3vw, 34px);
+  border: 1px solid #d6dcdc;
+  border-radius: 14px;
+  min-width: 0;
+}
+.setting-workbench > fieldset > legend {
+  float: left;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 750;
+  margin-bottom: 14px;
+}
+.setting-workbench > fieldset > legend + * {
+  clear: both;
+}
+.setting-field {
+  clear: both;
+  display: grid;
+  grid-template-columns: minmax(100px, 0.4fr) 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 9px 0;
+}
+.setting-field label,
+.setting-collection legend {
+  font-weight: 670;
+}
+.setting-field :is(input, textarea, select) {
+  color: #182a2b;
+  background: #f8faf9;
+  border: 1px solid #bfcac6;
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-height: 42px;
+  min-width: 0;
+  width: 100%;
+}
+.setting-field input[type='color'] {
+  width: 70px;
+}
+.setting-workbench > footer,
+.setting-order li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.setting-workbench > footer {
+  padding: 12px 0;
+}
+.setting-order {
+  margin: 8px 0 18px;
+}
+.setting-order li {
+  border-bottom: 1px solid #d7dfdc;
+  padding: 4px 0;
+}
+.setting-order label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+}
+.setting-order button {
+  padding: 9px;
+}
+.setting-order button:disabled {
+  opacity: 0.3;
+}
+.setting-workbench [role='alert'] {
+  color: #922314;
+}
+.setting-collection {
+  clear: both;
+}
+.setting-workbench [role='alert'] button {
+  text-decoration: underline;
+}
+@media (max-width: 640px) {
+  .setting-field {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .setting-workbench > nav {
+    gap: 2px;
+  }
+  .setting-workbench > nav button {
+    padding-inline: 8px;
+  }
+}

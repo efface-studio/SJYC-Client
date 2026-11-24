@@ -1,13 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../src/api/mock/seed';
 
 /**
  * 마스터 프롬프트 §13 주요 테스트 시나리오 — mock 모드 빌드 기준.
- * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 화면의 데모 버튼으로 채운다.
+ * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 로그인 폼으로 입력한다.
  */
 
 async function loginAs(page: Page, label: '일반 회원' | '센터 직원', next = '/my') {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByRole('button', { name: label }).click();
+  const account = DEMO_ACCOUNTS.find((candidate) => candidate.label === label);
+  if (!account) throw new Error('테스트 회원이 없습니다.');
+  await page.getByLabel('이메일').fill(account.email);
+  await page.locator('input[name="password"]').fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: '로그인', exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/login'));
 }
@@ -15,12 +19,72 @@ async function loginAs(page: Page, label: '일반 회원' | '센터 직원', nex
 test('비로그인 사용자가 공개 페이지를 탐색할 수 있다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /모집 중인 프로그램/ })).toBeVisible();
-  await page.getByRole('navigation', { name: '하단 메뉴' }).getByRole('link', { name: '프로그램' }).click();
+  await expect(page.getByRole('navigation', { name: '하단 메뉴' })).toHaveCount(0);
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page
+    .getByRole('navigation', { name: '전체 메뉴' })
+    .getByRole('link', { name: '프로그램', exact: true })
+    .click();
   await expect(page.getByRole('heading', { level: 1, name: '프로그램' })).toBeVisible();
   await page.getByRole('link', { name: /주말 농구 교실/ }).click();
   await expect(page.getByRole('link', { name: '로그인하고 신청하기' })).toBeVisible();
   // 기존 사이트로 나가는 링크가 없어야 한다
   await expect(page.locator('a[href*="j-youth"]')).toHaveCount(0);
+});
+
+test('배경 영상 요청이 실패해도 로고와 프로그램 바로가기가 남는다', async ({ page }) => {
+  await page.route('**/media/center-film.mp4', (route) => route.abort());
+  await page.goto('/');
+  await expect(page.locator('.center-film video')).toBeHidden();
+  await expect(page.locator('.center-film h1 img')).toBeVisible();
+  await expect(page.getByText(/공휴일·임시 휴관은/)).toBeVisible();
+  await page.getByRole('link', { name: '프로그램 찾기' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '프로그램', exact: true })).toBeVisible();
+});
+
+test('동작 줄이기 설정에서는 포스터부터 표시하고 사용자가 영상을 재생하고 멈출 수 있다', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const film = page.locator('.center-film video');
+  await expect(film).not.toHaveAttribute('src');
+  await expect(page.locator('.film-scroll-cue svg')).toHaveCSS('animation-name', 'none');
+  const playback = page.locator('.film-playback');
+  await playback.focus();
+  await playback.press('Enter');
+  await expect
+    .poll(() => film.evaluate((video: HTMLVideoElement) => video.currentTime))
+    .toBeGreaterThan(0.12);
+  await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.playbackRate)).toBe(1.2);
+  await expect(playback).toHaveText('배경 영상 일시정지');
+  await playback.press('Enter');
+  await expect.poll(() => film.evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+});
+
+test('홈 상단은 스크롤 위치에 따라 아이콘 메뉴와 전체 메뉴를 전환한다 @desktop', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const header = page.locator('header.site-header');
+  const nav = header.getByRole('navigation', { name: '주 메뉴', includeHidden: true });
+  await expect(nav).toBeHidden();
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await header.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await expect(page.getByRole('dialog', { name: '전체 메뉴' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(nav).toBeVisible();
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(nav.getByRole('link').first()).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await expect(header.getByRole('link', { name: '회원가입' })).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const boundary = await page
+    .locator('.center-film')
+    .evaluate((el) => el.getBoundingClientRect().bottom + scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y), boundary);
+  await expect(header).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(nav).toBeHidden();
+  await expect(header.getByRole('button', { name: '전체 메뉴 열기' })).toBeVisible();
 });
 
 test('잘못된 로그인 입력은 오류를 표시한다', async ({ page }) => {
@@ -92,7 +156,7 @@ test('모바일 전체 메뉴가 열리고 Esc 로 닫힌다', async ({ page }) 
   await expect(dialog).toBeHidden();
 });
 
-test('직원은 관리자 로그인 후 대시보드에 들어간다 @desktop', async ({ page }) => {
+test('직원은 대시보드에서 집계 기간을 바꾸고 처리 대기 신청을 조회한다 @desktop', async ({ page }) => {
   await page.goto('/admin/login');
   await page
     .getByRole('button', { name: /센터 직원|staff/ })
@@ -100,6 +164,16 @@ test('직원은 관리자 로그인 후 대시보드에 들어간다 @desktop', 
     .click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await expect(page).toHaveURL(/\/admin$/);
+  const period = page.getByRole('button', { name: '최근 30일' });
+  await period.click();
+  await expect(period).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('최근 30일 프로그램 신청')).toBeVisible();
+  await page
+    .getByRole('region', { name: '처리 대기 업무' })
+    .getByRole('link', { name: /프로그램 신청/ })
+    .click();
+  await expect(page).toHaveURL(/\/admin\/applications\?status=submitted$/);
+  await expect(page.getByRole('table', { name: '프로그램 신청 목록' })).toBeVisible();
 });
 
 test('알림 센터: 읽지 않은 알림을 확인하고 모두 읽음 처리한다', async ({ page }) => {
@@ -143,13 +217,23 @@ test('자체 셀렉트로 프로그램 분류를 고른다', async ({ page }) =>
 });
 
 test('자체 날짜 선택을 키보드로 조작한다 @desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 540 });
   await page.goto('/admin/login?next=%2Fadmin%2Fspaces');
   await page.getByRole('button', { name: '센터 직원' }).click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await page.waitForURL(/\/admin\/spaces/);
   const trigger = page.getByRole('button', { name: '이용 날짜' });
   await trigger.click();
-  await expect(page.getByRole('grid')).toBeVisible();
+  const grid = page.getByRole('grid');
+  await expect(grid).toBeVisible();
+  const previous = page.getByRole('button', { name: '이전 달' });
+  const today = page.getByRole('button', { name: '오늘', exact: true });
+  await expect(previous).toBeInViewport({ ratio: 1 });
+  await expect(today).toBeInViewport({ ratio: 1 });
+  await page.getByRole('button', { name: '다음 달' }).click();
+  await expect(previous).toBeInViewport({ ratio: 1 });
+  await expect(today).toBeInViewport({ ratio: 1 });
+  await grid.locator('button[tabindex="0"]').focus();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/date=\d{4}-\d{2}-\d{2}/);
@@ -182,6 +266,24 @@ async function adminLoginAs(
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await page.waitForURL((url) => url.pathname === next);
 }
+
+test('320px에서 회원 메뉴와 관리자 일정 입력란이 화면 안에 들어온다', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await loginAs(page, '일반 회원');
+  const menu = page.getByRole('button', { name: '전체 메뉴 열기' });
+  await expect(menu).toBeVisible();
+  expect(await menu.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(320);
+
+  await adminLoginAs(page, '최고 관리자', '/admin/programs/p-1');
+  const schedule = page.getByRole('group', { name: '일정', exact: true });
+  const dates = schedule.getByRole('button', { expanded: false });
+  await expect(dates.first()).toBeVisible();
+  for (const date of await dates.all()) {
+    const box = await date.evaluate((el) => el.getBoundingClientRect().toJSON());
+    expect(box.width).toBeGreaterThan(100);
+    expect(box.right).toBeLessThanOrEqual(320);
+  }
+});
 
 test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => {
   await adminLoginAs(page, '최고 관리자', '/admin/developer');
@@ -238,4 +340,116 @@ test('동아리 담당자는 담당 동아리만 운영하고 직원은 담당�
   await page.getByLabel('담당자로 지정할 회원 이메일').fill('sample5@demo.test');
   await page.getByRole('button', { name: '담당자 지정' }).click();
   await expect(page.getByText('sample5@demo.test ·')).toBeVisible();
+});
+
+test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크를 각각 누를 수 있다 @desktop', async ({ page }) => {
+  await adminLoginAs(page, '개발자', '/admin');
+  for (const [width, height] of [
+    [1440, 900],
+    [1024, 540],
+    [390, 600],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    if (width < 1024) await page.getByRole('button', { name: '관리자 메뉴 열기' }).click();
+    const nav = page.getByRole('navigation', { name: '관리자 메뉴' });
+    const last = nav.getByRole('link', { name: '개발자 도구' });
+    const account = page.getByRole('button', { name: '로그아웃' });
+    await expect(account).toBeVisible();
+    const initial = await account.boundingBox();
+    await last.focus();
+    await expect(last).toBeFocused();
+    for (const target of [last, account]) {
+      await expect
+        .poll(() =>
+          target.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+          }),
+        )
+        .toBe(true);
+    }
+    expect(await account.boundingBox()).toEqual(initial);
+    const port = await nav.boundingBox();
+    const footerTop = await account.evaluate(
+      (el) => el.closest('.console-account')!.getBoundingClientRect().top,
+    );
+    expect(port!.y + port!.height).toBeLessThanOrEqual(footerTop + 1);
+  }
+});
+
+test('꿈드림 메뉴에서 지원 분야와 참여 방법을 찾을 수 있다', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: '꿈드림', exact: true }).click();
+  await expect(page).toHaveURL(/\/kdream$/);
+  await expect(page.getByRole('heading', { name: '중구 꿈드림', level: 1 })).toBeVisible();
+  await page.getByRole('link', { name: /진로·자립 나에게 맞는/ }).click();
+  await expect(page).toHaveURL(/#career$/);
+  await page.getByRole('link', { name: '이용 방법 보기' }).click();
+  await expect(page).toHaveURL(/#participate$/);
+  await expect(page.getByRole('link', { name: /청소년1388 온라인 신청/ })).toHaveAttribute(
+    'href',
+    'https://www.1388.go.kr/ind/YTOSP_SC_IND_01',
+  );
+  await expect(page.getByRole('link', { name: '전화 문의', exact: true })).toHaveAttribute(
+    'href',
+    'tel:0222500543',
+  );
+});
+
+test('관리자 통합검색에서 업무를 열고 담당자 권한을 적용한다', async ({ page }) => {
+  await adminLoginAs(page, '최고 관리자', '/admin');
+  const open = page.getByRole('button', { name: '관리자 통합검색 열기' });
+  await open.click();
+  const dialog = page.getByRole('dialog', { name: '관리자 통합검색' });
+  const input = dialog.getByRole('searchbox', { name: '관리자 검색어' });
+  await expect(input).toBeFocused();
+  await input.fill('농구');
+  const program = dialog.getByRole('link', { name: /주말 농구 교실/ }).first();
+  await program.click();
+  await expect(page).toHaveURL(/\/admin\/programs\/[^/]+$/);
+  await expect(dialog).toBeHidden();
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '동아리 담당자', '/admin/my-clubs');
+  await open.click();
+  await expect(dialog.getByRole('link', { name: '동아리 운영' })).toBeVisible();
+  await expect(dialog.getByRole('link', { name: '회원', exact: true })).toHaveCount(0);
+  await input.fill('농구');
+  await expect(dialog.getByText('검색 결과가 없습니다.')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+});
+
+test('동아리와 공간 목록은 느린 응답에 스켈레톤을 표시하고 결과로 전환한다', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('sjyc.mock.scenario.v1', 'slow'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const [path, label, selector] of [
+    ['/clubs', '동아리 불러오는 중', '.club-list-link'],
+    ['/spaces', '공간 불러오는 중', '.space-row'],
+  ] as const) {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    const pending = page.getByRole('status', { name: label });
+    await expect(pending).toBeVisible();
+    await expect(pending.locator('[aria-hidden]').last()).toHaveCSS('animation-name', 'none');
+    await expect(pending).toHaveCount(0);
+    await expect(page.locator('a' + selector).first()).toBeVisible();
+  }
+});
+
+test('홈 영상은 화면 밖에서 멈추고 사용자가 멈춘 뒤에는 자동으로 재생되지 않는다', async ({ page }) => {
+  await page.goto('/');
+  const video = page.locator('.center-film video');
+  const paused = () => video.evaluate((el: HTMLVideoElement) => el.paused);
+  await expect.poll(paused).toBe(false);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await expect.poll(paused).toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(paused).toBe(false);
+  await page.locator('.film-playback').focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(paused).toBe(true);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.locator('.film-playback')).toHaveText('배경 영상 재생');
+  await expect.poll(paused).toBe(true);
 });

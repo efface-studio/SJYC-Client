@@ -132,7 +132,7 @@ function MemberDetail() {
             <h2 className="text-lg font-bold">{u.name}</h2>
             <Badge tone={USER_STATUS[u.status].tone}>{USER_STATUS[u.status].text}</Badge>
           </div>
-          <dl className="mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 border-y border-line bg-surface px-4 py-4 text-[15px]">
+          <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
             <dt className="text-ink-600">이메일</dt>
             <dd className="break-all">
               {u.email} {!u.emailVerified && <span className="text-sm text-warning-800">(미인증)</span>}

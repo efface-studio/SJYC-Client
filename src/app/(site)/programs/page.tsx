@@ -7,7 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { api } from '@/api';
 import { Pagination } from '@/components/ui/pagination';
-import { PageHeader } from '@/components/ui/page-header';
+import { DirectoryIntro } from '@/components/site/directory-intro';
 import { Select } from '@/components/ui/select';
 import { SearchInput } from '@/components/ui/search-input';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
@@ -72,7 +72,7 @@ function ProgramList() {
   return (
     <>
       <title>프로그램 | 중구청소년센터</title>
-      <div className="space-y-3">
+      <div className="space-y-4 rounded-lg bg-surface-muted p-4 md:p-5">
         <form
           role="search"
           onSubmit={(e) => {
@@ -80,7 +80,7 @@ function ProgramList() {
             const value = String(new FormData(e.currentTarget).get('q') ?? '').trim();
             router.push(hrefWith({ q: value }));
           }}
-          className="flex gap-2"
+          className="flex max-w-2xl gap-2"
         >
           <label htmlFor="program-q" className="sr-only">
             프로그램 검색
@@ -92,7 +92,7 @@ function ProgramList() {
             key={q}
             placeholder="프로그램명, 대상으로 검색"
             enterKeyHint="search"
-            className="h-12 rounded-md border border-line-strong px-3 text-base focus:border-brand-700 focus:outline-none"
+            className="h-12 rounded-md border border-line-strong bg-surface px-3 text-base focus:border-brand-700 focus:outline-none"
           />
           <button
             type="submit"
@@ -173,7 +173,7 @@ function ProgramList() {
             <p className="mb-3 text-sm text-ink-600" aria-live="polite">
               총 <strong className="text-ink-900">{programs.data.total}</strong>개
             </p>
-            <ul className="border-t-2 border-ink-900">
+            <ul className="program-catalog">
               {programs.data.items.map((p) => (
                 <li key={p.id}>
                   <ProgramRow program={p} categoryName={categoryName(p.categoryId)} />
@@ -195,15 +195,17 @@ function ProgramList() {
 
 export default function ProgramsPage() {
   return (
-    <div className="container-page py-6 md:py-10">
-      <PageHeader
-        title="프로그램"
-        description="청소년활동·체육/교육·진로체험·꿈드림 프로그램을 찾아 신청하세요."
-        actions={<ProgramViewToggle current="list" />}
-      />
-      <Suspense fallback={<ListSkeleton rows={3} />}>
-        <ProgramList />
-      </Suspense>
+    <div className="directory-page directory-programs">
+      <DirectoryIntro kind="programs" />
+      <div id="directory-content" className="directory-content">
+        <div className="directory-toolbar">
+          <h2>프로그램 찾기</h2>
+          <ProgramViewToggle current="list" />
+        </div>
+        <Suspense fallback={<ListSkeleton rows={3} />}>
+          <ProgramList />
+        </Suspense>
+      </div>
     </div>
   );
 }

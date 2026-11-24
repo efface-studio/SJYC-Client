@@ -51,7 +51,7 @@ function ClubOps({ club }: { club: Club }) {
         ref={listRef}
         role="tablist"
         aria-label={`${club.name} 운영`}
-        className="-mx-4 mb-6 scrollbar-none flex overflow-x-auto border-b border-line px-4 md:mx-0 md:px-0"
+        className="console-tabs mb-6 scrollbar-none"
       >
         {TABS.map((t, i) => (
           <button

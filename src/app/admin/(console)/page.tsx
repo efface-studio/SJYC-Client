@@ -1,205 +1,326 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { RotateCw } from 'lucide-react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { CalendarDays, ChevronRight, ClipboardList, FileText, RotateCw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
+import { Skeleton } from '@/components/ui/states';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { APPLICATION_STATUS, PUBLISH_STATUS } from '@/domain/labels';
-import { can, managesAnyClub, type Permission } from '@/domain/permissions';
-import type { DashboardSummary } from '@/domain/types';
+import { can, managesAnyClub } from '@/domain/permissions';
+import type { DashboardSummary, User } from '@/domain/types';
 import { useSession } from '@/features/auth/session';
-import { cn } from '@/lib/cn';
 import { formatDate, formatDateTime } from '@/lib/format';
 
-const PERIODS = [7, 30] as const;
-
-interface Kpi {
-  label: string;
-  value: (d: DashboardSummary) => number;
-  href: string;
-  permission: Permission;
-}
-
-const KPIS: Kpi[] = [
+const QUEUES = [
   {
-    label: '모집 중 프로그램',
-    value: (d) => d.programsOpen,
-    href: '/admin/programs?status=published',
-    permission: 'program.write',
-  },
-  {
-    label: '승인 대기 신청',
-    value: (d) => d.applicationsSubmitted,
+    key: 'applicationsSubmitted',
+    label: '프로그램 신청',
     href: '/admin/applications?status=submitted',
     permission: 'application.decide',
+    color: '#346dda',
   },
   {
-    label: '기간 내 신청',
-    value: (d) => d.applicationsInPeriod,
-    href: '/admin/applications',
-    permission: 'application.decide',
-  },
-  {
-    label: '동아리 가입 대기',
-    value: (d) => d.clubApplicationsPending,
+    key: 'clubApplicationsPending',
+    label: '동아리 가입',
     href: '/admin/clubs/applications?status=pending',
     permission: 'club.manage',
+    color: '#56a9cd',
   },
   {
-    label: '공간 예약 대기',
-    value: (d) => d.reservationsPending,
+    key: 'reservationsPending',
+    label: '공간 예약',
     href: '/admin/spaces?status=pending',
     permission: 'space.manage',
+    color: '#7a76b6',
   },
   {
-    label: '답변 대기 문의',
-    value: (d) => d.inquiriesOpen,
+    key: 'inquiriesOpen',
+    label: '문의 답변',
     href: '/admin/inquiries?status=open',
     permission: 'inquiry.answer',
+    color: '#e3a156',
   },
-];
+] as const;
+
+function DrillDown({ href, allowed, children }: { href: string; allowed: boolean; children: ReactNode }) {
+  return allowed ? (
+    <Link className="dash-row" href={href}>
+      {children}
+      <ChevronRight size={16} aria-hidden />
+    </Link>
+  ) : (
+    <div className="dash-row">{children}</div>
+  );
+}
+
+function WorkQueue({ data, user }: { data: DashboardSummary; user: User | undefined }) {
+  const total = QUEUES.reduce((sum, q) => sum + data[q.key], 0);
+  let offset = 0;
+  return (
+    <section className="dash-panel" aria-labelledby="queue-heading">
+      <h2 id="queue-heading">처리 대기 업무</h2>
+      <div className="queue-body">
+        <div className="queue-chart">
+          <svg aria-hidden="true" viewBox="0 0 112 112">
+            <circle cx="56" cy="56" r="48" fill="none" stroke="#e9edf2" strokeWidth="10" />
+            {total > 0 &&
+              QUEUES.map((q) => {
+                const share = (data[q.key] / total) * 100;
+                const start = offset;
+                offset += share;
+                if (share === 0) return null;
+                const gap = share === 100 ? 0 : Math.min(1.4, share / 4);
+                return (
+                  <circle
+                    key={q.key}
+                    cx="56"
+                    cy="56"
+                    r="48"
+                    pathLength="100"
+                    fill="none"
+                    stroke={q.color}
+                    strokeWidth="10"
+                    strokeDasharray={`${share - gap} ${100 - share + gap}`}
+                    strokeDashoffset={-start}
+                    transform="rotate(-90 56 56)"
+                  />
+                );
+              })}
+          </svg>
+          <div className="queue-total">
+            <span>전체 대기</span>
+            <strong>
+              {total.toLocaleString('ko-KR')}
+              <small>건</small>
+            </strong>
+          </div>
+        </div>
+        <ul className="queue-legend">
+          {QUEUES.map((q) => (
+            <li key={q.key}>
+              <DrillDown href={q.href} allowed={can(user, q.permission)}>
+                <span className="queue-dot" aria-hidden style={{ backgroundColor: q.color }} />
+                <span className="grow">{q.label}</span>
+                <b>
+                  {data[q.key].toLocaleString('ko-KR')}
+                  <small>건</small>
+                </b>
+              </DrillDown>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function RecentHeading({ title, href, allowed }: { title: string; href: string; allowed: boolean }) {
+  return (
+    <div className="dash-section-heading">
+      <h2>{title}</h2>
+      {allowed && (
+        <Link href={href} aria-label={`${title} 전체 보기`}>
+          전체 보기
+        </Link>
+      )}
+    </div>
+  );
+}
 
 function Dashboard() {
-  const [period, setPeriod] = useState<(typeof PERIODS)[number]>(7);
+  const [period, setPeriod] = useState<7 | 30>(7);
   const { data: session } = useSession();
   const summary = useQuery({
     queryKey: ['admin', 'dashboard', period],
-    queryFn: () => api.admin.dashboard(period),
+    queryFn: async () => ({ ...(await api.admin.dashboard(period)), period }),
+    placeholderData: keepPreviousData,
   });
-
+  const user = session?.user;
+  const stats = [
+    {
+      key: 'applicationsInPeriod',
+      label: `최근 ${summary.data?.period ?? period}일 프로그램 신청`,
+      unit: '건',
+      icon: ClipboardList,
+      href: '/admin/applications',
+      permission: 'application.decide',
+    },
+    {
+      key: 'programsOpen',
+      label: '모집 중인 프로그램',
+      unit: '개',
+      icon: CalendarDays,
+      href: '/admin/programs?status=published',
+      permission: 'program.write',
+    },
+    {
+      key: 'noticesPublished',
+      label: '게시 중인 공지',
+      unit: '건',
+      icon: FileText,
+      href: '/admin/notices?status=published',
+      permission: 'notice.write',
+    },
+  ] as const;
   return (
-    <>
-      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div role="group" aria-label="집계 기간" className="inline-flex border border-line-strong bg-surface">
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              aria-pressed={period === p}
-              onClick={() => setPeriod(p)}
-              className={cn(
-                'min-h-11 px-4 text-[15px] font-semibold',
-                period === p ? 'bg-ink-900 text-white' : 'text-ink-700 hover:bg-surface-muted',
-              )}
-            >
-              최근 {p}일
-            </button>
-          ))}
+    <AdminPage
+      title="대시보드"
+      permission="admin.access"
+      actions={
+        <div className="flex flex-wrap items-center gap-x-3">
+          {summary.data && (
+            <time className="text-sm text-ink-600 tabular-nums" dateTime={summary.data.generatedAt}>
+              {formatDateTime(summary.data.generatedAt)} 기준
+            </time>
+          )}
+          <Button
+            size="sm"
+            variant="secondary"
+            className="min-h-11"
+            loading={summary.isFetching}
+            onClick={() => void summary.refetch()}
+          >
+            {!summary.isFetching && <RotateCw size={15} aria-hidden />}새로고침
+          </Button>
         </div>
-        {summary.data && (
-          <p className="text-sm text-ink-600 tabular-nums">
-            갱신 시각{' '}
-            <time dateTime={summary.data.generatedAt}>{formatDateTime(summary.data.generatedAt)}</time>
-          </p>
-        )}
-        <Button
-          variant="secondary"
-          size="sm"
-          className="min-h-11"
-          loading={summary.isFetching}
-          onClick={() => void summary.refetch()}
-        >
-          {!summary.isFetching && <RotateCw aria-hidden className="size-4" />}
-          새로고침
-        </Button>
-      </div>
-
-      <QueryState query={summary}>
+      }
+    >
+      <QueryState query={summary} loading={<DashboardSkeleton />}>
         {(d) => (
-          <>
-            <section aria-labelledby="kpi-title">
-              <h2 id="kpi-title" className="sr-only">
-                운영 현황
-              </h2>
-              <dl className="grid grid-cols-2 border-t border-l border-line bg-surface sm:grid-cols-3">
-                {KPIS.map((k) => (
-                  <div key={k.label} className="flex flex-col border-r border-b border-line px-4 py-3">
-                    <dt className="text-sm text-ink-600">
-                      {k.label}
-                      {k.label === '기간 내 신청' && ` (${period}일)`}
-                    </dt>
-                    <dd className="mt-1 text-3xl font-bold text-ink-900 tabular-nums">
-                      {k.value(d).toLocaleString('ko-KR')}
-                    </dd>
-                    {can(session?.user, k.permission) && (
-                      <dd className="mt-auto">
-                        <Link
-                          href={k.href}
-                          className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-700 hover:underline"
-                        >
-                          목록 보기<span className="sr-only">: {k.label}</span>
-                        </Link>
-                      </dd>
-                    )}
-                  </div>
+          <div className="dashboard-grid">
+            <WorkQueue data={d} user={user} />
+            <section className="dash-panel" aria-labelledby="stats-heading">
+              <div className="dash-section-heading">
+                <h2 id="stats-heading">운영 현황</h2>
+                <div role="group" aria-label="집계 기간" className="period-switch">
+                  {([7, 30] as const).map((p) => (
+                    <button key={p} type="button" aria-pressed={period === p} onClick={() => setPeriod(p)}>
+                      최근 {p}일
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <ul className="stats-list">
+                {stats.map(({ key, label, unit, icon: Icon, href, permission }) => (
+                  <li key={key}>
+                    <DrillDown href={href} allowed={can(user, permission)}>
+                      <Icon size={18} aria-hidden />
+                      <span className="grow">{label}</span>
+                      <b>
+                        {d[key].toLocaleString('ko-KR')}
+                        <small>{unit}</small>
+                      </b>
+                    </DrillDown>
+                  </li>
                 ))}
-              </dl>
+              </ul>
             </section>
-
-            <div className="mt-8 grid gap-8 xl:grid-cols-2">
-              <section aria-labelledby="recent-apps">
-                <h2 id="recent-apps" className="mb-2 border-b border-ink-900 pb-2 text-base font-bold">
-                  최근 프로그램 신청
-                </h2>
-                {d.recentApplications.length === 0 ? (
-                  <p className="py-6 text-[15px] text-ink-600">최근 신청이 없습니다.</p>
-                ) : (
-                  <ul className="divide-y divide-line">
+            <section className="dash-panel recent-panel" aria-label="최근 프로그램 신청">
+              <RecentHeading
+                title="최근 프로그램 신청"
+                href="/admin/applications"
+                allowed={can(user, 'application.decide')}
+              />
+              {!d.recentApplications.length ? (
+                <p className="dash-empty">최근 신청이 없습니다.</p>
+              ) : (
+                <table className="recent-table">
+                  <caption className="sr-only">최근 프로그램 신청 내역</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">프로그램</th>
+                      <th scope="col">신청자</th>
+                      <th scope="col" className="date-col">
+                        신청 일시
+                      </th>
+                      <th scope="col">상태</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                     {d.recentApplications.map((a) => (
-                      <li key={a.id} className="flex items-center gap-3 py-2">
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            href={`/admin/applications/${a.id}`}
-                            className="block truncate font-semibold hover:underline"
-                          >
-                            {a.applicantName} · {a.programTitle}
-                          </Link>
-                          <p className="text-sm text-ink-600 tabular-nums">{formatDateTime(a.createdAt)}</p>
-                        </div>
-                        <Badge tone={APPLICATION_STATUS[a.status].tone}>
-                          {APPLICATION_STATUS[a.status].text}
-                        </Badge>
-                      </li>
+                      <tr key={a.id}>
+                        <td>
+                          {can(user, 'application.decide') ? (
+                            <Link href={`/admin/applications/${a.id}`}>{a.programTitle}</Link>
+                          ) : (
+                            a.programTitle
+                          )}
+                          <time dateTime={a.createdAt} className="row-date">
+                            {formatDateTime(a.createdAt)}
+                          </time>
+                        </td>
+                        <td>{a.applicantName}</td>
+                        <td className="date-col">
+                          <time dateTime={a.createdAt}>{formatDateTime(a.createdAt)}</time>
+                        </td>
+                        <td>
+                          <Badge tone={APPLICATION_STATUS[a.status].tone}>
+                            {APPLICATION_STATUS[a.status].text}
+                          </Badge>
+                        </td>
+                      </tr>
                     ))}
-                  </ul>
-                )}
-              </section>
-              <section aria-labelledby="recent-notices">
-                <h2 id="recent-notices" className="mb-2 border-b border-ink-900 pb-2 text-base font-bold">
-                  최근 수정된 공지
-                </h2>
-                {d.recentNotices.length === 0 ? (
-                  <p className="py-6 text-[15px] text-ink-600">공지가 없습니다.</p>
-                ) : (
-                  <ul className="divide-y divide-line">
-                    {d.recentNotices.map((n) => (
-                      <li key={n.id} className="flex items-center gap-3 py-2">
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            href={`/admin/notices/${n.id}`}
-                            className="block truncate font-semibold hover:underline"
-                          >
-                            {n.title}
-                          </Link>
-                          <p className="text-sm text-ink-600 tabular-nums">{formatDate(n.updatedAt)}</p>
-                        </div>
-                        <Badge tone={PUBLISH_STATUS[n.status].tone}>{PUBLISH_STATUS[n.status].text}</Badge>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            </div>
-          </>
+                  </tbody>
+                </table>
+              )}
+            </section>
+            <section className="dash-panel recent-panel" aria-label="최근 수정된 공지">
+              <RecentHeading
+                title="최근 수정된 공지"
+                href="/admin/notices"
+                allowed={can(user, 'notice.write')}
+              />
+              {!d.recentNotices.length ? (
+                <p className="dash-empty">공지가 없습니다.</p>
+              ) : (
+                <ul className="dash-notices">
+                  {d.recentNotices.map((n) => (
+                    <li key={n.id}>
+                      <div className="min-w-0">
+                        <p>
+                          {can(user, 'notice.write') ? (
+                            <Link href={`/admin/notices/${n.id}`}>{n.title}</Link>
+                          ) : (
+                            n.title
+                          )}
+                        </p>
+                        <time dateTime={n.updatedAt}>{formatDate(n.updatedAt)}</time>
+                      </div>
+                      <Badge tone={PUBLISH_STATUS[n.status].tone}>{PUBLISH_STATUS[n.status].text}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
         )}
       </QueryState>
-    </>
+    </AdminPage>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div role="status" aria-label="운영 현황 불러오는 중" className="dashboard-grid">
+      {[4, 3].map((rows) => (
+        <div key={rows} className="dash-panel" aria-hidden="true">
+          <Skeleton className="mb-4 h-6 w-28" />
+          {Array.from({ length: rows }, (_, index) => (
+            <div key={index} className="dash-row">
+              <Skeleton className="size-5" />
+              <Skeleton className="h-4 w-2/5" />
+              <Skeleton className="ml-auto h-4 w-8" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -211,9 +332,5 @@ export default function AdminDashboardPage() {
     if (managerOnly) router.replace('/admin/my-clubs');
   }, [managerOnly, router]);
   if (managerOnly) return null;
-  return (
-    <AdminPage title="대시보드" permission="admin.access">
-      <Dashboard />
-    </AdminPage>
-  );
+  return <Dashboard />;
 }

@@ -1,3 +1,5 @@
+'use client';
+import { useSiteSettings } from '@/features/settings/use-settings';
 import Image from 'next/image';
 import Link from 'next/link';
 import { siFacebook, siInstagram, siNaver, siYoutube, type SimpleIcon } from 'simple-icons';
@@ -14,9 +16,36 @@ const CHANNEL_ICON: Record<(typeof OFFICIAL_CHANNELS)[number]['key'], SimpleIcon
 
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" className="size-4 shrink-0" fill={`#${icon.hex}`}>
-      <path d={icon.path} />
+    <svg aria-hidden viewBox="0 0 24 24" className="size-5 shrink-0" fill={`#${icon.hex}`}>
+      {icon === siYoutube && <path fill="white" d="M7 7h10v10H7z" />}
+      {icon === siFacebook && <circle fill="white" cx="12" cy="12" r="11.7" />}
+      {icon === siInstagram && (
+        <defs>
+          <linearGradient id="footer-instagram" x1="0" y1="1" x2="1" y2="0" gradientUnits="objectBoundingBox">
+            <stop stopColor="#ffcf68" />
+            <stop offset=".36" stopColor="#ff8852" />
+            <stop offset=".67" stopColor="#f04f88" />
+            <stop offset="1" stopColor="#ba83ff" />
+          </linearGradient>
+        </defs>
+      )}
+      <path d={icon.path} fill={icon === siInstagram ? 'url(#footer-instagram)' : undefined} />
     </svg>
+  );
+}
+
+function MakerCredit() {
+  return (
+    <a
+      href="https://v2.efface.dev/en"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex min-h-10 items-center gap-1.5 self-start hover:underline"
+    >
+      Made by <Image src="/brand/efface-mark.png" width={18} height={18} alt="" unoptimized />
+      <span className="font-semibold">efface</span>
+      <span className="sr-only">(새 창)</span>
+    </a>
   );
 }
 
@@ -26,6 +55,7 @@ interface FooterLink {
   strong?: boolean;
   external?: boolean;
   icon?: SimpleIcon;
+  channel?: (typeof OFFICIAL_CHANNELS)[number]['key'];
 }
 
 const GROUPS: { title: string; links: FooterLink[] }[] = [
@@ -43,6 +73,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
     title: '센터',
     links: [
       { href: '/about', label: '센터 소개' },
+      { href: '/kdream', label: '꿈드림' },
       { href: '/about#location', label: '오시는 길' },
       { href: '/qna', label: '질문·문의' },
     ],
@@ -62,6 +93,7 @@ const GROUPS: { title: string; links: FooterLink[] }[] = [
       label: c.label,
       external: true,
       icon: CHANNEL_ICON[c.key],
+      channel: c.key,
     })),
   },
 ];
@@ -84,96 +116,110 @@ function InfoLine({ items }: { items: string[] }) {
   );
 }
 
+function CenterContactDetails() {
+  const center = useSiteSettings();
+  return (
+    <div className="space-y-1">
+      <InfoLine items={[`(${center.postalCode}) ${center.address}`, `관장 ${center.director}`]} />
+      <InfoLine
+        items={[`사업자등록번호 ${center.businessNumber}`, `통신판매업신고 ${center.mailOrderNumber}`]}
+      />
+      <InfoLine items={[`Tel ${center.telDisplay}`, `Fax ${center.fax}`]} />
+    </div>
+  );
+}
+
 /**
  * 푸터 — 링크 묶음 + 작은 회색 기관 정보. 표·라벨 격자 없이 여백으로만 구분한다.
  * 기관 정보는 공식 홈페이지 기준이며 src/config/center.ts 한 곳에서 관리한다.
  */
 export function SiteFooter({ compact = false }: { compact?: boolean }) {
-  return (
-    <footer className="bg-surface-muted text-[13px] leading-relaxed text-ink-600">
-      <div className="container-page py-10 md:py-14">
-        {!compact && (
-          <>
-            <div className="mb-8">
-              <p className="text-[13px] font-semibold text-ink-700">대표전화</p>
-              <a
-                href={`tel:${CENTER.tel}`}
-                className="mt-0.5 inline-block text-[22px] font-bold tracking-tight text-ink-900 tabular-nums"
-              >
-                {CENTER.telDisplay}
-              </a>
-              <p className="mt-1">
-                평일 06:00–22:00 · 토 06:00–21:00 · 일 06:00–18:00 (매월 둘째 주 일요일 휴관)
+  const center = useSiteSettings();
+  if (compact)
+    return (
+      <footer className="border-t border-line bg-white px-4 py-4 text-xs text-ink-600 md:px-8">
+        <div className="mx-auto flex max-w-[1700px] flex-wrap items-start justify-between gap-3">
+          <details>
+            <summary className="cursor-pointer py-1 font-semibold">{center.formalName} 기관 정보</summary>
+            <address className="mt-2 space-y-1 not-italic">
+              <CenterContactDetails />
+              <p>
+                Copyright © {CENTER.copyrightSince} {center.englishName}. All rights reserved.
               </p>
+            </address>
+          </details>
+          <MakerCredit />
+        </div>
+      </footer>
+    );
+  return (
+    <footer className="public-footer bg-surface-muted text-[13px] leading-relaxed text-ink-600">
+      <div className="container-page py-10 md:py-14">
+        <div id="contact" className="mb-8 scroll-mt-24">
+          <p className="text-[13px] font-semibold text-ink-700">대표전화</p>
+          <a
+            href={`tel:${center.tel}`}
+            className="mt-0.5 inline-block text-[22px] font-bold tracking-tight text-ink-900 tabular-nums"
+          >
+            {center.telDisplay}
+          </a>
+          <p className="mt-1">
+            평일 {center.weekdayHours} · 토 {center.saturdayHours} · 일 {center.sundayHours}{' '}
+            {center.closedSunday === 'second' && '(매월 둘째 주 일요일 휴관)'}
+          </p>
+        </div>
+
+        <nav aria-label="푸터 메뉴" className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
+          {GROUPS.map((g) => (
+            <div key={g.title}>
+              <h2 className="mb-4 text-sm font-bold text-ink-900">{g.title}</h2>
+              <ul className="space-y-2">
+                {g.links.map((l) => (
+                  <li key={l.href}>
+                    {l.external ? (
+                      <a
+                        href={l.channel ? center[l.channel] : l.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 hover:text-ink-900"
+                      >
+                        {l.icon && <BrandIcon icon={l.icon} />}
+                        {l.label}
+                        <span className="sr-only">(새 창)</span>
+                      </a>
+                    ) : (
+                      <Link
+                        href={l.href}
+                        className={
+                          l.strong ? 'font-semibold text-ink-900 hover:underline' : 'hover:text-ink-900'
+                        }
+                      >
+                        {l.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))}
+        </nav>
 
-            <nav aria-label="푸터 메뉴" className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-              {GROUPS.map((g) => (
-                <div key={g.title}>
-                  <h2 className="mb-4 text-sm font-bold text-ink-900">{g.title}</h2>
-                  <ul className="space-y-2">
-                    {g.links.map((l) => (
-                      <li key={l.href}>
-                        {l.external ? (
-                          <a
-                            href={l.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 hover:text-ink-900"
-                          >
-                            {l.icon && <BrandIcon icon={l.icon} />}
-                            {l.label}
-                            <span className="sr-only">(새 창)</span>
-                          </a>
-                        ) : (
-                          <Link
-                            href={l.href}
-                            className={
-                              l.strong ? 'font-semibold text-ink-900 hover:underline' : 'hover:text-ink-900'
-                            }
-                          >
-                            {l.label}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </nav>
-          </>
-        )}
-
-        <address className={compact ? 'not-italic' : 'mt-10 border-t border-line pt-8 not-italic'}>
-          {/* 공식 로고(흰 배경 JPG) — multiply 로 회색 배경에 녹인다 */}
+        <address className="mt-10 border-t border-line pt-8 not-italic">
           <Image
-            src="/brand/logo-horizontal.jpg"
-            alt={CENTER.formalName}
+            src={center.footerLogo}
+            unoptimized
+            alt={center.formalName}
             width={300}
             height={50}
-            className="mb-4 h-7 w-auto mix-blend-multiply"
+            className="footer-logo mb-4"
           />
-          <div className="space-y-1">
-            <InfoLine items={[`(${CENTER.postalCode}) ${CENTER.address}`, `관장 ${CENTER.director}`]} />
-            <InfoLine
-              items={[`사업자등록번호 ${CENTER.businessNumber}`, `통신판매업신고 ${CENTER.mailOrderNumber}`]}
-            />
-            <InfoLine items={[`Tel ${CENTER.telDisplay}`, `Fax ${CENTER.fax}`]} />
-          </div>
+          <CenterContactDetails />
         </address>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Copyright © {CENTER.copyrightSince} {CENTER.englishName}. All rights reserved.
+            Copyright © {CENTER.copyrightSince} {center.englishName}. All rights reserved.
           </p>
-          <a
-            href="https://v2.efface.dev/en"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-ink-600 hover:text-ink-900"
-          >
-            Made by <span className="font-semibold">efface</span>
-            <span className="sr-only">(새 창)</span>
-          </a>
+          <MakerCredit />
         </div>
       </div>
     </footer>

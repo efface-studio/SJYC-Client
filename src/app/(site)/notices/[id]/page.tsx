@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { api, isApiError } from '@/api';
 import { buttonClass } from '@/components/ui/button';
+import '@/components/site/directories.css';
 import { PageHeader } from '@/components/ui/page-header';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { NOTICE_CATEGORY_LABEL } from '@/domain/labels';
@@ -16,7 +17,7 @@ export default function NoticeDetailPage() {
   const notice = useQuery({ queryKey: ['notice', id], queryFn: () => api.notices.get(id) });
 
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-detail directory-notices directory-content">
       <div className="mx-auto max-w-3xl">
         {notice.isPending ? (
           <ListSkeleton rows={2} />
@@ -41,18 +42,16 @@ export default function NoticeDetailPage() {
                 { label: '공지사항', href: '/notices' },
                 { label: NOTICE_CATEGORY_LABEL[notice.data.category] },
               ]}
-              title={<span className="text-xl leading-snug md:text-2xl">{notice.data.title}</span>}
+              title={notice.data.title}
               description={
                 notice.data.publishedAt && (
                   <time dateTime={notice.data.publishedAt}>{formatDateTime(notice.data.publishedAt)}</time>
                 )
               }
-              className="border-b border-ink-900 pb-4"
+              className="border-b border-line pb-5"
             />
             {/* 본문은 일반 텍스트로만 렌더링 (HTML 주입 없음) */}
-            <div className="text-base leading-relaxed whitespace-pre-line text-ink-900">
-              {notice.data.body}
-            </div>
+            <div className="text-[17px] leading-8 whitespace-pre-line text-ink-900">{notice.data.body}</div>
 
             {notice.data.attachments.length > 0 && (
               <section aria-labelledby="files-title" className="mt-8 rounded-md bg-surface-muted p-4">

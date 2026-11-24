@@ -18,7 +18,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, breadcrumbs, actions, className }: PageHeaderProps) {
   return (
-    <div className={cn('mb-6', className)}>
+    <div className={cn('page-heading mb-6', className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav aria-label="현재 위치" className="mb-2">
           <ol className="flex flex-wrap items-center gap-1 text-sm text-ink-600">

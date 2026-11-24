@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { api } from '@/api';
-import { PageHeader } from '@/components/ui/page-header';
+import { DirectoryIntro } from '@/components/site/directory-intro';
 import { SearchInput } from '@/components/ui/search-input';
 import { Pagination } from '@/components/ui/pagination';
 import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
@@ -83,7 +83,7 @@ function NoticeList() {
           e.preventDefault();
           router.push(href({ q: String(new FormData(e.currentTarget).get('q') ?? '').trim() }));
         }}
-        className="mt-4 flex gap-2"
+        className="mt-5 flex max-w-2xl gap-2"
       >
         <label htmlFor="notice-q" className="sr-only">
           공지 검색
@@ -118,7 +118,7 @@ function NoticeList() {
             <p className="mb-2 text-sm text-ink-600" aria-live="polite">
               총 <strong className="text-ink-900">{notices.data.total}</strong>건
             </p>
-            <ul className="border-t-2 border-ink-900">
+            <ul className="notice-feed">
               {notices.data.items.map((n) => (
                 <NoticeItem key={n.id} notice={n} />
               ))}
@@ -138,12 +138,15 @@ function NoticeList() {
 
 export default function NoticesPage() {
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-page directory-notices">
       <title>공지사항 | 중구청소년센터</title>
-      <PageHeader title="공지사항" description="센터 운영과 프로그램 관련 소식을 알려 드립니다." />
-      <Suspense fallback={<ListSkeleton rows={4} />}>
-        <NoticeList />
-      </Suspense>
+      <DirectoryIntro kind="notices" />
+      <div id="directory-content" className="directory-content">
+        <h2 className="directory-content-heading">센터 공지</h2>
+        <Suspense fallback={<ListSkeleton rows={4} />}>
+          <NoticeList />
+        </Suspense>
+      </div>
     </div>
   );
 }

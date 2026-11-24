@@ -51,7 +51,7 @@ function CheckInPanel({
   const open = !!session.checkInCode && remaining !== '0:00';
 
   return (
-    <section aria-labelledby="checkin-title" className="border border-line bg-surface p-4 sm:p-5">
+    <section aria-labelledby="checkin-title" className="console-surface p-4 sm:p-5">
       <h2 id="checkin-title" className="text-base font-bold">
         출석 코드
       </h2>
@@ -143,11 +143,11 @@ function Roster({
         </Button>
       </div>
       {session.records.length === 0 ? (
-        <p className="border border-line bg-surface p-4 text-ink-600">
+        <p className="console-surface p-4 text-ink-600">
           명단이 비어 있습니다. 출석부를 만든 시점의 동아리원·승인된 신청자가 명단이 됩니다.
         </p>
       ) : (
-        <ul className="divide-y divide-line border-y border-line bg-surface">
+        <ul className="console-surface divide-y divide-line">
           {session.records.map((r) => (
             <li key={r.userId} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1">

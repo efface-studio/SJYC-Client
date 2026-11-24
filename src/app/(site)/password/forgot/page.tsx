@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="container-page py-8 md:py-14">
       <title>비밀번호 찾기 | 중구청소년센터</title>
-      <div className="mx-auto max-w-md">
+      <div className="account-sheet mx-auto">
         <h1 className="text-2xl font-bold">비밀번호 찾기</h1>
         <p className="mt-1 mb-6 text-[15px] text-ink-600">
           가입한 이메일로 비밀번호 재설정 링크를 보내 드립니다.

@@ -57,7 +57,7 @@ function ApplicationDetail() {
             {a.applicantName} · {a.programTitle}
           </h2>
 
-          <dl className="mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 border-y border-line bg-surface px-4 py-4 text-[15px]">
+          <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
             <dt className="text-ink-600">프로그램</dt>
             <dd>
               <Link href={`/admin/programs/${a.programId}`} className="text-brand-700 hover:underline">

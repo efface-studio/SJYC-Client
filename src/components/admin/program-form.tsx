@@ -36,9 +36,9 @@ const DATE_FIELDS = [
 
 function Fieldset({ legend, children }: { legend: string; children: React.ReactNode }) {
   return (
-    <fieldset className="space-y-5 border-t border-line pt-5">
-      <legend className="float-left mb-4 w-full text-base font-bold">{legend}</legend>
-      {children}
+    <fieldset className="min-w-0 border-t border-line">
+      <legend className="pr-3 text-base font-bold">{legend}</legend>
+      <div className="min-w-0 space-y-5 pt-4">{children}</div>
     </fieldset>
   );
 }
@@ -60,7 +60,7 @@ export function ProgramForm({
   return (
     <form
       noValidate
-      className="max-w-3xl space-y-6"
+      className="console-surface console-form max-w-3xl space-y-6"
       onSubmit={(e) => {
         e.preventDefault();
         if (pending) return;

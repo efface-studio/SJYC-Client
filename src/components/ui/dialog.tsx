@@ -13,13 +13,22 @@ interface ModalProps {
   /** dialog: 화면 중앙 / drawer: 좌측에서 열리는 메뉴 */
   variant?: 'dialog' | 'drawer';
   className?: string;
+  bodyClassName?: string;
 }
 
 /**
  * 네이티브 <dialog>.showModal() — 포커스 가두기, Esc 닫기, 배경 비활성화(inert),
  * 닫힐 때 이전 포커스 복원을 브라우저가 처리한다.
  */
-export function Modal({ open, onClose, title, children, variant = 'dialog', className }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  variant = 'dialog',
+  className,
+  bodyClassName,
+}: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -66,7 +75,7 @@ export function Modal({ open, onClose, title, children, variant = 'dialog', clas
               <X aria-hidden className="size-5" />
             </button>
           </div>
-          <div className="overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
+          <div className={cn('overflow-y-auto overscroll-contain px-4 py-4', bodyClassName)}>{children}</div>
         </div>
       )}
     </dialog>

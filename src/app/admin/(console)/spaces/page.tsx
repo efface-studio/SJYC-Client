@@ -20,7 +20,6 @@ import { EmptyState } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { RESERVATION_STATUS } from '@/domain/labels';
 import type { SpaceReservation } from '@/domain/types';
-import { cn } from '@/lib/cn';
 import { formatDate } from '@/lib/format';
 
 interface Target {
@@ -192,20 +191,11 @@ function SpacesTabs() {
   ] as const;
   return (
     <>
-      <nav aria-label="공간 예약 메뉴" className="mb-5 border-b border-line">
+      <nav aria-label="공간 예약 메뉴" className="console-tabs mb-5">
         <ul className="flex gap-1">
           {tabs.map((t) => (
             <li key={t.id}>
-              <Link
-                href={t.href}
-                aria-current={tab === t.id ? 'page' : undefined}
-                className={cn(
-                  '-mb-px flex min-h-11 items-center border-b-2 px-3 text-[15px] font-semibold',
-                  tab === t.id
-                    ? 'border-ink-900 text-ink-900'
-                    : 'border-transparent text-ink-600 hover:text-ink-900',
-                )}
-              >
+              <Link href={t.href} aria-current={tab === t.id ? 'page' : undefined}>
                 {t.label}
               </Link>
             </li>

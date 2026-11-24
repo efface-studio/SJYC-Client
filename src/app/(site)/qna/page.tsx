@@ -145,6 +145,7 @@ export default function QnaPage() {
       <title>질문·문의 | 중구청소년센터</title>
       <div className="mx-auto max-w-3xl">
         <PageHeader
+          className="news-heading"
           title="질문·문의"
           description={`급한 문의는 대표번호 ${CENTER.telDisplay}로 전화해 주세요.`}
         />

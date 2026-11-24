@@ -4,8 +4,9 @@ import { useQueries } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '@/api';
-import { PageHeader } from '@/components/ui/page-header';
-import { Callout, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { BookOpenText } from 'lucide-react';
+import './policy-reader.css';
+import { ErrorState, ListSkeleton } from '@/components/ui/states';
 import { OSS_WEB } from '@/config/oss-licenses';
 import { POLICY_NAV, POLICY_TITLE } from '@/domain/labels';
 import type { PolicyDoc, PolicyKey } from '@/domain/types';
@@ -41,12 +42,7 @@ function PolicySection({ doc }: { doc: PolicyDoc }) {
         title={doc.title}
         sub={doc.effectiveAt ? `시행일 ${formatDate(doc.effectiveAt)}` : undefined}
       />
-      {!doc.confirmed && (
-        <Callout tone="warning" title="센터 확정본 미등록" className="mb-6">
-          아래 내용은 초안입니다. 센터가 확정한 문서가 등록되면 이 화면에 표시됩니다.
-        </Callout>
-      )}
-      <div className="text-base leading-[1.8] whitespace-pre-line text-ink-900">{doc.body}</div>
+      <div className="policy-prose">{doc.confirmed ? doc.body : '게시된 문서가 없습니다.'}</div>
     </>
   );
 }
@@ -244,46 +240,53 @@ export default function PolicyPage() {
   const activeTitle = POLICY_NAV.find((p) => p.key === active)?.title ?? '정책 및 약관';
 
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="policy-reader">
       <title>{`${activeTitle} | 중구청소년센터`}</title>
-      <PageHeader title="정책 및 약관" description="중구청소년센터 온라인 서비스 이용에 관한 문서입니다." />
+      <header className="policy-intro">
+        <div>
+          <BookOpenText aria-hidden size={32} />
+          <h1>정책 및 약관</h1>
+          <p>중구청소년센터 온라인 서비스 이용에 관한 문서입니다.</p>
+        </div>
+      </header>
+      <div className="policy-body">
+        <nav aria-label="정책 문서 목차" className="sticky top-[60px] z-20 -mx-4 mb-6 bg-surface md:hidden">
+          <PolicyToc active={active} onSelect={select} orientation="horizontal" />
+        </nav>
 
-      <nav aria-label="정책 문서 목차" className="sticky top-[60px] z-20 -mx-4 mb-6 bg-surface md:hidden">
-        <PolicyToc active={active} onSelect={select} orientation="horizontal" />
-      </nav>
+        <div className="md:grid md:grid-cols-[200px_minmax(0,1fr)] md:gap-12 lg:gap-16">
+          <aside className="hidden md:block">
+            <nav aria-label="정책 문서 목차" className="sticky top-28">
+              <PolicyToc active={active} onSelect={select} orientation="vertical" />
+            </nav>
+          </aside>
 
-      <div className="md:grid md:grid-cols-[200px_minmax(0,1fr)] md:gap-12 lg:gap-16">
-        <aside className="hidden md:block">
-          <nav aria-label="정책 문서 목차" className="sticky top-28">
-            <PolicyToc active={active} onSelect={select} orientation="vertical" />
-          </nav>
-        </aside>
-
-        <div className="max-w-3xl space-y-16 md:space-y-20">
-          {POLICY_NAV.map((p) => {
-            const query = p.key === 'opensource' ? undefined : docs[DOC_KEYS.indexOf(p.key)];
-            return (
-              <section
-                key={p.key}
-                id={sectionId(p.key)}
-                aria-labelledby={`${sectionId(p.key)}-title`}
-                className="scroll-mt-14 md:scroll-mt-4"
-              >
-                {p.key === 'opensource' ? (
-                  <OpenSourceLicenses />
-                ) : !query || query.isPending ? (
-                  <ListSkeleton rows={2} />
-                ) : query.isError ? (
-                  <>
-                    <SectionHeading id={sectionId(p.key)} title={p.title} />
-                    <ErrorState error={query.error} onRetry={() => void query.refetch()} />
-                  </>
-                ) : (
-                  <PolicySection doc={query.data} />
-                )}
-              </section>
-            );
-          })}
+          <div className="policy-articles min-w-0 space-y-16 md:space-y-20">
+            {POLICY_NAV.map((p) => {
+              const query = p.key === 'opensource' ? undefined : docs[DOC_KEYS.indexOf(p.key)];
+              return (
+                <section
+                  key={p.key}
+                  id={sectionId(p.key)}
+                  aria-labelledby={`${sectionId(p.key)}-title`}
+                  className="scroll-mt-14 md:scroll-mt-4"
+                >
+                  {p.key === 'opensource' ? (
+                    <OpenSourceLicenses />
+                  ) : !query || query.isPending ? (
+                    <ListSkeleton rows={2} />
+                  ) : query.isError ? (
+                    <>
+                      <SectionHeading id={sectionId(p.key)} title={p.title} />
+                      <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+                    </>
+                  ) : (
+                    <PolicySection doc={query.data} />
+                  )}
+                </section>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

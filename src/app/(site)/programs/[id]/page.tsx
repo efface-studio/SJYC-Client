@@ -6,9 +6,9 @@ import { useParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { api, isApiError } from '@/api';
 import { buttonClass } from '@/components/ui/button';
+import '@/components/site/directories.css';
 import { PageHeader } from '@/components/ui/page-header';
-import { Callout, EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
-import { DEMO_DATA } from '@/config/env';
+import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
 import { remainingSeats } from '@/domain/program';
 import type { Program } from '@/domain/types';
 import { useSession } from '@/features/auth/session';
@@ -111,7 +111,7 @@ export default function ProgramDetailPage() {
 
   const p = program.data;
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-detail directory-programs directory-content">
       <title>{`${p.title} | 중구청소년센터`}</title>
       <PageHeader
         breadcrumbs={[
@@ -120,22 +120,16 @@ export default function ProgramDetailPage() {
         ]}
         title={p.title}
         description={
-          <span className="mt-1 flex items-center gap-2">
+          <span className="mt-1 flex flex-wrap items-center gap-2">
             <RecruitBadge program={p} />
             {p.summary}
           </span>
         }
       />
 
-      {DEMO_DATA && (
-        <Callout tone="warning" className="mb-4">
-          개발용 샘플 프로그램입니다. 실제 일정·정원·장소가 아닙니다.
-        </Callout>
-      )}
-
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div>
-          <dl className="border-t border-ink-900">
+          <dl className="border-t border-line-strong">
             <Row label="분류">{categoryName(p.categoryId)}</Row>
             <Row label="대상">{p.target}</Row>
             <Row label="장소">{p.place}</Row>
@@ -157,10 +151,11 @@ export default function ProgramDetailPage() {
           </section>
         </div>
 
-        {/* 모바일: 하단 탭바 위에 고정되는 신청 영역 / 데스크톱: 우측 고정 */}
-        <aside className="sticky bottom-[calc(64px+env(safe-area-inset-bottom))] z-20 -mx-4 border-t border-line bg-surface px-4 py-3 md:bottom-0 lg:top-24 lg:mx-0 lg:self-start lg:rounded-lg lg:border lg:p-5">
+        {/* 모바일은 화면 하단, 데스크톱은 본문 오른쪽에 신청 버튼을 둔다. */}
+        <aside className="program-apply-bar sticky bottom-0 z-20 -mx-4 border-t border-line bg-surface px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] lg:top-24 lg:mx-0 lg:self-start lg:rounded-xl lg:border lg:bg-surface-muted lg:p-6">
           <p className="mb-3 hidden text-[15px] text-ink-700 lg:block">
-            모집 마감 <strong className="text-ink-900">{formatDateTime(p.recruitEndsAt)}</strong>
+            모집 마감{' '}
+            <strong className="mt-1 block text-lg text-ink-900">{formatDateTime(p.recruitEndsAt)}</strong>
           </p>
           <ApplyAction program={p} />
         </aside>
