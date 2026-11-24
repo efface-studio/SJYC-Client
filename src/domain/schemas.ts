@@ -56,7 +56,6 @@ export const signupSchema = z
   .object({
     name,
     email,
-    phone: z.union([z.literal(''), phone]).optional(),
     password,
     passwordConfirm: z.string(),
     phone: z.union([z.literal(''), phone]).optional(),

@@ -104,29 +104,29 @@ export function TextField({
         trailing && 'min-w-0 flex-1 border-0 bg-transparent focus-visible:outline-none',
       )}
       {...props}
-        value={formatted(props.value)}
-        defaultValue={formatted(props.defaultValue)}
-        onFocus={(event) => {
-          if (phone) lastPhone.current = event.currentTarget.value;
-          props.onFocus?.(event);
-        }}
-        onChange={(event) => {
-          const field = event.currentTarget;
-          if (phone) {
-            const next = field.value;
-            const remaining = next.slice(field.selectionStart ?? next.length).replace(/\D/g, '').length;
-            const value = editMobilePhone(lastPhone.current, next);
-            lastPhone.current = value;
-            if (value !== next) {
-              field.value = value;
-              let caret = value.length;
-              let count = remaining;
-              while (caret > 0 && count) if (/\d/.test(value[--caret]!)) count--;
-              field.setSelectionRange(caret, caret);
-            }
+      value={formatted(props.value)}
+      defaultValue={formatted(props.defaultValue)}
+      onFocus={(event) => {
+        if (phone) lastPhone.current = event.currentTarget.value;
+        props.onFocus?.(event);
+      }}
+      onChange={(event) => {
+        const field = event.currentTarget;
+        if (phone) {
+          const next = field.value;
+          const remaining = next.slice(field.selectionStart ?? next.length).replace(/\D/g, '').length;
+          const value = editMobilePhone(lastPhone.current, next);
+          lastPhone.current = value;
+          if (value !== next) {
+            field.value = value;
+            let caret = value.length;
+            let count = remaining;
+            while (caret > 0 && count) if (/\d/.test(value[--caret]!)) count--;
+            field.setSelectionRange(caret, caret);
           }
-          props.onChange?.(event);
-        }}
+        }
+        props.onChange?.(event);
+      }}
     />
   );
   return (
