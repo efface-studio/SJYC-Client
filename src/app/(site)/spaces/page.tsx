@@ -5,8 +5,10 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { api } from '@/api';
 import { Badge } from '@/components/ui/badge';
-import { PageHeader } from '@/components/ui/page-header';
-import { EmptyState, ErrorState, ListSkeleton } from '@/components/ui/states';
+import { SpacePhoto } from '@/components/site/space-photo';
+import { DirectorySkeleton } from '@/components/site/directory-skeleton';
+import { DirectoryIntro } from '@/components/site/directory-intro';
+import { EmptyState, ErrorState } from '@/components/ui/states';
 import { FLOORS } from '@/config/center';
 import type { Space } from '@/domain/types';
 import { RESERVATION_MAX_DAYS_AHEAD, RESERVATION_MAX_HOURS } from '@/domain/space';
@@ -25,16 +27,19 @@ export default function SpacesPage() {
   );
 
   return (
-    <div className="container-page py-6 md:py-10">
+    <div className="directory-page directory-spaces">
       <title>공간 예약 | 중구청소년센터</title>
-      <div className="mx-auto">
-        <PageHeader
-          className="directory-heading spaces-photo"
-          title="공간 예약"
-          description={`내일부터 ${RESERVATION_MAX_DAYS_AHEAD}일 이내, 1시간 단위로 최대 ${RESERVATION_MAX_HOURS}시간까지 신청할 수 있습니다. 담당자 확인 후 확정됩니다.`}
-        />
+      <DirectoryIntro kind="spaces" />
+      <div id="directory-content" className="directory-content">
+        <div className="directory-toolbar">
+          <h2>층별 공간</h2>
+        </div>
+        <p className="reservation-rule">
+          내일부터 {RESERVATION_MAX_DAYS_AHEAD}일 이내 · 1시간 단위 · 최대 {RESERVATION_MAX_HOURS}시간 ·
+          담당자 확인 후 확정
+        </p>
         {spaces.isPending ? (
-          <ListSkeleton rows={4} label="공간 불러오는 중" />
+          <DirectorySkeleton kind="spaces" />
         ) : spaces.isError ? (
           <ErrorState error={spaces.error} onRetry={() => void spaces.refetch()} />
         ) : spaces.data.length === 0 ? (
@@ -48,7 +53,8 @@ export default function SpacesPage() {
                   {spacesByFloor.get(floor)?.map((s) => (
                     <li key={s.id}>
                       <Link href={`/spaces/${s.id}`} className="space-row group">
-                        <span>
+                        <SpacePhoto space={s} thumbnail />
+                        <span className="min-w-0 flex-1">
                           <span className="block text-lg font-bold group-hover:underline">{s.name}</span>
                           <span className="mt-1 block text-sm text-ink-600">
                             최대 {s.capacity}명 · {s.description}

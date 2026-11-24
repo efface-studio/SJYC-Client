@@ -11,11 +11,15 @@ import {
   SessionPanel,
   StoragePanel,
 } from '@/features/developer/developer-console';
+import { ServerLogPanel } from '@/features/developer/server-log-panel';
+import { Terminal } from 'lucide-react';
+import '@/features/developer/operations.css';
 import { cn } from '@/lib/cn';
 
 const TABS = [
   { key: 'env', label: '환경', panel: EnvironmentPanel },
   { key: 'session', label: '세션·권한', panel: SessionPanel },
+  { key: 'server', label: '서버 로그', panel: ServerLogPanel },
   { key: 'requests', label: 'API 요청', panel: ApiLogPanel },
   { key: 'cache', label: '쿼리 캐시', panel: QueryCachePanel },
   { key: 'data', label: 'mock 데이터', panel: MockDataPanel },
@@ -43,29 +47,41 @@ function DeveloperTabs() {
   const Panel = active.panel;
   return (
     <>
-      <div ref={listRef} role="tablist" aria-label="개발자 도구" className="console-tabs mb-6 scrollbar-none">
-        {TABS.map((t, i) => (
-          <button
-            key={t.key}
-            id={`dev-tab-${t.key}`}
-            type="button"
-            role="tab"
-            aria-selected={t.key === active.key}
-            aria-controls="dev-panel"
-            tabIndex={t.key === active.key ? 0 : -1}
-            onClick={() => select(t.key)}
-            onKeyDown={(e) => onKey(e, i)}
-            className={cn(
-              'h-11 shrink-0 border-b-2 px-3 text-[15px] font-semibold whitespace-nowrap',
-              t.key === active.key ? 'border-ink-900 text-ink-900' : 'border-transparent text-ink-600',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div id="dev-panel" role="tabpanel" aria-labelledby={`dev-tab-${active.key}`} className="space-y-8">
-        <Panel />
+      <div className="developer-workspace">
+        <header className="operations-heading">
+          <Terminal size={23} />
+          <strong>Developer console</strong>
+          <span>시스템 진단</span>
+        </header>
+        <div
+          ref={listRef}
+          role="tablist"
+          aria-label="개발자 도구"
+          className="console-tabs mb-6 scrollbar-none"
+        >
+          {TABS.map((t, i) => (
+            <button
+              key={t.key}
+              id={`dev-tab-${t.key}`}
+              type="button"
+              role="tab"
+              aria-selected={t.key === active.key}
+              aria-controls="dev-panel"
+              tabIndex={t.key === active.key ? 0 : -1}
+              onClick={() => select(t.key)}
+              onKeyDown={(e) => onKey(e, i)}
+              className={cn(
+                'h-11 shrink-0 border-b-2 px-3 text-[15px] font-semibold whitespace-nowrap',
+                t.key === active.key ? 'border-ink-900 text-ink-900' : 'border-transparent text-ink-600',
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div id="dev-panel" role="tabpanel" aria-labelledby={`dev-tab-${active.key}`} className="space-y-8">
+          <Panel />
+        </div>
       </div>
     </>
   );

@@ -5,22 +5,16 @@ import { Bell, Menu, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { api } from '@/api';
 import { buttonClass } from '@/components/ui/button';
 import { Modal } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
-import { CENTER } from '@/config/center';
+import { useSiteSettings } from '@/features/settings/use-settings';
+import { NAV_LINKS } from '@/domain/site-settings';
+import { orderedKeys } from '@/config/site-settings';
 import { useLogout, useSession } from '@/features/auth/session';
 import { cn } from '@/lib/cn';
-
-export const SITE_NAV = [
-  { href: '/programs', label: '프로그램' },
-  { href: '/spaces', label: '공간 예약' },
-  { href: '/clubs', label: '동아리' },
-  { href: '/notices', label: '공지사항' },
-  { href: '/about', label: '센터 안내' },
-] as const;
 
 const MORE = [
   { href: '/gallery', label: '센터 소식·갤러리' },
@@ -35,11 +29,12 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 export function Logo({ className, onDark = false }: { className?: string; onDark?: boolean }) {
+  const settings = useSiteSettings();
   return (
     <Link href="/" className={cn('inline-flex shrink-0 items-center', className)}>
       <Image
-        src={onDark ? '/brand/logo-on-dark.png' : '/brand/logo-horizontal.jpg'}
-        alt={`${CENTER.formalName} 홈`}
+        src={onDark ? settings.heroLogo : settings.headerLogo}
+        alt={`${settings.formalName} 홈`}
         width={300}
         height={50}
         priority
@@ -78,15 +73,40 @@ function NotificationBell() {
   );
 }
 
-function watchScroll(update: () => void) {
+function watchPosition(update: () => void) {
   window.addEventListener('scroll', update, { passive: true });
-  return () => window.removeEventListener('scroll', update);
+  window.addEventListener('resize', update);
+  window.addEventListener('pageshow', update);
+  const resize = new ResizeObserver(update);
+  const film = document.querySelector('.center-film');
+  if (film) resize.observe(film);
+  return () => {
+    resize.disconnect();
+    window.removeEventListener('scroll', update);
+    window.removeEventListener('resize', update);
+    window.removeEventListener('pageshow', update);
+  };
 }
-const pastTop = () => window.scrollY > 24;
 
 export function SiteHeader() {
+  const settings = useSiteSettings();
+  const nav = orderedKeys(settings.navOrder, NAV_LINKS).map((key) => ({
+    href: '/' + key,
+    label: NAV_LINKS[key],
+  }));
   const pathname = usePathname();
-  const scrolled = useSyncExternalStore(watchScroll, pastTop, () => false);
+  const home = pathname === '/';
+  const readPosition = useCallback(() => {
+    if (window.scrollY <= 24) return 'top';
+    if (home) {
+      const film = document.querySelector('.center-film');
+      const bar = document.querySelector('.site-header > .container-page');
+      if (film && bar && film.getBoundingClientRect().bottom >= bar.clientHeight) return 'film';
+    }
+    return 'content';
+  }, [home]);
+  const position = useSyncExternalStore(watchPosition, readPosition, () => 'initial');
+  const onFilm = home && position !== 'content';
   const router = useRouter();
   const toast = useToast();
   const { data: session } = useSession();
@@ -106,16 +126,17 @@ export function SiteHeader() {
     <header
       className={cn(
         'site-header sticky top-0 z-30',
-        pathname === '/' && 'over-film',
-        scrolled && 'is-scrolled',
+        home && 'over-film',
+        onFilm && 'on-film',
+        (position === 'film' || position === 'content') && 'is-scrolled',
       )}
     >
       <div className="container-page flex h-14 items-center justify-between gap-4 md:h-[72px]">
-        <Logo onDark={pathname === '/' || scrolled} />
+        <Logo onDark={onFilm} />
 
         <nav aria-label="주 메뉴" className="full-navigation hidden lg:block">
           <ul className="flex items-center gap-1">
-            {SITE_NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -174,6 +195,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
+            disabled={position === 'initial'}
             aria-label="전체 메뉴 열기"
             aria-expanded={menuOpen}
             className="compact-navigation flex size-11 items-center justify-center rounded-full lg:hidden"
@@ -195,7 +217,7 @@ export function SiteHeader() {
           <ul className="site-menu-main">
             {[
               { href: '/', label: '홈' },
-              ...SITE_NAV,
+              ...nav,
               { href: '/my', label: '마이페이지' },
               ...(session
                 ? [{ href: '/notifications', label: '알림' }]

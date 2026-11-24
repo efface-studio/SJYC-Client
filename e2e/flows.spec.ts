@@ -1,13 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../src/api/mock/seed';
 
 /**
  * 마스터 프롬프트 §13 주요 테스트 시나리오 — mock 모드 빌드 기준.
- * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 화면의 데모 버튼으로 채운다.
+ * 데모 계정 비밀번호는 mock 시드(src/api/mock/seed.ts) 의 개발용 값이며 로그인 폼으로 입력한다.
  */
 
 async function loginAs(page: Page, label: '일반 회원' | '센터 직원', next = '/my') {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
-  await page.getByRole('button', { name: label }).click();
+  const account = DEMO_ACCOUNTS.find((candidate) => candidate.label === label);
+  if (!account) throw new Error('테스트 회원이 없습니다.');
+  await page.getByLabel('이메일').fill(account.email);
+  await page.locator('input[name="password"]').fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: '로그인', exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith('/login'));
 }
@@ -15,7 +19,12 @@ async function loginAs(page: Page, label: '일반 회원' | '센터 직원', nex
 test('비로그인 사용자가 공개 페이지를 탐색할 수 있다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /모집 중인 프로그램/ })).toBeVisible();
-  await page.getByRole('navigation', { name: '하단 메뉴' }).getByRole('link', { name: '프로그램' }).click();
+  await expect(page.getByRole('navigation', { name: '하단 메뉴' })).toHaveCount(0);
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page
+    .getByRole('navigation', { name: '전체 메뉴' })
+    .getByRole('link', { name: '프로그램', exact: true })
+    .click();
   await expect(page.getByRole('heading', { level: 1, name: '프로그램' })).toBeVisible();
   await page.getByRole('link', { name: /주말 농구 교실/ }).click();
   await expect(page.getByRole('link', { name: '로그인하고 신청하기' })).toBeVisible();
@@ -63,6 +72,16 @@ test('홈 상단은 스크롤 위치에 따라 아이콘 메뉴와 전체 메뉴
   await page.keyboard.press('Escape');
   await page.evaluate(() => window.scrollTo(0, 300));
   await expect(nav).toBeVisible();
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(nav.getByRole('link').first()).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await expect(header.getByRole('link', { name: '회원가입' })).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const boundary = await page
+    .locator('.center-film')
+    .evaluate((el) => el.getBoundingClientRect().bottom + scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y), boundary);
+  await expect(header).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(nav).toBeHidden();
   await expect(header.getByRole('button', { name: '전체 메뉴 열기' })).toBeVisible();
@@ -356,4 +375,81 @@ test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크�
     );
     expect(port!.y + port!.height).toBeLessThanOrEqual(footerTop + 1);
   }
+});
+
+test('꿈드림 메뉴에서 지원 분야와 참여 방법을 찾을 수 있다', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '전체 메뉴 열기' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: '꿈드림', exact: true }).click();
+  await expect(page).toHaveURL(/\/kdream$/);
+  await expect(page.getByRole('heading', { name: '중구 꿈드림', level: 1 })).toBeVisible();
+  await page.getByRole('link', { name: /진로·자립 나에게 맞는/ }).click();
+  await expect(page).toHaveURL(/#career$/);
+  await page.getByRole('link', { name: '이용 방법 보기' }).click();
+  await expect(page).toHaveURL(/#participate$/);
+  await expect(page.getByRole('link', { name: /청소년1388 온라인 신청/ })).toHaveAttribute(
+    'href',
+    'https://www.1388.go.kr/ind/YTOSP_SC_IND_01',
+  );
+  await expect(page.getByRole('link', { name: '전화 문의', exact: true })).toHaveAttribute(
+    'href',
+    'tel:0222500543',
+  );
+});
+
+test('관리자 통합검색에서 업무를 열고 담당자 권한을 적용한다', async ({ page }) => {
+  await adminLoginAs(page, '최고 관리자', '/admin');
+  const open = page.getByRole('button', { name: '관리자 통합검색 열기' });
+  await open.click();
+  const dialog = page.getByRole('dialog', { name: '관리자 통합검색' });
+  const input = dialog.getByRole('searchbox', { name: '관리자 검색어' });
+  await expect(input).toBeFocused();
+  await input.fill('농구');
+  const program = dialog.getByRole('link', { name: /주말 농구 교실/ }).first();
+  await program.click();
+  await expect(page).toHaveURL(/\/admin\/programs\/[^/]+$/);
+  await expect(dialog).toBeHidden();
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '동아리 담당자', '/admin/my-clubs');
+  await open.click();
+  await expect(dialog.getByRole('link', { name: '동아리 운영' })).toBeVisible();
+  await expect(dialog.getByRole('link', { name: '회원', exact: true })).toHaveCount(0);
+  await input.fill('농구');
+  await expect(dialog.getByText('검색 결과가 없습니다.')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+});
+
+test('동아리와 공간 목록은 느린 응답에 스켈레톤을 표시하고 결과로 전환한다', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('sjyc.mock.scenario.v1', 'slow'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const [path, label, selector] of [
+    ['/clubs', '동아리 불러오는 중', '.club-list-link'],
+    ['/spaces', '공간 불러오는 중', '.space-row'],
+  ] as const) {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    const pending = page.getByRole('status', { name: label });
+    await expect(pending).toBeVisible();
+    await expect(pending.locator('[aria-hidden]').last()).toHaveCSS('animation-name', 'none');
+    await expect(pending).toHaveCount(0);
+    await expect(page.locator('a' + selector).first()).toBeVisible();
+  }
+});
+
+test('홈 영상은 화면 밖에서 멈추고 사용자가 멈춘 뒤에는 자동으로 재생되지 않는다', async ({ page }) => {
+  await page.goto('/');
+  const video = page.locator('.center-film video');
+  const paused = () => video.evaluate((el: HTMLVideoElement) => el.paused);
+  await expect.poll(paused).toBe(false);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await expect.poll(paused).toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(paused).toBe(false);
+  await page.locator('.film-playback').focus();
+  await page.keyboard.press('Enter');
+  await expect.poll(paused).toBe(true);
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.locator('.film-playback')).toHaveText('배경 영상 재생');
+  await expect.poll(paused).toBe(true);
 });
