@@ -111,9 +111,11 @@ export function PasswordField({ label, error, hint, className, required, ...prop
           type={visible ? 'text' : 'password'}
           required={required}
           aria-invalid={!!error || undefined}
-          aria-describedby={ids.describedBy}
           className={cn(control, 'h-12 pr-12')}
           {...props}
+          aria-describedby={
+            [ids.describedBy, props['aria-describedby']].filter(Boolean).join(' ') || undefined
+          }
         />
         <button
           type="button"
