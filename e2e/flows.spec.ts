@@ -486,3 +486,17 @@ test('관리자 메뉴 배치는 계정별로 유지되고 빠른 검색은 키�
   await adminLoginAs(page, '센터 직원', '/admin');
   await expect(preference.getByRole('button', { name: '상단 메뉴' })).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('센터 안내에서 카페 라라의 사진, 운영시간과 메뉴판을 열 수 있다', async ({ page }) => {
+  await page.goto('/about');
+  await page.getByRole('link', { name: '카페 라라 이용 안내' }).click();
+  await expect(page).toHaveURL(/\/about\/cafe-lala$/);
+  await expect(page.getByRole('heading', { name: '카페 라라', exact: true })).toBeVisible();
+  await expect(page.getByText('화요일–토요일 08:30–19:30')).toBeVisible();
+  await expect(page.getByRole('link', { name: '02-2250-0570' })).toHaveAttribute('href', 'tel:0222500570');
+  const menu = page.getByRole('link', { name: /메뉴판 크게 보기/ });
+  await menu.scrollIntoViewIfNeeded();
+  await expect(menu).toHaveAttribute('href', '/media/about/cafe-lala/menu.jpg');
+  await menu.click();
+  await expect(page.locator('img')).toHaveJSProperty('naturalWidth', 608);
+});
