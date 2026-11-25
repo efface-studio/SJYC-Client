@@ -203,6 +203,7 @@ function Settings() {
 export default function Page() {
   return (
     <AdminPage
+      view="settings"
       title="사이트 설정"
       permission="site.manage"
       description="공개 웹사이트의 기관 정보, 메뉴와 콘텐츠를 관리합니다."

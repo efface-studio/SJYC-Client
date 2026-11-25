@@ -101,6 +101,7 @@ function EditNotice() {
 export default function AdminNoticeEditPage() {
   return (
     <AdminPage
+      view="editor"
       title="공지 수정"
       permission="notice.write"
       breadcrumbs={[{ label: '공지 관리', href: '/admin/notices' }, { label: '수정' }]}

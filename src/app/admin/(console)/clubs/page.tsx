@@ -4,41 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { api } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
-import { DataList, RowLink, type Column } from '@/components/admin/data-list';
+import { ClubVisual } from '@/components/site/club-visual';
+import { ChevronRight } from 'lucide-react';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
 import { buttonClass } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/states';
-import type { Club } from '@/domain/types';
-
-const COLUMNS: Column<Club>[] = [
-  {
-    key: 'name',
-    header: '동아리명',
-    primary: true,
-    cell: (c) => <RowLink href={`/admin/clubs/${c.id}`}>{c.name}</RowLink>,
-  },
-  { key: 'field', header: '활동 분야', cell: (c) => c.field },
-  {
-    key: 'members',
-    header: '회원 수',
-    cell: (c) => `${c.memberCount}명`,
-    className: 'tabular-nums whitespace-nowrap',
-  },
-  {
-    key: 'recruiting',
-    header: '모집',
-    cell: (c) => (c.recruiting ? '모집 중' : '모집 안 함'),
-    className: 'whitespace-nowrap',
-  },
-  {
-    key: 'status',
-    header: '운영',
-    status: true,
-    cell: (c) =>
-      c.status === 'active' ? <Badge tone="success">운영 중</Badge> : <Badge tone="neutral">운영 중지</Badge>,
-  },
-];
 
 function ClubList() {
   const clubs = useQuery({ queryKey: ['admin', 'clubs'], queryFn: () => api.admin.clubs.list() });
@@ -55,7 +26,26 @@ function ClubList() {
           <p className="mb-3 text-sm text-ink-600">
             총 <strong className="text-ink-900 tabular-nums">{d.length}</strong>개
           </p>
-          <DataList caption="동아리 목록" rows={d} columns={COLUMNS} rowLabel={(c) => c.name} />
+          <ul className="club-catalog">
+            {d.map((c) => (
+              <li key={c.id}>
+                <Link href={`/admin/clubs/${c.id}`}>
+                  <ClubVisual photo={c.photos[0]} field={c.field} decorative />
+                  <div>
+                    <small>{c.field}</small>
+                    <strong>{c.name}</strong>
+                    <span>
+                      회원 {c.memberCount}명 · {c.recruiting ? '모집 중' : '모집 안 함'}
+                    </span>
+                  </div>
+                  <Badge tone={c.status === 'active' ? 'success' : 'neutral'}>
+                    {c.status === 'active' ? '운영 중' : '운영 중지'}
+                  </Badge>
+                  <ChevronRight size={15} aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </>
       )}
     </QueryState>
@@ -65,6 +55,7 @@ function ClubList() {
 export default function AdminClubsPage() {
   return (
     <AdminPage
+      view="list"
       title="동아리 관리"
       permission="club.manage"
       actions={

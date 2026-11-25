@@ -233,6 +233,7 @@ function RequestPanel({
 }
 
 export function ApiReference() {
+  const [indexOpen, setIndexOpen] = useState(false);
   const url = useSearchParams(),
     requested = url.get('endpoint');
   const [key, setKey] = useState<string | null>(null),
@@ -269,8 +270,17 @@ export function ApiReference() {
     });
   }
   return (
-    <div className="spec-workspace">
-      <aside className="spec-index" aria-label="API 목록">
+    <div className="spec-workspace" data-index-open={indexOpen}>
+      <button
+        type="button"
+        className="spec-index-toggle"
+        aria-controls="reference-index"
+        aria-expanded={indexOpen}
+        onClick={() => setIndexOpen(!indexOpen)}
+      >
+        API 목록 {indexOpen ? '닫기' : '열기'}
+      </button>
+      <aside id="reference-index" className="spec-index" aria-label="API 목록">
         <label>
           경로 검색
           <input
@@ -295,7 +305,10 @@ export function ApiReference() {
             <button
               key={keyOf(r)}
               aria-current={r === chosen ? 'true' : undefined}
-              onClick={() => setKey(keyOf(r))}
+              onClick={() => {
+                setKey(keyOf(r));
+                setIndexOpen(false);
+              }}
             >
               <small>{r.method}</small>
               <code>{r.path}</code>

@@ -168,10 +168,11 @@ test('직원은 대시보드에서 집계 기간을 바꾸고 처리 대기 신�
   await period.click();
   await expect(period).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('최근 30일 프로그램 신청')).toBeVisible();
-  await page
-    .getByRole('region', { name: '처리 대기 업무' })
-    .getByRole('link', { name: /프로그램 신청/ })
-    .click();
+  const inbox = page.getByRole('region', { name: '처리 대기' });
+  await inbox.getByRole('button', { name: /문의 답변/ }).click();
+  await expect(inbox.getByRole('heading', { name: '문의 답변' })).toBeVisible();
+  await inbox.getByRole('button', { name: /프로그램 신청/ }).click();
+  await inbox.getByRole('link', { name: '전체 보기' }).click();
   await expect(page).toHaveURL(/\/admin\/applications\?status=submitted$/);
   await expect(page.getByRole('table', { name: '프로그램 신청 목록' })).toBeVisible();
 });
@@ -222,6 +223,7 @@ test('자체 날짜 선택을 키보드로 조작한다 @desktop', async ({ page
   await page.getByRole('button', { name: '센터 직원' }).click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
   await page.waitForURL(/\/admin\/spaces/);
+  await page.getByRole('button', { name: '필터', exact: true }).click();
   const trigger = page.getByRole('button', { name: '이용 날짜' });
   await trigger.click();
   const grid = page.getByRole('grid');
@@ -350,8 +352,9 @@ test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크�
     [390, 600],
   ] as const) {
     await page.setViewportSize({ width, height });
-    if (width < 1024) await page.getByRole('button', { name: '관리자 메뉴 열기' }).click();
+    await page.getByRole('button', { name: '관리자 메뉴 열기' }).click();
     const nav = page.getByRole('navigation', { name: '관리자 메뉴' });
+    await nav.getByText('기술·기록', { exact: true }).click();
     const last = nav.getByRole('link', { name: '개발자 도구' });
     const account = page.getByRole('button', { name: '로그아웃' });
     await expect(account).toBeVisible();
@@ -374,6 +377,7 @@ test('관리자 메뉴를 끝까지 스크롤해도 계정과 마지막 링크�
       (el) => el.closest('.console-account')!.getBoundingClientRect().top,
     );
     expect(port!.y + port!.height).toBeLessThanOrEqual(footerTop + 1);
+    await page.keyboard.press('Escape');
   }
 });
 
@@ -402,18 +406,18 @@ test('관리자 통합검색에서 업무를 열고 담당자 권한을 적용�
   const open = page.getByRole('button', { name: '관리자 통합검색 열기' });
   await open.click();
   const dialog = page.getByRole('dialog', { name: '관리자 통합검색' });
-  const input = dialog.getByRole('searchbox', { name: '관리자 검색어' });
+  const input = dialog.getByRole('combobox', { name: '관리자 검색어' });
   await expect(input).toBeFocused();
   await input.fill('농구');
-  const program = dialog.getByRole('link', { name: /주말 농구 교실/ }).first();
+  const program = dialog.getByRole('option', { name: /주말 농구 교실/ }).first();
   await program.click();
   await expect(page).toHaveURL(/\/admin\/programs\/[^/]+$/);
   await expect(dialog).toBeHidden();
   await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
   await adminLoginAs(page, '동아리 담당자', '/admin/my-clubs');
   await open.click();
-  await expect(dialog.getByRole('link', { name: '동아리 운영' })).toBeVisible();
-  await expect(dialog.getByRole('link', { name: '회원', exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole('option', { name: '동아리 운영' })).toBeVisible();
+  await expect(dialog.getByRole('option', { name: '회원', exact: true })).toHaveCount(0);
   await input.fill('농구');
   await expect(dialog.getByText('검색 결과가 없습니다.')).toBeVisible();
   await page.keyboard.press('Escape');
@@ -452,4 +456,29 @@ test('홈 영상은 화면 밖에서 멈추고 사용자가 멈춘 뒤에는 자
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect(page.locator('.film-playback')).toHaveText('배경 영상 재생');
   await expect.poll(paused).toBe(true);
+});
+
+test('관리자 메뉴 배치는 계정별로 유지되고 빠른 검색은 키보드로 이동한다 @desktop', async ({ page }) => {
+  await adminLoginAs(page, '개발자', '/admin');
+  const preference = page.getByRole('group', { name: '메뉴 배치' });
+  await preference.getByRole('button', { name: '사이드 메뉴' }).click();
+  await page.reload();
+  await expect(preference.getByRole('button', { name: '사이드 메뉴' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.getByRole('navigation', { name: '관리자 메뉴' })).toBeVisible();
+  await page.keyboard.press('Control+k');
+  const dialog = page.getByRole('dialog', { name: '관리자 통합검색' });
+  const field = dialog.getByRole('combobox');
+  await expect(field).toBeFocused();
+  await expect(dialog.getByRole('option')).toHaveCount(5);
+  await field.press('ArrowDown');
+  await expect(dialog.getByRole('option', { selected: true })).toHaveText('프로그램 신청');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/\/admin\/applications$/);
+  await expect(dialog).toBeHidden();
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '센터 직원', '/admin');
+  await expect(preference.getByRole('button', { name: '상단 메뉴' })).toHaveAttribute('aria-pressed', 'true');
 });

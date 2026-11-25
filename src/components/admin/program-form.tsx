@@ -1,5 +1,7 @@
 'use client';
 
+import { EditorIndex } from './editor-index';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +38,7 @@ const DATE_FIELDS = [
 
 function Fieldset({ legend, children }: { legend: string; children: React.ReactNode }) {
   return (
-    <fieldset className="min-w-0 border-t border-line">
+    <fieldset id={'edit-' + legend.replaceAll(' ', '-')} className="editor-section">
       <legend className="pr-3 text-base font-bold">{legend}</legend>
       <div className="min-w-0 space-y-5 pt-4">{children}</div>
     </fieldset>
@@ -60,7 +62,7 @@ export function ProgramForm({
   return (
     <form
       noValidate
-      className="console-surface console-form max-w-3xl space-y-6"
+      className="editor-sheet console-form space-y-6"
       onSubmit={(e) => {
         e.preventDefault();
         if (pending) return;
@@ -73,6 +75,7 @@ export function ProgramForm({
         onSubmit(parsed.data);
       }}
     >
+      <EditorIndex sections={['기본 정보', '일정', '상세 내용']} />
       <Fieldset legend="기본 정보">
         <TextField
           label="프로그램명"
@@ -178,7 +181,7 @@ export function ProgramForm({
       </Fieldset>
 
       <FormError message={formError} />
-      <div className="flex flex-col-reverse gap-2 border-t border-line pt-5 sm:flex-row sm:justify-between">
+      <div className="editor-actions flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
         <div>{extraActions}</div>
         <Button type="submit" loading={pending}>
           {submitLabel}

@@ -41,6 +41,7 @@ function NewClub() {
 export default function AdminClubNewPage() {
   return (
     <AdminPage
+      view="editor"
       title="동아리 등록"
       permission="club.manage"
       breadcrumbs={[{ label: '동아리 관리', href: '/admin/clubs' }, { label: '등록' }]}

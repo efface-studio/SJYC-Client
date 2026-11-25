@@ -5,6 +5,7 @@ import { features } from './features';
 import './specifications.css';
 
 export function FeatureReference() {
+  const [indexOpen, setIndexOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [key, setKey] = useState(features[0]!.key);
   const list = features.filter((f) =>
@@ -15,8 +16,17 @@ export function FeatureReference() {
   );
   const feature = list.find((f) => f.key === key) ?? list[0];
   return (
-    <div className="spec-workspace">
-      <aside className="spec-index" aria-label="기능 목차">
+    <div className="spec-workspace" data-index-open={indexOpen}>
+      <button
+        type="button"
+        className="spec-index-toggle"
+        aria-controls="reference-index"
+        aria-expanded={indexOpen}
+        onClick={() => setIndexOpen(!indexOpen)}
+      >
+        기능 목차 {indexOpen ? '닫기' : '열기'}
+      </button>
+      <aside id="reference-index" className="spec-index" aria-label="기능 목차">
         <label>
           기능 찾기
           <input
@@ -32,7 +42,10 @@ export function FeatureReference() {
             <button
               key={f.key}
               aria-current={feature?.key === f.key ? 'true' : undefined}
-              onClick={() => setKey(f.key)}
+              onClick={() => {
+                setKey(f.key);
+                setIndexOpen(false);
+              }}
             >
               {f.title}
               <small>{f.area}</small>

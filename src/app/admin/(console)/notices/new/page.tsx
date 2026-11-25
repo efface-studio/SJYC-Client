@@ -41,6 +41,7 @@ function NewNotice() {
 export default function AdminNoticeNewPage() {
   return (
     <AdminPage
+      view="editor"
       title="공지 등록"
       permission="notice.write"
       breadcrumbs={[{ label: '공지 관리', href: '/admin/notices' }, { label: '등록' }]}

@@ -36,7 +36,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="border-t border-line pt-5">
+    <section className="diagnostic-section">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-base font-bold">{title}</h2>
@@ -51,9 +51,9 @@ function Section({
 
 function InfoList({ rows }: { rows: [string, ReactNode][] }) {
   return (
-    <dl className="grid gap-x-6 gap-y-2.5 text-[15px] sm:grid-cols-[160px_1fr]">
+    <dl className="diagnostic-properties">
       {rows.map(([k, v]) => (
-        <div key={k} className="contents">
+        <div key={k}>
           <dt className="text-ink-600">{k}</dt>
           <dd className="min-w-0 break-all">{v}</dd>
         </div>
