@@ -202,7 +202,8 @@ export const httpClient: ApiClient = {
   site: { settings: () => request('GET', '/site/settings') },
   admin: {
     updateSettings: (input) => request('PUT', '/admin/site-settings', { body: input }),
-    changeAppUpdate:(id,input)=>request('POST','/admin/app-updates/'+encodeURIComponent(id)+'/control',{body:input}),
+    changeAppUpdate: (id, input) =>
+      request('POST', '/admin/app-updates/' + encodeURIComponent(id) + '/control', { body: input }),
     appUpdates: () => request('GET', '/admin/app-updates'),
     serverLogs: () => request('GET', '/admin/server-logs'),
     dashboard: (periodDays) => request('GET', '/admin/dashboard', { query: { periodDays } }),
@@ -227,6 +228,8 @@ export const httpClient: ApiClient = {
         request('POST', '/admin/applications/decisions', { body: { ids, decision, reason } }),
     },
     members: {
+      activityOptions: (id) => request('GET', `/admin/members/${enc(id)}/activity-options`),
+      act: (id, command) => request('POST', `/admin/members/${enc(id)}/actions`, { body: command }),
       list: (query) => request('GET', '/admin/members', { query: { ...query } }),
       get: (id) => request('GET', `/admin/members/${enc(id)}`),
       update: (id, patch) => request('PATCH', `/admin/members/${enc(id)}`, { body: patch }),
