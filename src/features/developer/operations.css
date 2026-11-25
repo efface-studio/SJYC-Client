@@ -379,3 +379,141 @@
     grid-template-columns: minmax(75px, 26%) minmax(0, 1fr);
   }
 }
+
+.dev-center {
+  display: grid;
+  grid-template-columns: minmax(155px, 205px) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: start;
+}
+.dev-center-nav {
+  display: grid;
+  gap: 4px;
+}
+.dev-center-nav a,
+.dev-center-back,
+.dev-center-pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dev-center-nav a {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.dev-center-nav a:hover,
+.dev-center-group a:hover {
+  background: #f3f4f6;
+}
+.dev-center-nav a[aria-current] {
+  color: #513781;
+  background: #f1edf7;
+}
+.dev-center-nav .dev-center-device {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.dev-center-content {
+  max-width: 850px;
+  min-width: 0;
+}
+.dev-center-content h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 750;
+  margin-bottom: 20px;
+}
+.dev-center-back {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.dev-center-group {
+  margin-bottom: 28px;
+}
+.dev-center-group h3,
+.dev-center-form legend {
+  font-size: 14px;
+  font-weight: 650;
+  color: #575666;
+  margin-bottom: 8px;
+}
+.dev-center-group li {
+  border-top: 1px solid #e6e5e9;
+}
+.dev-center-group li > * {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 4px;
+  overflow-wrap: anywhere;
+}
+.dev-center-group li > * > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.dev-center-group strong,
+.dev-center-group small {
+  display: block;
+}
+.dev-center-group small,
+.dev-center-value {
+  color: #575666;
+  font-size: 13px;
+}
+.dev-center-value {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.dev-center-field,
+.dev-center-form {
+  display: grid;
+  gap: 8px;
+}
+.dev-center-form {
+  gap: 20px;
+  margin-block: 18px;
+}
+.dev-center-form button[type='submit'] {
+  justify-self: start;
+}
+.dev-center-field input,
+.dev-center-field select,
+.dev-center-search input {
+  border: 1px solid #aaa9b4;
+  border-radius: 6px;
+  padding: 9px 12px;
+  background: white;
+}
+.dev-center-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px 8px 0;
+}
+.dev-center-search,
+.dev-center-pager {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.dev-center-search input {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .dev-center {
+    display: block;
+  }
+  .dev-center-nav {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  .dev-center-nav a {
+    flex: none;
+    padding: 9px 10px;
+  }
+  .dev-center-nav .dev-center-device {
+    margin-top: 0;
+  }
+}

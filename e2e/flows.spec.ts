@@ -299,6 +299,11 @@ test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => 
   await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
   await adminLoginAs(page, '개발자', '/admin/developer');
   await expect(page.getByRole('heading', { level: 1, name: '개발자 도구' })).toBeVisible();
+  const areas = page.getByRole('navigation', { name: '개발자 도구 영역' });
+  for (const name of ['권한 관리', '로그', '세션·보안', '운영', '시스템']) {
+    await expect(areas.getByRole('link', { name, exact: true })).toBeVisible();
+  }
+  await areas.getByRole('link', { name: '이 브라우저 진단' }).click();
   await page.getByRole('tab', { name: 'API 요청' }).click();
   await expect(page).toHaveURL(/tab=requests/);
   await expect(page.getByRole('cell', { name: 'auth.me' }).first()).toBeVisible();
