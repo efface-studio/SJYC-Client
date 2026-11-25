@@ -223,7 +223,7 @@ export interface ApiClient {
   site: { settings(): Promise<SettingsRecord> };
   admin: {
     updateSettings(input: SettingsRecord): Promise<SettingsRecord>;
-    changeAppUpdate(id:string,input:import('@/domain/app-update').UpdateControl):Promise<{ok:boolean}>;
+    changeAppUpdate(id: string, input: UpdateControl): Promise<{ ok: boolean }>;
     appUpdates(): Promise<AppUpdate[]>;
     serverLogs(): Promise<ServerLogSnapshot>;
     dashboard(periodDays: number): Promise<DashboardSummary>;
@@ -248,7 +248,7 @@ export interface ApiClient {
     };
     members: {
       activityOptions(id: string): Promise<MemberActivityOptions>;
-      act(id: string, command: MemberCommand): Promise<{resetUrl?: string}>;
+      act(id: string, command: MemberCommand): Promise<{ resetUrl?: string }>;
       list(query: AdminListQuery): Promise<Page<User>>;
       get(id: string): Promise<User>;
       update(id: string, patch: { roles?: Role[]; status?: UserStatus }): Promise<User>;
