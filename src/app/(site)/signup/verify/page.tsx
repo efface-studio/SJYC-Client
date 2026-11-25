@@ -5,7 +5,7 @@ import { MailCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { api, errorMessage } from '@/api';
-import { mockDev } from '@/api/mock/client';
+import { PreviewCode } from '@/features/auth/preview-code';
 import { Button, buttonClass } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { IS_MOCK } from '@/config/env';
@@ -22,7 +22,11 @@ export default function VerifyEmailPage() {
     () => null,
   );
   const [cooldown, setCooldown] = useState(0);
-  const [devVerified, setDevVerified] = useState(false);
+  const mode = useSyncExternalStore(
+    noop,
+    () => sessionStorage.getItem(PENDING_VERIFY_KEY + '.mode'),
+    () => null,
+  );
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -39,6 +43,7 @@ export default function VerifyEmailPage() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
+  if (email && (mode === 'preview' || IS_MOCK)) return <PreviewCode email={email} />;
   return (
     <div className="container-page py-10 md:py-16">
       <title>이메일 인증 | 중구청소년센터</title>
@@ -71,23 +76,6 @@ export default function VerifyEmailPage() {
             로그인 화면으로
           </Link>
         </div>
-
-        {IS_MOCK && email && (
-          <div className="mt-8 rounded-md border border-dashed border-warning-800/40 bg-warning-50 p-3 text-left text-sm text-warning-800">
-            <p className="font-bold">개발용 · 실제 메일은 발송되지 않습니다</p>
-            {devVerified ? (
-              <p className="mt-1">인증 완료로 처리했습니다. 로그인할 수 있습니다.</p>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setDevVerified(mockDev.verifyEmail(email))}
-                className="mt-2 min-h-11 font-semibold underline"
-              >
-                인증 링크를 누른 것으로 처리하기
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

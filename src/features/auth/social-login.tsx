@@ -56,7 +56,9 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
               </span>
               <span className="oauth-label">{STYLE[provider].text}</span>
               {!enabled && (
-                <span className="oauth-status">{provider === 'google' ? '준비 중' : '설정 필요'}</span>
+                <span className="oauth-status">
+                  {provider === 'google' || provider === 'apple' ? '준비 중' : '설정 필요'}
+                </span>
               )}
             </button>
           </li>

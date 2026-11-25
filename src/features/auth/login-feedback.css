@@ -10,16 +10,10 @@
   background: var(--color-brand-700);
   color: white;
   font-weight: 650;
-  transition:
-    border-radius 250ms ease,
-    background-color 180ms ease;
+  transition: background-color 180ms ease;
 }
 .login-submit:enabled:hover {
   background: var(--color-brand-800);
-}
-.login-submit[data-phase='loading'],
-.login-submit[data-phase='success'] {
-  border-radius: 28px;
 }
 .login-submit[data-phase='error'] {
   background: var(--color-danger-700);

@@ -1,3 +1,4 @@
+import type { SocialDraft, SocialDetails } from '@/domain/social-profile';
 import type { SettingsRecord, ServerLogSnapshot } from '../domain/site-settings';
 import type {
   AttendanceSessionInput,
@@ -98,11 +99,15 @@ export interface ApiClient {
   auth: {
     /** 세션이 없거나 만료면 null */
     me(): Promise<Session | null>;
+    socialDraft(): Promise<SocialDraft>;
+    requestSocialCode(email: string): Promise<void>;
+    saveSocialProfile(input: SocialDetails): Promise<{ signedIn: boolean }>;
     socialProviders(): Promise<OAuthProvider[]>;
     startWebLink(provider: OAuthProvider): Promise<{ url: string }>;
     login(input: LoginInput): Promise<Session>;
     logout(): Promise<void>;
-    signup(input: SignupInput): Promise<{ requiresEmailVerification: boolean }>;
+    signup(input: SignupInput): Promise<{ requiresEmailVerification: boolean; verificationMode?: 'preview' }>;
+    confirmPreviewCode(code: string): Promise<void>;
     resendVerification(email: string): Promise<void>;
     requestPasswordReset(email: string): Promise<void>;
     resetPassword(token: string, password: string): Promise<void>;

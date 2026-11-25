@@ -267,6 +267,15 @@ let lastResetToken: { token: string; userId: string } | null = null;
 
 export const mockClient: ApiClient = {
   auth: {
+    socialDraft: async () => {
+      throw new ApiError('VALIDATION', '소셜 로그인을 다시 시작해 주세요.');
+    },
+    requestSocialCode: async () => {
+      throw new ApiError('NOT_CONFIGURED', '소셜 로그인을 다시 시작해 주세요.');
+    },
+    saveSocialProfile: async () => {
+      throw new ApiError('NOT_CONFIGURED', '소셜 로그인을 다시 시작해 주세요.');
+    },
     socialProviders: async () => [],
     startWebLink: async () => {
       throw new ApiError('NOT_CONFIGURED', '소셜 로그인을 사용할 수 없습니다.');
@@ -291,6 +300,10 @@ export const mockClient: ApiClient = {
       }),
     signup: (input) =>
       respond((db) => {
+        const preview = () => {
+          db.pendingSignup = { email: input.email.toLowerCase(), expiresAt: Date.now() + 900000 };
+          return { requiresEmailVerification: true, verificationMode: 'preview' as const };
+        };
         const registered = db.users.find((x) => x.email.toLowerCase() === input.email.toLowerCase());
         if (registered) {
           if (
@@ -298,7 +311,7 @@ export const mockClient: ApiClient = {
             !registered.emailVerified &&
             registered.password === input.password
           )
-            return { requiresEmailVerification: true };
+            return preview();
           throw new ApiError('CONFLICT', '이미 가입된 이메일입니다.', {
             reason: 'EMAIL_TAKEN',
             fieldErrors: { email: '이미 가입된 이메일입니다.' },
@@ -328,7 +341,20 @@ export const mockClient: ApiClient = {
           createdAt: now,
           password: input.password,
         });
-        return { requiresEmailVerification: true };
+        return preview();
+      }),
+    confirmPreviewCode: (code) =>
+      respond((db) => {
+        const pending = db.pendingSignup;
+        if (!pending || pending.expiresAt <= Date.now())
+          throw new ApiError('VALIDATION', '가입을 다시 진행해 주세요.');
+        if (code !== '284600') throw new ApiError('VALIDATION', '인증 코드가 일치하지 않습니다.');
+        const user = db.users.find(
+          (u) => u.email.toLowerCase() === pending.email && !u.emailVerified && u.status === 'active',
+        );
+        if (!user) throw new ApiError('VALIDATION', '가입 정보를 확인해 주세요.');
+        user.emailVerified = true;
+        delete db.pendingSignup;
       }),
     resendVerification: () => respond(() => undefined),
     requestPasswordReset: (email) =>

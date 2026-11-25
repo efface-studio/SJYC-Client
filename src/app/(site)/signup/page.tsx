@@ -37,7 +37,8 @@ export default function SignupPage() {
 
   const signup = useMutation({
     mutationFn: api.auth.signup,
-    onSuccess: (_res, input) => {
+    onSuccess: (result, input) => {
+      sessionStorage.setItem(PENDING_VERIFY_KEY + '.mode', result.verificationMode ?? 'link');
       sessionStorage.setItem(PENDING_VERIFY_KEY, input.email);
       router.push('/signup/verify');
     },
@@ -133,7 +134,8 @@ export default function SignupPage() {
           />
 
           <TextField
-            label="휴대전화 (선택)"
+            label="휴대전화"
+            required
             name="phone"
             type="tel"
             inputMode="tel"

@@ -104,6 +104,7 @@ describe('폼 검증', () => {
         email: 'a@b.co',
         password: 'abcd1234',
         passwordConfirm: 'abcd12345',
+        phone: '010-1234-5678',
         birthYear: '2008',
       }),
     );

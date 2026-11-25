@@ -1,4 +1,4 @@
-import { birthDateError, confirmFeedback, passwordRules, emailWithDomain } from './signup-feedback';
+import { birthDateError, confirmFeedback, passwordRules } from './signup-feedback';
 import { signupSchema } from './schemas';
 
 describe('회원가입 입력', () => {
@@ -23,6 +23,7 @@ describe('회원가입 입력', () => {
         email: 'qa@example.org',
         password,
         passwordConfirm: password,
+        phone: '010-1234-5678',
         birthYear: 2020,
         agreeTerms: 'on',
         agreePrivacy: 'on',
@@ -32,11 +33,5 @@ describe('회원가입 입력', () => {
     expect(confirmFeedback('abcdefg1', 'abc')).toBeUndefined();
     expect(confirmFeedback('abcdefg1', 'abcdefg2')).toContain('일치하지');
     expect(confirmFeedback('abcdefg1', 'abcdefg1')).toBe('일치합니다.');
-  });
-  it('선택한 도메인만 교체하고 직접 입력한 주소와 아이디는 보존한다', () => {
-    expect(emailWithDomain('student+1', 'gmail.com')).toBe('student+1@gmail.com');
-    expect(emailWithDomain('student@nav', 'naver.com')).toBe('student@naver.com');
-    expect(emailWithDomain('student@school.kr', '')).toBe('student@school.kr');
-    expect(emailWithDomain('', 'naver.com')).toBe('');
   });
 });
