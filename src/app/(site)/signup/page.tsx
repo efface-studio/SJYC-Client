@@ -84,6 +84,14 @@ export default function SignupPage() {
         >
           <TextField label="이름" name="name" autoComplete="name" required error={errors.name} />
           <TextField
+            label="휴대전화 (선택)"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder="010-1234-5678"
+            error={errors.phone}
+          />
+          <TextField
             label="이메일"
             name="email"
             type="email"

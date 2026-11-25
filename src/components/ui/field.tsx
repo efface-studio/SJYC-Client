@@ -1,7 +1,8 @@
 'use client';
 
 import { AlertCircle, Eye, EyeOff, Minus, Plus } from 'lucide-react';
-import { useId, useState, type ComponentProps, type ReactNode } from 'react';
+import { useId, useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { editMobilePhone, formatMobilePhone } from '@/lib/phone';
 import { cn } from '@/lib/cn';
 import { Checkbox } from './choice';
 import { DatePicker, type DatePickerProps } from './date-picker';
@@ -79,6 +80,10 @@ type TextFieldProps = FieldMeta & ComponentProps<'input'>;
 
 export function TextField({ label, error, hint, className, required, ...props }: TextFieldProps) {
   const ids = useFieldIds(error, hint);
+  const lastPhone = useRef('');
+  const phone = props.type === 'tel';
+  const formatted = (value: typeof props.value) =>
+    phone && typeof value === 'string' ? formatMobilePhone(value) : value;
   return (
     <div className={className}>
       <Label htmlFor={ids.id} required={required}>
@@ -91,6 +96,29 @@ export function TextField({ label, error, hint, className, required, ...props }:
         aria-describedby={ids.describedBy}
         className={cn(control, 'h-12')}
         {...props}
+        value={formatted(props.value)}
+        defaultValue={formatted(props.defaultValue)}
+        onFocus={(event) => {
+          if (phone) lastPhone.current = event.currentTarget.value;
+          props.onFocus?.(event);
+        }}
+        onChange={(event) => {
+          const field = event.currentTarget;
+          if (phone) {
+            const next = field.value;
+            const remaining = next.slice(field.selectionStart ?? next.length).replace(/\D/g, '').length;
+            const value = editMobilePhone(lastPhone.current, next);
+            lastPhone.current = value;
+            if (value !== next) {
+              field.value = value;
+              let caret = value.length;
+              let count = remaining;
+              while (caret > 0 && count) if (/\d/.test(value[--caret]!)) count--;
+              field.setSelectionRange(caret, caret);
+            }
+          }
+          props.onChange?.(event);
+        }}
       />
       <FieldMessages {...ids} hint={hint} error={error} />
     </div>
