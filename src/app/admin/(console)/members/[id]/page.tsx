@@ -151,6 +151,9 @@ function MemberDetail() {
             <p className="mt-2 text-sm text-ink-600">연락처는 회원 관리 권한이 있는 관리자에게 표시됩니다.</p>
           </article>
           <div className="review-side">
+            {canManageUser(me, u) && u.status !== 'withdrawn' && (
+              <MemberCommands key={u.id} user={u} self={me?.id === u.id} />
+            )}
             {can(me, 'member.manage') &&
               (me?.id === u.id ? (
                 <Callout tone="info" className="mt-8 max-w-2xl">
@@ -163,10 +166,7 @@ function MemberDetail() {
               ) : u.status === 'withdrawn' ? (
                 <Callout tone="info">탈퇴한 회원입니다.</Callout>
               ) : (
-                <>
-                  <MemberCommands key={u.id} user={u} />
-                  <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
-                </>
+                <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
               ))}
           </div>
         </div>
