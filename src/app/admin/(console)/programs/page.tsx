@@ -24,7 +24,12 @@ function columns(categoryName: (id: string) => string): Column<Program>[] {
       header: '프로그램명',
       sort: 'title',
       primary: true,
-      cell: (p) => <RowLink href={`/admin/programs/${p.id}`}>{p.title}</RowLink>,
+      cell: (p) => (
+        <div className="list-subject">
+          <RowLink href={`/admin/programs/${p.id}`}>{p.title}</RowLink>
+          <small>{p.target}</small>
+        </div>
+      ),
     },
     {
       key: 'category',
@@ -42,7 +47,19 @@ function columns(categoryName: (id: string) => string): Column<Program>[] {
     {
       key: 'count',
       header: '신청/정원',
-      cell: (p) => `${p.appliedCount}/${p.capacity}`,
+      cell: (p) => (
+        <span className="capacity">
+          <span>
+            {p.appliedCount}/{p.capacity}
+          </span>
+          <meter
+            min={0}
+            max={Math.max(1, p.capacity)}
+            value={Math.min(p.appliedCount, p.capacity)}
+            aria-label="신청 인원 비율"
+          />
+        </span>
+      ),
       className: 'tabular-nums whitespace-nowrap',
     },
     {
@@ -127,6 +144,7 @@ function ProgramList() {
 export default function AdminProgramsPage() {
   return (
     <AdminPage
+      view="list"
       title="프로그램 관리"
       permission="program.write"
       actions={

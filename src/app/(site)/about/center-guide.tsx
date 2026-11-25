@@ -102,6 +102,11 @@ export function CenterGuide() {
             <Link className="guide-underlink" href="/spaces">
               공간 예약 <ArrowUpRight size={16} aria-hidden />
             </Link>
+            <div>
+              <Link className="guide-underlink" href="/about/cafe-lala">
+                카페 라라 이용 안내 <ArrowUpRight size={16} aria-hidden />
+              </Link>
+            </div>
           </div>
           <ol>
             {settingsRows(center.floors).map((f) => (

@@ -21,16 +21,19 @@
 
 ## 인증
 
-| 메서드 | 경로                                                        | 설명                                                                                                               |
-| ------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| GET    | `/auth/session`                                             | 현재 세션 `{ user, expiresAt }`, 없으면 401                                                                        |
-| POST   | `/auth/login`                                               | `{ email, password }` → 세션. 실패 메시지는 원인을 특정하지 않는다                                                 |
-| POST   | `/auth/logout`                                              | 세션 폐기                                                                                                          |
-| POST   | `/auth/signup`                                              | `{ name, email, password, birthYear, agreeTerms, agreePrivacy, agreeMarketing }` → `{ requiresEmailVerification }` |
-| POST   | `/auth/email-verification/resend`                           | `{ email }` (요청 제한)                                                                                            |
-| POST   | `/auth/password-reset`                                      | `{ email }` — 가입 여부와 무관하게 같은 응답                                                                       |
-| POST   | `/auth/password-reset/confirm`                              | `{ token, password }`                                                                                              |
-| GET    | `/auth/oauth/{kakao\|naver\|apple\|google}/start?redirect=` | 서버 주도 OAuth 시작 (architecture.md 참고)                                                                        |
+| 메서드 | 경로                                                        | 설명                                                                                                        |
+| ------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| GET    | `/auth/session`                                             | 현재 세션 `{ user, expiresAt }`, 없으면 401                                                                 |
+| POST   | `/auth/login`                                               | `{ email, password }` → 세션. 실패 메시지는 원인을 특정하지 않는다                                          |
+| POST   | `/auth/logout`                                              | 세션 폐기                                                                                                   |
+| POST   | `/auth/signup`                                              | 이름·이메일·비밀번호·생년월일·휴대전화·약관을 검증하고 휴대전화 인증을 시작한다. HttpOnly 쿠키를 발급한다.  |
+| GET    | `/auth/phone-verification`                                  | 현재 번호와 재발송 가능 시각, 코드 만료 시각을 조회한다.                                                    |
+| POST   | `/auth/phone-verification/resend`                           | 같은 번호는 30초 뒤 다시 요청한다. 새 번호를 전달하면 즉시 변경할 수 있다. 성공하면 이전 코드를 무효화한다. |
+| POST   | `/auth/phone-verification/confirm`                          | 여섯 자리 코드를 확인한 뒤 계정을 만든다. 소셜 가입은 세션도 발급한다.                                      |
+| POST   | `/auth/email-verification/resend`                           | `{ email }` (요청 제한)                                                                                     |
+| POST   | `/auth/password-reset`                                      | `{ email }` — 가입 여부와 무관하게 같은 응답                                                                |
+| POST   | `/auth/password-reset/confirm`                              | `{ token, password }`                                                                                       |
+| GET    | `/auth/oauth/{kakao\|naver\|apple\|google}/start?redirect=` | 서버 주도 OAuth 시작 (architecture.md 참고)                                                                 |
 
 ## 사용자
 

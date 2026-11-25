@@ -92,6 +92,12 @@ const enc = encodeURIComponent;
 
 export const httpClient: ApiClient = {
   auth: {
+    adminSocialLink: () => request('GET', '/auth/admin-social/link'),
+    linkAdminSocial: (input) => request('POST', '/auth/admin-social/link', { body: input }),
+    socialDraft: () => request('GET', '/auth/social/onboarding'),
+    saveSocialProfile: (input) => request('POST', '/auth/social/onboarding', { body: input }),
+    socialProviders: () => request('GET', '/auth/social/providers'),
+    startWebLink: (provider) => request('POST', '/me/social/' + provider + '/web-start'),
     async me() {
       try {
         return await request('GET', '/auth/session');
@@ -103,12 +109,17 @@ export const httpClient: ApiClient = {
     login: (input) => request('POST', '/auth/login', { body: input }),
     logout: () => request('POST', '/auth/logout'),
     signup: (input) => request('POST', '/auth/signup', { body: input }),
+    signupPhone: () => request('GET', '/auth/phone-verification'),
+    resendPhone: (phone) => request('POST', '/auth/phone-verification/resend', { body: { phone } }),
+    confirmPhone: (code) => request('POST', '/auth/phone-verification/confirm', { body: { code } }),
     resendVerification: (email) => request('POST', '/auth/email-verification/resend', { body: { email } }),
     requestPasswordReset: (email) => request('POST', '/auth/password-reset', { body: { email } }),
     resetPassword: (token, password) =>
       request('POST', '/auth/password-reset/confirm', { body: { token, password } }),
   },
   me: {
+    profilePhoto: () => request('GET', '/me/profile/photo'),
+    setProfilePhoto: (image) => request('PUT', '/me/profile/photo', { body: { image } }),
     updateProfile: (input) => request('PATCH', '/me/profile', { body: input }),
     withdraw: () => request('DELETE', '/me'),
     applications: () => request('GET', '/me/applications'),
@@ -123,6 +134,7 @@ export const httpClient: ApiClient = {
     notifications: () => request('GET', '/me/notifications'),
     markNotificationsRead: (ids) => request('POST', '/me/notifications/read', { body: { ids } }),
     attendance: () => request('GET', '/me/attendance'),
+    scanAttendance: (input) => request('POST', '/me/attendance/scan', { body: input }),
     checkIn: (input) => request('POST', '/me/attendance/check-in', { body: input }),
   },
   manage: {
@@ -150,7 +162,8 @@ export const httpClient: ApiClient = {
       request('POST', '/attendance/sessions', { body: { targetType: t.type, targetId: t.id, ...input } }),
     remove: (id) => request('DELETE', `/attendance/sessions/${enc(id)}`),
     mark: (id, marks) => request('PUT', `/attendance/sessions/${enc(id)}/records`, { body: { marks } }),
-    setCheckIn: (id, open) => request('POST', `/attendance/sessions/${enc(id)}/check-in`, { body: { open } }),
+    setCheckIn: (id, open, position) =>
+      request('POST', `/attendance/sessions/${enc(id)}/check-in`, { body: { open, position } }),
     stats: (t) => request('GET', '/attendance/stats', { query: { targetType: t.type, targetId: t.id } }),
   },
   media: {
@@ -191,6 +204,9 @@ export const httpClient: ApiClient = {
   site: { settings: () => request('GET', '/site/settings') },
   admin: {
     updateSettings: (input) => request('PUT', '/admin/site-settings', { body: input }),
+    changeAppUpdate: (id, input) =>
+      request('POST', '/admin/app-updates/' + encodeURIComponent(id) + '/control', { body: input }),
+    appUpdates: () => request('GET', '/admin/app-updates'),
     serverLogs: () => request('GET', '/admin/server-logs'),
     dashboard: (periodDays) => request('GET', '/admin/dashboard', { query: { periodDays } }),
     notices: {
@@ -214,6 +230,8 @@ export const httpClient: ApiClient = {
         request('POST', '/admin/applications/decisions', { body: { ids, decision, reason } }),
     },
     members: {
+      activityOptions: (id) => request('GET', `/admin/members/${enc(id)}/activity-options`),
+      act: (id, command) => request('POST', `/admin/members/${enc(id)}/actions`, { body: command }),
       list: (query) => request('GET', '/admin/members', { query: { ...query } }),
       get: (id) => request('GET', `/admin/members/${enc(id)}`),
       update: (id, patch) => request('PATCH', `/admin/members/${enc(id)}`, { body: patch }),

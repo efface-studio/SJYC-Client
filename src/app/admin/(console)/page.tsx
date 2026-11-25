@@ -1,7 +1,16 @@
 'use client';
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, ClipboardList, FileText, RotateCw } from 'lucide-react';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  CalendarCheck,
+  MessageCircle,
+  UsersRound,
+  CalendarDays,
+  ChevronRight,
+  ClipboardList,
+  FileText,
+  RotateCw,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -23,28 +32,28 @@ const QUEUES = [
     label: '프로그램 신청',
     href: '/admin/applications?status=submitted',
     permission: 'application.decide',
-    color: '#346dda',
+    icon: ClipboardList,
   },
   {
     key: 'clubApplicationsPending',
     label: '동아리 가입',
     href: '/admin/clubs/applications?status=pending',
     permission: 'club.manage',
-    color: '#56a9cd',
+    icon: UsersRound,
   },
   {
     key: 'reservationsPending',
     label: '공간 예약',
     href: '/admin/spaces?status=pending',
     permission: 'space.manage',
-    color: '#7a76b6',
+    icon: CalendarCheck,
   },
   {
     key: 'inquiriesOpen',
     label: '문의 답변',
     href: '/admin/inquiries?status=open',
     permission: 'inquiry.answer',
-    color: '#e3a156',
+    icon: MessageCircle,
   },
 ] as const;
 
@@ -60,61 +69,110 @@ function DrillDown({ href, allowed, children }: { href: string; allowed: boolean
 }
 
 function WorkQueue({ data, user }: { data: DashboardSummary; user: User | undefined }) {
-  const total = QUEUES.reduce((sum, q) => sum + data[q.key], 0);
-  let offset = 0;
+  const available = QUEUES.filter((queue) => can(user, queue.permission));
+  const [choice, setChoice] = useState<(typeof QUEUES)[number]['key']>();
+  const active = available.find((queue) => queue.key === choice) ?? available[0];
+  const query = useQuery({
+    queryKey: ['admin', 'inbox', user?.id, active?.key],
+    enabled: !!active,
+    queryFn: async () => {
+      const paging = { page: 1, pageSize: 5 };
+      switch (active?.key) {
+        case 'applicationsSubmitted':
+          return (await api.admin.applications.list({ ...paging, status: 'submitted' })).items.map((a) => ({
+            id: a.id,
+            title: a.programTitle,
+            note: a.applicantName,
+            at: a.createdAt,
+            href: '/admin/applications/' + a.id,
+          }));
+        case 'clubApplicationsPending':
+          return (await api.admin.clubs.applications({ ...paging, status: 'pending' })).items.map((a) => ({
+            id: a.id,
+            title: a.clubName,
+            note: a.applicantName,
+            at: a.createdAt,
+            href: '/admin/clubs/applications?status=pending&q=' + encodeURIComponent(a.applicantName),
+          }));
+        case 'reservationsPending':
+          return (await api.admin.spaces.reservations({ ...paging, status: 'pending' })).items.map((a) => ({
+            id: a.id,
+            title: a.spaceName,
+            note: a.applicantName + ' · ' + a.startTime + '–' + a.endTime,
+            at: a.createdAt,
+            href:
+              '/admin/spaces?status=pending&date=' +
+              encodeURIComponent(a.date) +
+              '&spaceId=' +
+              encodeURIComponent(a.spaceId),
+          }));
+        case 'inquiriesOpen':
+          return (await api.admin.inquiries.list({ ...paging, status: 'open' })).items.map((a) => ({
+            id: a.id,
+            title: a.title,
+            note: a.authorName,
+            at: a.createdAt,
+            href: '/admin/inquiries/' + a.id,
+          }));
+        default:
+          return [];
+      }
+    },
+  });
+  if (!active) return null;
+  const total = available.reduce((sum, q) => sum + data[q.key], 0);
   return (
-    <section className="dash-panel" aria-labelledby="queue-heading">
-      <h2 id="queue-heading">처리 대기 업무</h2>
-      <div className="queue-body">
-        <div className="queue-chart">
-          <svg aria-hidden="true" viewBox="0 0 112 112">
-            <circle cx="56" cy="56" r="48" fill="none" stroke="#e9edf2" strokeWidth="10" />
-            {total > 0 &&
-              QUEUES.map((q) => {
-                const share = (data[q.key] / total) * 100;
-                const start = offset;
-                offset += share;
-                if (share === 0) return null;
-                const gap = share === 100 ? 0 : Math.min(1.4, share / 4);
-                return (
-                  <circle
-                    key={q.key}
-                    cx="56"
-                    cy="56"
-                    r="48"
-                    pathLength="100"
-                    fill="none"
-                    stroke={q.color}
-                    strokeWidth="10"
-                    strokeDasharray={`${share - gap} ${100 - share + gap}`}
-                    strokeDashoffset={-start}
-                    transform="rotate(-90 56 56)"
-                  />
-                );
-              })}
-          </svg>
-          <div className="queue-total">
-            <span>전체 대기</span>
-            <strong>
-              {total.toLocaleString('ko-KR')}
-              <small>건</small>
-            </strong>
-          </div>
-        </div>
-        <ul className="queue-legend">
-          {QUEUES.map((q) => (
-            <li key={q.key}>
-              <DrillDown href={q.href} allowed={can(user, q.permission)}>
-                <span className="queue-dot" aria-hidden style={{ backgroundColor: q.color }} />
-                <span className="grow">{q.label}</span>
-                <b>
-                  {data[q.key].toLocaleString('ko-KR')}
-                  <small>건</small>
-                </b>
-              </DrillDown>
-            </li>
+    <section className="inbox" aria-labelledby="queue-heading">
+      <div className="inbox-summary">
+        <h2 id="queue-heading">처리 대기</h2>
+        <p className="inbox-total">
+          {total.toLocaleString('ko-KR')}
+          <small>건</small>
+        </p>
+        <div role="group" aria-label="대기 업무 선택" className="inbox-folders">
+          {available.map((q) => (
+            <button
+              type="button"
+              key={q.key}
+              aria-pressed={q.key === active.key}
+              onClick={() => setChoice(q.key)}
+            >
+              <q.icon aria-hidden size={17} />
+              <span>{q.label}</span>
+              <b>{data[q.key]}</b>
+            </button>
           ))}
-        </ul>
+        </div>
+      </div>
+      <div className="inbox-content">
+        <div className="inbox-head">
+          <h3>{active.label}</h3>
+          <Link href={active.href}>
+            전체 보기 <ChevronRight size={15} aria-hidden />
+          </Link>
+        </div>
+        <QueryState query={query} rows={3}>
+          {(rows) =>
+            rows.length ? (
+              <ul className="inbox-records">
+                {rows.map((row) => (
+                  <li key={row.id}>
+                    <Link href={row.href}>
+                      <div>
+                        <strong>{row.title}</strong>
+                        <span>{row.note}</span>
+                      </div>
+                      <time dateTime={row.at}>{formatDate(row.at)}</time>
+                      <ChevronRight size={16} aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="inbox-empty">처리를 기다리는 {active.label} 내역이 없습니다.</p>
+            )
+          }
+        </QueryState>
       </div>
     </section>
   );
@@ -134,6 +192,7 @@ function RecentHeading({ title, href, allowed }: { title: string; href: string; 
 }
 
 function Dashboard() {
+  const cache = useQueryClient();
   const [period, setPeriod] = useState<7 | 30>(7);
   const { data: session } = useSession();
   const summary = useQuery({
@@ -170,7 +229,9 @@ function Dashboard() {
   ] as const;
   return (
     <AdminPage
-      title="대시보드"
+      view="inbox"
+      title="업무 인박스"
+      docTitle="대시보드"
       permission="admin.access"
       actions={
         <div className="flex flex-wrap items-center gap-x-3">
@@ -184,7 +245,10 @@ function Dashboard() {
             variant="secondary"
             className="min-h-11"
             loading={summary.isFetching}
-            onClick={() => void summary.refetch()}
+            onClick={() => {
+              void summary.refetch();
+              void cache.invalidateQueries({ queryKey: ['admin', 'inbox'] });
+            }}
           >
             {!summary.isFetching && <RotateCw size={15} aria-hidden />}새로고침
           </Button>
@@ -195,7 +259,7 @@ function Dashboard() {
         {(d) => (
           <div className="dashboard-grid">
             <WorkQueue data={d} user={user} />
-            <section className="dash-panel" aria-labelledby="stats-heading">
+            <section className="dash-panel overview-stats" aria-labelledby="stats-heading">
               <div className="dash-section-heading">
                 <h2 id="stats-heading">운영 현황</h2>
                 <div role="group" aria-label="집계 기간" className="period-switch">

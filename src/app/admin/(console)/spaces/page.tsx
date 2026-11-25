@@ -209,7 +209,7 @@ function SpacesTabs() {
 
 export default function AdminSpacesPage() {
   return (
-    <AdminPage title="공간 예약" permission="space.manage" docTitle="공간 예약 관리">
+    <AdminPage view="list" title="공간 예약" permission="space.manage" docTitle="공간 예약 관리">
       <SpacesTabs />
     </AdminPage>
   );

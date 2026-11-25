@@ -4,7 +4,8 @@ import { useQueries } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '@/api';
-import { BookOpenText } from 'lucide-react';
+import Image from 'next/image';
+import { BookOpenText, Package } from 'lucide-react';
 import './policy-reader.css';
 import { ErrorState, ListSkeleton } from '@/components/ui/states';
 import { OSS_WEB } from '@/config/oss-licenses';
@@ -20,7 +21,12 @@ const LAST: SectionKey = POLICY_NAV[POLICY_NAV.length - 1]!.key;
 const DOC_KEYS = POLICY_NAV.map((p) => p.key).filter((k): k is PolicyKey => k in POLICY_TITLE);
 const sectionId = (key: string) => `policy-${key}`;
 /** 고정 헤더(+모바일 가로 목차) 아래로 이만큼 지나간 문서를 현재 문서로 본다 */
-const spyOffset = () => (window.matchMedia('(min-width: 48rem)').matches ? 110 : 150);
+function spyOffset() {
+  const section = document.getElementById(sectionId(FIRST));
+  const margin = section ? Number.parseFloat(getComputedStyle(section).scrollMarginTop) : 0;
+  const padding = Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop);
+  return (margin || 0) + (padding || 0) + 1;
+}
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function SectionHeading({ id, title, sub }: { id: string; title: string; sub?: string }) {
@@ -44,6 +50,35 @@ function PolicySection({ doc }: { doc: PolicyDoc }) {
       />
       <div className="policy-prose">{doc.confirmed ? doc.body : '게시된 문서가 없습니다.'}</div>
     </>
+  );
+}
+
+const marks: Record<string, string> = {
+  '@tanstack/react-query': 'tanstack.svg',
+  'lucide-react': 'lucide.svg',
+  next: 'nextdotjs.svg',
+  react: 'react.svg',
+  'react-dom': 'react.svg',
+  'simple-icons': 'simpleicons.svg',
+  zod: 'zod.svg',
+  'tailwind-merge': 'tailwind-merge.png',
+  pretendard: 'pretendard.png',
+};
+
+function PackageMark({ name }: { name: string }) {
+  const mark = marks[name];
+  return mark ? (
+    <Image
+      aria-hidden
+      alt=""
+      src={'/oss/' + mark}
+      width={24}
+      height={24}
+      unoptimized
+      className="size-6 shrink-0 object-contain"
+    />
+  ) : (
+    <Package aria-hidden size={22} className="shrink-0 text-ink-600" />
   );
 }
 
@@ -75,19 +110,22 @@ function OpenSourceLicenses() {
           {OSS_WEB.map((p) => (
             <tr key={p.name} className="border-b border-line">
               <td className="py-2.5 pr-3">
-                {p.url ? (
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold hover:underline"
-                  >
-                    {p.name}
-                    <span className="sr-only">(새 창)</span>
-                  </a>
-                ) : (
-                  <span className="font-semibold">{p.name}</span>
-                )}
+                <div className="flex items-center gap-2">
+                  <PackageMark name={p.name} />
+                  {p.url ? (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold hover:underline"
+                    >
+                      {p.name}
+                      <span className="sr-only">(새 창)</span>
+                    </a>
+                  ) : (
+                    <span className="font-semibold">{p.name}</span>
+                  )}
+                </div>
               </td>
               <td className="py-2.5 pr-3 text-ink-600 tabular-nums">{p.version}</td>
               <td className="py-2.5">{p.license}</td>
@@ -202,10 +240,10 @@ export default function PolicyPage() {
     ready.current = true;
 
     let frame = 0;
+    let offset = spyOffset();
     const spy = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const offset = spyOffset();
         let current = FIRST;
         for (const p of POLICY_NAV) {
           const el = document.getElementById(sectionId(p.key));
@@ -215,10 +253,16 @@ export default function PolicyPage() {
         setActive(atBottom ? LAST : current);
       });
     };
+    const resize = () => {
+      offset = spyOffset();
+      spy();
+    };
     spy();
+    window.addEventListener('resize', resize);
     window.addEventListener('scroll', spy, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', spy);
     };
   }, [loaded, initial]);

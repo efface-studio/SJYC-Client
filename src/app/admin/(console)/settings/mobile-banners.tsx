@@ -13,7 +13,7 @@ export function MobileBannersEditor({
   config: BannerConfig;
   onChange: (next: BannerConfig) => void;
 }) {
-  const items = (next: MobileBanner[]) => apply({ ...config, items: next });
+  const items = (next: MobileBanner[]) => apply({ ...config, seconds: 0, items: next });
   const patch = (id: string, changes: Partial<MobileBanner>) =>
     items(config.items.map((b) => (b.id === id ? { ...b, ...changes } : b)));
   return (
@@ -22,23 +22,9 @@ export function MobileBannersEditor({
         <input
           type="checkbox"
           checked={config.automatic}
-          onChange={(e) => apply({ ...config, automatic: e.target.checked })}
+          onChange={(e) => apply({ ...config, seconds: 0, automatic: e.target.checked })}
         />{' '}
         모집 중인 프로그램·동아리도 자동으로 표시
-      </label>
-      <label>
-        자동 전환{' '}
-        <select
-          value={config.seconds}
-          onChange={(e) => apply({ ...config, seconds: Number(e.target.value) })}
-        >
-          <option value={0}>수동으로만 넘기기</option>
-          {Array.from({ length: 18 }, (_, i) => i + 3).map((n) => (
-            <option key={n} value={n}>
-              {n}초
-            </option>
-          ))}
-        </select>
       </label>
       {config.items.map((b, i) => (
         <fieldset key={b.id}>

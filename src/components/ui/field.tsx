@@ -1,7 +1,8 @@
 'use client';
 
 import { AlertCircle, Eye, EyeOff, Minus, Plus } from 'lucide-react';
-import { useId, useState, type ComponentProps, type ReactNode } from 'react';
+import { useId, useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { editMobilePhone, formatMobilePhone } from '@/lib/phone';
 import { cn } from '@/lib/cn';
 import { Checkbox } from './choice';
 import { DatePicker, type DatePickerProps } from './date-picker';
@@ -77,21 +78,76 @@ export function FieldMessages({
 
 type TextFieldProps = FieldMeta & ComponentProps<'input'>;
 
-export function TextField({ label, error, hint, className, required, ...props }: TextFieldProps) {
+export function TextField({
+  label,
+  error,
+  hint,
+  className,
+  required,
+  trailing,
+  ...props
+}: TextFieldProps & { trailing?: ReactNode }) {
   const ids = useFieldIds(error, hint);
+  const lastPhone = useRef('');
+  const phone = props.type === 'tel';
+  const formatted = (value: typeof props.value) =>
+    phone && typeof value === 'string' ? formatMobilePhone(value) : value;
+  const input = (
+    <input
+      id={ids.id}
+      required={required}
+      aria-invalid={!!error || undefined}
+      aria-describedby={ids.describedBy}
+      className={cn(
+        control,
+        'h-12',
+        trailing && 'min-w-0 flex-1 border-0 bg-transparent focus-visible:outline-none',
+      )}
+      {...props}
+      value={formatted(props.value)}
+      defaultValue={formatted(props.defaultValue)}
+      onFocus={(event) => {
+        if (phone) lastPhone.current = event.currentTarget.value;
+        props.onFocus?.(event);
+      }}
+      onChange={(event) => {
+        const field = event.currentTarget;
+        if (phone) {
+          const next = field.value;
+          const remaining = next.slice(field.selectionStart ?? next.length).replace(/\D/g, '').length;
+          const value = editMobilePhone(lastPhone.current, next);
+          lastPhone.current = value;
+          if (value !== next) {
+            field.value = value;
+            let caret = value.length;
+            let count = remaining;
+            while (caret > 0 && count) if (/\d/.test(value[--caret]!)) count--;
+            field.setSelectionRange(caret, caret);
+          }
+        }
+        props.onChange?.(event);
+      }}
+    />
+  );
   return (
     <div className={className}>
       <Label htmlFor={ids.id} required={required}>
         {label}
       </Label>
-      <input
-        id={ids.id}
-        required={required}
-        aria-invalid={!!error || undefined}
-        aria-describedby={ids.describedBy}
-        className={cn(control, 'h-12')}
-        {...props}
-      />
+      {trailing ? (
+        <div
+          className={cn(
+            control,
+            'flex items-center gap-1 p-0 pr-2 focus-within:border-brand-700 focus-within:outline-2 focus-within:outline-brand-700/40',
+            error && 'border-danger-700',
+          )}
+        >
+          {input}
+          {trailing}
+        </div>
+      ) : (
+        input
+      )}
       <FieldMessages {...ids} hint={hint} error={error} />
     </div>
   );
@@ -111,9 +167,11 @@ export function PasswordField({ label, error, hint, className, required, ...prop
           type={visible ? 'text' : 'password'}
           required={required}
           aria-invalid={!!error || undefined}
-          aria-describedby={ids.describedBy}
           className={cn(control, 'h-12 pr-12')}
           {...props}
+          aria-describedby={
+            [ids.describedBy, props['aria-describedby']].filter(Boolean).join(' ') || undefined
+          }
         />
         <button
           type="button"

@@ -12,7 +12,8 @@ import { Callout, ListSkeleton } from '@/components/ui/states';
 import { OAUTH_ERROR_MESSAGE } from '@/config/oauth';
 import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
-import { PENDING_VERIFY_KEY, SESSION_KEY, useSession } from '@/features/auth/session';
+import { SESSION_KEY, useSession } from '@/features/auth/session';
+import { useToast } from '@/components/ui/toast';
 import { SocialLoginButtons } from '@/features/auth/social-login';
 import { memberRedirect } from '@/lib/safe-redirect';
 
@@ -30,6 +31,12 @@ function LoginForm() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  const toast = useToast();
+  const sendEmail = useMutation({
+    mutationFn: api.auth.resendVerification,
+    onSuccess: () => toast.success('받은 메일에서 인증 링크를 눌러 주세요.'),
+    onError: (e) => toast.error(errorMessage(e)),
+  });
   const login = useMutation({
     mutationFn: api.auth.login,
     onSuccess: (s) => {
@@ -66,6 +73,7 @@ function LoginForm() {
       )}
 
       <form
+        method="post"
         noValidate
         onChange={feedback.edit}
         onSubmit={(e) => {
@@ -106,13 +114,14 @@ function LoginForm() {
         />
         <FormError message={formError} />
         {unverifiedEmail && (
-          <Link
-            href="/signup/verify"
-            onClick={() => sessionStorage.setItem(PENDING_VERIFY_KEY, unverifiedEmail)}
+          <button
+            type="button"
+            disabled={sendEmail.isPending}
+            onClick={() => sendEmail.mutate(unverifiedEmail)}
             className="block text-[15px] font-semibold text-brand-700 underline"
           >
             인증 메일 다시 받기
-          </Link>
+          </button>
         )}
         <LoginSubmit phase={feedback.phase} attempt={feedback.attempt} title="로그인" />
       </form>

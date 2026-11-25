@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import './social-login.css';
+import { useSocialProviders } from './use-social-providers';
 import Image from 'next/image';
 import { siNaver, siApple } from 'simple-icons';
 import { oauthStartUrl, providerStates } from '@/config/oauth';
-import { OAUTH_PROVIDER_LABEL } from '@/domain/labels';
 import type { OAuthProvider } from '@/domain/types';
 import { cn } from '@/lib/cn';
 
@@ -33,9 +33,8 @@ const STYLE: Record<OAuthProvider, { className: string; text: string }> = {
   google: { className: 'border border-[#747775] bg-white text-[#1F1F1F]', text: 'Google 계정으로 로그인' },
 };
 
-export function SocialLoginButtons({ next }: { next: string | null }) {
-  const providers = providerStates();
-  const [notice, setNotice] = useState<string | null>(null);
+export function SocialLoginButtons({ next, admin = false }: { next: string | null; admin?: boolean }) {
+  const providers = providerStates(useSocialProviders());
   const anyEnabled = providers.some((p) => p.enabled);
 
   return (
@@ -45,33 +44,29 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
           <li key={provider}>
             <button
               type="button"
-              aria-disabled={!enabled || undefined}
-              onClick={() => {
-                if (!enabled) {
-                  setNotice(
-                    `${OAUTH_PROVIDER_LABEL[provider]} 로그인은 설정이 필요합니다. 관리자에게 문의해 주세요.`,
-                  );
-                  return;
-                }
-                window.location.assign(oauthStartUrl(provider, next));
-              }}
+              disabled={!enabled}
+              onClick={() => window.location.assign(oauthStartUrl(provider, next, admin))}
               className={cn(
                 'min-h-12 w-full rounded-md text-[15px] font-semibold',
                 STYLE[provider].className,
-                'oauth-button',
+                'oauth-button disabled:cursor-not-allowed disabled:opacity-55',
               )}
             >
               <span className="oauth-mark">
                 <ProviderMark provider={provider} />
               </span>
               <span className="oauth-label">{STYLE[provider].text}</span>
-              {!enabled && <span className="oauth-status">설정 필요</span>}
+              {!enabled && (
+                <span className="oauth-status">
+                  {provider === 'google' || provider === 'apple' ? '준비 중' : '설정 필요'}
+                </span>
+              )}
             </button>
           </li>
         ))}
       </ul>
       <p role="status" aria-live="polite" className="login-social-note">
-        {notice ?? (!anyEnabled ? '현재 이메일 로그인을 이용할 수 있어요.' : '')}
+        {!anyEnabled ? '현재 이메일 로그인을 이용할 수 있어요.' : ''}
       </p>
     </div>
   );

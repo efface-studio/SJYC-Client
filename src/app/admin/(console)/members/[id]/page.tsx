@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { api, errorMessage } from '@/api';
+import { MemberCommands } from '@/components/admin/member-commands';
 import { AdminPage } from '@/components/admin/admin-page';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
@@ -127,42 +128,48 @@ function MemberDetail() {
   return (
     <QueryState query={member} notFound="회원을 찾을 수 없습니다">
       {(u) => (
-        <>
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-lg font-bold">{u.name}</h2>
-            <Badge tone={USER_STATUS[u.status].tone}>{USER_STATUS[u.status].text}</Badge>
+        <div className="review-layout">
+          <article className="review-record">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-lg font-bold">{u.name}</h2>
+              <Badge tone={USER_STATUS[u.status].tone}>{USER_STATUS[u.status].text}</Badge>
+            </div>
+            <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
+              <dt className="text-ink-600">이메일</dt>
+              <dd className="break-all">
+                {u.email} {!u.emailVerified && <span className="text-sm text-warning-800">(미인증)</span>}
+              </dd>
+              <dt className="text-ink-600">역할</dt>
+              <dd>{u.roles.map((r) => ROLE_LABEL[r]).join(', ')}</dd>
+              <dt className="text-ink-600">소셜 연결</dt>
+              <dd>
+                {u.providers.length ? u.providers.map((p) => OAUTH_PROVIDER_LABEL[p]).join(', ') : '없음'}
+              </dd>
+              <dt className="text-ink-600">가입일</dt>
+              <dd className="tabular-nums">{formatDate(u.createdAt)}</dd>
+            </dl>
+            <p className="mt-2 text-sm text-ink-600">연락처는 회원 관리 권한이 있는 관리자에게 표시됩니다.</p>
+          </article>
+          <div className="review-side">
+            {can(me, 'member.manage') &&
+              (me?.id === u.id ? (
+                <Callout tone="info" className="mt-8 max-w-2xl">
+                  자기 자신의 역할·상태는 변경할 수 없습니다. 다른 최고 관리자에게 요청해 주세요.
+                </Callout>
+              ) : !canManageUser(me, u) ? (
+                <Callout tone="info" className="mt-8 max-w-2xl">
+                  개발자 계정의 역할·상태는 개발자만 변경할 수 있습니다.
+                </Callout>
+              ) : u.status === 'withdrawn' ? (
+                <Callout tone="info">탈퇴한 회원입니다.</Callout>
+              ) : (
+                <>
+                  <MemberCommands key={u.id} user={u} />
+                  <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
+                </>
+              ))}
           </div>
-          <dl className="console-surface mt-4 grid max-w-2xl grid-cols-[96px_1fr] gap-y-2 px-4 py-4 text-[15px]">
-            <dt className="text-ink-600">이메일</dt>
-            <dd className="break-all">
-              {u.email} {!u.emailVerified && <span className="text-sm text-warning-800">(미인증)</span>}
-            </dd>
-            <dt className="text-ink-600">역할</dt>
-            <dd>{u.roles.map((r) => ROLE_LABEL[r]).join(', ')}</dd>
-            <dt className="text-ink-600">소셜 연결</dt>
-            <dd>
-              {u.providers.length ? u.providers.map((p) => OAUTH_PROVIDER_LABEL[p]).join(', ') : '없음'}
-            </dd>
-            <dt className="text-ink-600">가입일</dt>
-            <dd className="tabular-nums">{formatDate(u.createdAt)}</dd>
-          </dl>
-          <p className="mt-2 text-sm text-ink-600">
-            연락처 등 그 밖의 개인정보는 업무상 필요한 화면(신청 상세 등)에서만 확인할 수 있습니다.
-          </p>
-
-          {can(me, 'member.manage') &&
-            (me?.id === u.id ? (
-              <Callout tone="info" className="mt-8 max-w-2xl">
-                자기 자신의 역할·상태는 변경할 수 없습니다. 다른 최고 관리자에게 요청해 주세요.
-              </Callout>
-            ) : !canManageUser(me, u) ? (
-              <Callout tone="info" className="mt-8 max-w-2xl">
-                개발자 계정의 역할·상태는 개발자만 변경할 수 있습니다.
-              </Callout>
-            ) : (
-              <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
-            ))}
-        </>
+        </div>
       )}
     </QueryState>
   );
@@ -171,6 +178,7 @@ function MemberDetail() {
 export default function AdminMemberDetailPage() {
   return (
     <AdminPage
+      view="record"
       title="회원 상세"
       permission="member.read"
       breadcrumbs={[{ label: '회원', href: '/admin/members' }, { label: '상세' }]}

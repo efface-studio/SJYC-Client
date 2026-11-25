@@ -1,5 +1,7 @@
 'use client';
 
+import { ProfilePhoto } from '@/features/profile/profile-photo';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -8,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckboxField, FormError, TextField } from '@/components/ui/field';
 import { useToast } from '@/components/ui/toast';
+import { useSocialProviders } from '@/features/auth/use-social-providers';
 import { OAUTH_PROVIDERS, providerStates } from '@/config/oauth';
 import { OAUTH_PROVIDER_LABEL } from '@/domain/labels';
 import { parseForm, profileSchema, type FieldErrors } from '@/domain/schemas';
@@ -26,8 +29,19 @@ export default function ProfilePage() {
   const qc = useQueryClient();
   const toast = useToast();
   const [errors, setErrors] = useState<FieldErrors>({});
+  const available = useSocialProviders();
+  const verifyEmail = useMutation({
+    mutationFn: api.auth.resendVerification,
+    onSuccess: () => toast.success('받은 메일에서 인증 링크를 눌러 주세요.'),
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const connect = useMutation({
+    mutationFn: api.auth.startWebLink,
+    onSuccess: ({ url }) => window.location.assign(url),
+    onError: (e) => toast.error(errorMessage(e)),
+  });
   const enabledProviders = new Set(
-    providerStates()
+    providerStates(available)
       .filter((p) => p.enabled)
       .map((p) => p.provider),
   );
@@ -50,6 +64,9 @@ export default function ProfilePage() {
   return (
     <>
       <title>내 정보 | 중구청소년센터</title>
+      <div className="mb-5">
+        <ProfilePhoto userId={user.id} editable />
+      </div>
       <form
         noValidate
         onSubmit={(e) => {
@@ -69,7 +86,18 @@ export default function ProfilePage() {
           <p className="mb-1.5 text-[15px] font-semibold">이메일</p>
           <p className="flex min-h-12 items-center gap-2 rounded-md bg-surface-muted px-3 text-base break-all">
             {user.email}
-            {user.emailVerified && <Badge tone="success">인증됨</Badge>}
+            {user.emailVerified ? (
+              <Badge tone="success">인증됨</Badge>
+            ) : (
+              <button
+                type="button"
+                className="font-semibold text-brand-700"
+                disabled={verifyEmail.isPending}
+                onClick={() => verifyEmail.mutate(user.email)}
+              >
+                인증 메일 받기
+              </button>
+            )}
           </p>
         </div>
         <TextField
@@ -81,7 +109,8 @@ export default function ProfilePage() {
           error={errors.name}
         />
         <TextField
-          label="휴대전화 (선택)"
+          label="휴대전화"
+          required
           name="phone"
           type="tel"
           inputMode="tel"
@@ -133,16 +162,21 @@ export default function ProfilePage() {
               {user.providers.includes(p) ? (
                 <Badge tone="success">연결됨</Badge>
               ) : enabledProviders.has(p) ? (
-                <Badge tone="neutral">연결 안 됨</Badge>
+                <button
+                  type="button"
+                  disabled={connect.isPending}
+                  onClick={() => connect.mutate(p)}
+                  className="min-h-11 font-semibold underline"
+                >
+                  연결하기
+                </button>
               ) : (
-                <Badge tone="warning">설정 필요</Badge>
+                <Badge tone="neutral">{p === 'google' ? '준비 중' : '설정 필요'}</Badge>
               )}
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-sm text-ink-600">
-          소셜 계정 연결·해제는 서버 OAuth 설정이 끝난 뒤 제공됩니다.
-        </p>
+        <p className="mt-2 text-sm text-ink-600">연결한 소셜 계정으로 다음부터 로그인할 수 있습니다.</p>
       </section>
 
       <div className="mt-10 border-t border-line pt-6">

@@ -11,7 +11,7 @@ interface ModalProps {
   title: ReactNode;
   children: ReactNode;
   /** dialog: 화면 중앙 / drawer: 좌측에서 열리는 메뉴 */
-  variant?: 'dialog' | 'drawer';
+  variant?: 'dialog' | 'drawer' | 'command';
   className?: string;
   bodyClassName?: string;
 }
@@ -62,19 +62,25 @@ export function Modal({
     >
       {open && (
         <div className={cn('flex max-h-[inherit] flex-col', variant === 'drawer' && 'h-full')}>
-          <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
-            <h2 id={titleId} className="text-lg font-bold">
+          {variant === 'command' ? (
+            <h2 id={titleId} className="sr-only">
               {title}
             </h2>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="닫기"
-              className="-mr-2 flex size-11 items-center justify-center rounded-md text-ink-600 hover:bg-surface-muted"
-            >
-              <X aria-hidden className="size-5" />
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
+              <h2 id={titleId} className="text-lg font-bold">
+                {title}
+              </h2>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="닫기"
+                className="-mr-2 flex size-11 items-center justify-center rounded-md text-ink-600 hover:bg-surface-muted"
+              >
+                <X aria-hidden className="size-5" />
+              </button>
+            </div>
+          )}
           <div className={cn('overflow-y-auto overscroll-contain px-4 py-4', bodyClassName)}>{children}</div>
         </div>
       )}

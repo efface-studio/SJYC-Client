@@ -1,6 +1,7 @@
 'use client';
 
 import '@/components/admin/admin-console.css';
+import '@/components/admin/workspace.css';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -19,19 +20,12 @@ import { canEnterConsole } from '@/domain/permissions';
 import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { SESSION_KEY, useLogout, useSession } from '@/features/auth/session';
-import { safeRedirect } from '@/lib/safe-redirect';
+import { SocialLoginButtons } from '@/features/auth/social-login';
+import { adminRedirect } from '@/lib/safe-redirect';
 
 const ADMIN_DEMO = DEMO_ACCOUNTS.filter((a) =>
   ['leader@demo.test', 'staff@demo.test', 'admin@demo.test', 'developer@demo.test'].includes(a.email),
 );
-
-/** next 는 /admin 하위 경로만 허용한다 (/admin/login 자체 제외) */
-function adminRedirect(target: string | null): string {
-  const path = safeRedirect(target, '/admin');
-  const pathname = path.split(/[?#]/)[0] ?? '';
-  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
-  return isAdmin && !pathname.startsWith('/admin/login') ? path : '/admin';
-}
 
 function AdminLoginForm() {
   const feedback = useLoginFeedback();
@@ -93,6 +87,7 @@ function AdminLoginForm() {
       )}
 
       <form
+        method="post"
         noValidate
         onChange={feedback.edit}
         onSubmit={(e) => {
@@ -138,6 +133,9 @@ function AdminLoginForm() {
           disabled={logout.isPending}
         />
       </form>
+      <div className="mt-6">
+        <SocialLoginButtons admin next={next} />
+      </div>
 
       {DEMO_DATA && (
         <div className="mt-6 border-t border-dashed border-line-strong pt-4">
@@ -165,31 +163,24 @@ function AdminLoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="admin-console flex min-h-dvh flex-col">
+    <div className="admin-console workspace-login">
       <AdminTitle>로그인</AdminTitle>
-      <main
-        id="main"
-        tabIndex={-1}
-        className="flex flex-1 items-start justify-center px-4 py-10 focus:outline-none md:items-center"
-      >
-        <div className="console-surface w-full max-w-md p-6 sm:p-9">
-          <div className="flex items-center gap-2">
-            <Logo className="[&_img]:h-6 md:[&_img]:h-6" />
+      <main id="main" tabIndex={-1} className="login-layout">
+        <div className="login-photo" role="img" aria-label="중구청소년센터 건물 전경" />
+        <div className="login-paper">
+          <div className="login-content">
+            <Logo className="[&_img]:h-7" />
+            <h1>관리자 로그인</h1>
+            <p>센터 직원 및 동아리 담당자 계정으로 로그인해 주세요.</p>
+            <Suspense fallback={<ListSkeleton rows={2} />}>
+              <AdminLoginForm />
+            </Suspense>
+            <Link href="/" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
+              사용자 화면으로
+            </Link>
           </div>
-          <h1 className="mt-7 text-[28px] font-bold">관리자 로그인</h1>
-          <p className="mt-1 mb-5 text-sm text-ink-600">
-            센터 직원·관리자·동아리 담당자 계정으로 로그인해 주세요.
-          </p>
-          <Suspense fallback={<ListSkeleton rows={2} />}>
-            <AdminLoginForm />
-          </Suspense>
         </div>
       </main>
-      <p className="pb-6 text-center">
-        <Link href="/" className={buttonClass({ variant: 'tertiary', size: 'sm' })}>
-          사용자 화면으로
-        </Link>
-      </p>
     </div>
   );
 }

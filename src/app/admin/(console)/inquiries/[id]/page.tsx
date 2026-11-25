@@ -109,19 +109,23 @@ function InquiryDetail() {
   return (
     <QueryState query={inquiry} notFound="문의를 찾을 수 없습니다">
       {(x) => (
-        <>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-ink-600">
-            <Badge tone={INQUIRY_STATUS[x.status].tone}>{INQUIRY_STATUS[x.status].text}</Badge>
-            <span>{INQUIRY_CATEGORY_LABEL[x.category]}</span>
-            <span>{x.authorName}</span>
-            <span className="tabular-nums">{formatDateTime(x.createdAt)}</span>
+        <div className="review-layout">
+          <article className="review-record">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-ink-600">
+              <Badge tone={INQUIRY_STATUS[x.status].tone}>{INQUIRY_STATUS[x.status].text}</Badge>
+              <span>{INQUIRY_CATEGORY_LABEL[x.category]}</span>
+              <span>{x.authorName}</span>
+              <span className="tabular-nums">{formatDateTime(x.createdAt)}</span>
+            </div>
+            <h2 className="mt-2 text-lg font-bold">{x.title}</h2>
+            <div className="console-surface mt-3 max-w-3xl px-4 py-4 text-[15px] leading-relaxed whitespace-pre-line">
+              {x.body}
+            </div>
+          </article>
+          <div className="review-side">
+            <AnswerForm key={x.answer?.answeredAt ?? 'new'} inquiry={x} />
           </div>
-          <h2 className="mt-2 text-lg font-bold">{x.title}</h2>
-          <div className="console-surface mt-3 max-w-3xl px-4 py-4 text-[15px] leading-relaxed whitespace-pre-line">
-            {x.body}
-          </div>
-          <AnswerForm key={x.answer?.answeredAt ?? 'new'} inquiry={x} />
-        </>
+        </div>
       )}
     </QueryState>
   );
@@ -130,6 +134,7 @@ function InquiryDetail() {
 export default function AdminInquiryDetailPage() {
   return (
     <AdminPage
+      view="record"
       title="문의 상세"
       permission="inquiry.answer"
       breadcrumbs={[{ label: '문의', href: '/admin/inquiries' }, { label: '상세' }]}

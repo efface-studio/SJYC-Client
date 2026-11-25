@@ -1,0 +1,2849 @@
+[
+  {
+    "method": "GET",
+    "path": "/admin/applications",
+    "access": "application.decide",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      },
+      {
+        "name": "programId",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<ProgramApplication>",
+    "call": "admin.applications.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/applications/:id",
+    "access": "application.decide",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ProgramApplication",
+    "call": "admin.applications.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/applications/decisions",
+    "access": "application.decide",
+    "params": [
+      {
+        "name": "decision",
+        "kind": "body",
+        "type": "\"approved\" | \"rejected\"",
+        "required": true
+      },
+      {
+        "name": "ids",
+        "kind": "body",
+        "type": "string[]",
+        "required": true
+      },
+      {
+        "name": "reason",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "BulkResult",
+    "call": "admin.applications.decide",
+    "args": ["body.ids", "body.decision", "body.reason"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/audit-events",
+    "access": "audit.read",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<AuditEvent>",
+    "call": "admin.audit.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/club-applications",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<ClubApplication>",
+    "call": "admin.clubs.applications",
+    "args": ["query"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/club-applications/:id/decision",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "decision",
+        "kind": "body",
+        "type": "\"approved\" | \"rejected\"",
+        "required": true
+      },
+      {
+        "name": "reason",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "ClubApplication",
+    "call": "admin.clubs.decideApplication",
+    "args": ["param.id", "body.decision", "body.reason"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/clubs",
+    "access": "club.manage",
+    "params": [],
+    "status": 200,
+    "result": "Club[]",
+    "call": "admin.clubs.list",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/admin/clubs",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "field",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "summary",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "meetingInfo",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruiting",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"active\" | \"inactive\"",
+        "required": true
+      },
+      {
+        "name": "target",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      },
+      {
+        "name": "photos",
+        "kind": "body",
+        "type": "{ url: string; caption: string; sourceUrl: string; date: string | null; }[]",
+        "required": false
+      },
+      {
+        "name": "activities",
+        "kind": "body",
+        "type": "{ date: string; title: string; url: string | null; }[]",
+        "required": false
+      },
+      {
+        "name": "sourceUrls",
+        "kind": "body",
+        "type": "string[]",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "Club",
+    "call": "admin.clubs.create",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/clubs/:id",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Club",
+    "call": "admin.clubs.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/clubs/:id",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "field",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "summary",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "meetingInfo",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruiting",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"active\" | \"inactive\"",
+        "required": true
+      },
+      {
+        "name": "target",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      },
+      {
+        "name": "photos",
+        "kind": "body",
+        "type": "{ url: string; caption: string; sourceUrl: string; date: string | null; }[]",
+        "required": false
+      },
+      {
+        "name": "activities",
+        "kind": "body",
+        "type": "{ date: string; title: string; url: string | null; }[]",
+        "required": false
+      },
+      {
+        "name": "sourceUrls",
+        "kind": "body",
+        "type": "string[]",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Club",
+    "call": "admin.clubs.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/clubs/:id/managers",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubManager[]",
+    "call": "admin.clubs.managers",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/clubs/:id/managers",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "ClubManager",
+    "call": "admin.clubs.assignManager",
+    "args": ["param.id", "body.email"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/admin/clubs/:id/managers/:userId",
+    "access": "club.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "admin.clubs.removeManager",
+    "args": ["param.id", "param.userId"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/dashboard",
+    "access": "admin.access",
+    "params": [
+      {
+        "name": "periodDays",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "DashboardSummary",
+    "call": "admin.dashboard",
+    "args": ["query.periodDays"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/faqs",
+    "access": "inquiry.answer",
+    "params": [],
+    "status": 200,
+    "result": "Faq[]",
+    "call": "admin.faqs.list",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/admin/faqs",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "category",
+        "kind": "body",
+        "type": "\"program\" | \"club\" | \"space\" | \"account\" | \"etc\"",
+        "required": true
+      },
+      {
+        "name": "question",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "answer",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "order",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "published",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "Faq",
+    "call": "admin.faqs.create",
+    "args": ["body"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/admin/faqs/:id",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "admin.faqs.remove",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/faqs/:id",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "category",
+        "kind": "body",
+        "type": "\"program\" | \"club\" | \"space\" | \"account\" | \"etc\"",
+        "required": true
+      },
+      {
+        "name": "question",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "answer",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "order",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "published",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Faq",
+    "call": "admin.faqs.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/inquiries",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<Inquiry>",
+    "call": "admin.inquiries.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/inquiries/:id",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Inquiry",
+    "call": "admin.inquiries.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/inquiries/:id/answer",
+    "access": "inquiry.answer",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Inquiry",
+    "call": "admin.inquiries.answer",
+    "args": ["param.id", "body.body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/members",
+    "access": "member.read",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<User>",
+    "call": "admin.members.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/members/:id",
+    "access": "member.read",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "User",
+    "call": "admin.members.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/admin/members/:id",
+    "access": "member.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "roles",
+        "kind": "body",
+        "type": "Role[]",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "UserStatus",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "User",
+    "call": "admin.members.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/notices",
+    "access": "notice.write",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<Notice>",
+    "call": "admin.notices.list",
+    "args": ["query"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/notices",
+    "access": "notice.write",
+    "params": [
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "category",
+        "kind": "body",
+        "type": "\"center\" | \"youth\" | \"education\"",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "pinned",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"draft\" | \"published\" | \"hidden\"",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "Notice",
+    "call": "admin.notices.create",
+    "args": ["body"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/admin/notices/:id",
+    "access": "notice.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "admin.notices.remove",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/notices/:id",
+    "access": "notice.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Notice",
+    "call": "admin.notices.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/notices/:id",
+    "access": "notice.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "category",
+        "kind": "body",
+        "type": "\"center\" | \"youth\" | \"education\"",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "pinned",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"draft\" | \"published\" | \"hidden\"",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Notice",
+    "call": "admin.notices.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/policies",
+    "access": "policy.manage",
+    "params": [],
+    "status": 200,
+    "result": "PolicyDoc[]",
+    "call": "admin.policies.list",
+    "args": []
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/policies/:key",
+    "access": "policy.manage",
+    "params": [
+      {
+        "name": "key",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "effectiveAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "PolicyDoc",
+    "call": "admin.policies.update",
+    "args": ["param.key", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/programs",
+    "access": "program.write",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<Program>",
+    "call": "admin.programs.list",
+    "args": ["query"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/programs",
+    "access": "program.write",
+    "params": [
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "categoryId",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "summary",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "target",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "place",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "startsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "endsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruitStartsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruitEndsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cancelDeadline",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "capacity",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"draft\" | \"published\" | \"hidden\"",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "Program",
+    "call": "admin.programs.create",
+    "args": ["body"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/admin/programs/:id",
+    "access": "program.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "admin.programs.remove",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/programs/:id",
+    "access": "program.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Program",
+    "call": "admin.programs.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/programs/:id",
+    "access": "program.write",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "categoryId",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "summary",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "target",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "place",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "startsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "endsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruitStartsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruitEndsAt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cancelDeadline",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "capacity",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "status",
+        "kind": "body",
+        "type": "\"draft\" | \"published\" | \"hidden\"",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Program",
+    "call": "admin.programs.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/reservations",
+    "access": "space.manage",
+    "params": [
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "status",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sort",
+        "kind": "query",
+        "type": "\"title\" | \"newest\" | \"oldest\"",
+        "required": false
+      },
+      {
+        "name": "spaceId",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "date",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<SpaceReservation>",
+    "call": "admin.spaces.reservations",
+    "args": ["query"]
+  },
+  {
+    "method": "POST",
+    "path": "/admin/reservations/:id/decision",
+    "access": "space.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "decision",
+        "kind": "body",
+        "type": "\"approved\" | \"rejected\"",
+        "required": true
+      },
+      {
+        "name": "reason",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "SpaceReservation",
+    "call": "admin.spaces.decideReservation",
+    "args": ["param.id", "body.decision", "body.reason"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/server-logs",
+    "access": "developer.access",
+    "params": [],
+    "status": 200,
+    "result": "ServerLogSnapshot",
+    "call": "admin.serverLogs",
+    "args": []
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/site-settings",
+    "access": "site.manage",
+    "params": [
+      {
+        "name": "version",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "values",
+        "kind": "body",
+        "type": "object",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "{ version: number; values: { name?: string | undefined; formalName?: string | undefined; englishName?: string | undefined; slogan?: string | undefined; address?: string | undefined; postalCode?: string | undefined; ... 34 more ...; seoDescription?: string | undefined; }; }",
+    "call": "admin.updateSettings",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/admin/spaces",
+    "access": "space.manage",
+    "params": [],
+    "status": 200,
+    "result": "Space[]",
+    "call": "admin.spaces.list",
+    "args": []
+  },
+  {
+    "method": "PUT",
+    "path": "/admin/spaces/:id",
+    "access": "space.manage",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "capacity",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "reservable",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Space",
+    "call": "admin.spaces.update",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/attendance/sessions",
+    "access": "session",
+    "params": [
+      {
+        "name": "targetType",
+        "kind": "query",
+        "type": "\"program\" | \"club\"",
+        "required": true
+      },
+      {
+        "name": "targetId",
+        "kind": "query",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "AttendanceSession[]",
+    "call": "attendance.sessions",
+    "args": ["target"]
+  },
+  {
+    "method": "POST",
+    "path": "/attendance/sessions",
+    "access": "session",
+    "params": [
+      {
+        "name": "targetType",
+        "kind": "body",
+        "type": "\"program\" | \"club\"",
+        "required": true
+      },
+      {
+        "name": "targetId",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "date",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "AttendanceSession",
+    "call": "attendance.create",
+    "args": ["target", "body"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/attendance/sessions/:id",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "attendance.remove",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/attendance/sessions/:id",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "AttendanceSession",
+    "call": "attendance.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/attendance/sessions/:id/check-in",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "open",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "AttendanceSession",
+    "call": "attendance.setCheckIn",
+    "args": ["param.id", "body.open"]
+  },
+  {
+    "method": "PUT",
+    "path": "/attendance/sessions/:id/records",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "marks",
+        "kind": "body",
+        "type": "{ userId: string; status: \"present\" | \"late\" | \"absent\" | \"excused\" | null; note?: string | null; }[]",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "AttendanceSession",
+    "call": "attendance.mark",
+    "args": ["param.id", "body.marks"]
+  },
+  {
+    "method": "GET",
+    "path": "/attendance/stats",
+    "access": "session",
+    "params": [
+      {
+        "name": "targetType",
+        "kind": "query",
+        "type": "\"program\" | \"club\"",
+        "required": true
+      },
+      {
+        "name": "targetId",
+        "kind": "query",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "AttendanceMemberStat[]",
+    "call": "attendance.stats",
+    "args": ["target"]
+  },
+  {
+    "method": "GET",
+    "path": "/attendance/targets",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "AttendanceTargetSummary[]",
+    "call": "attendance.targets",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/:provider/start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/:provider/web-start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "redirect",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 302,
+    "result": "Location",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/complete",
+    "access": "public",
+    "params": [
+      {
+        "name": "receipt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "claim",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "{ provider: OAuthProvider; }",
+    "call": "auth.adminSocialLink",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.linkAdminSocial",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/email-verification/confirm",
+    "access": "public",
+    "params": [
+      {
+        "name": "token",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 302,
+    "result": "Location",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/email-verification/resend",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "auth.resendVerification",
+    "args": ["body.email"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/login",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Session",
+    "call": "auth.login",
+    "args": ["body"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/logout",
+    "access": "public",
+    "params": [],
+    "status": 204,
+    "result": "void",
+    "call": "auth.logout",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/oauth/:provider/start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 302,
+    "result": "Location",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/password-reset",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "auth.requestPasswordReset",
+    "args": ["body.email"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/password-reset/confirm",
+    "access": "public",
+    "params": [
+      {
+        "name": "token",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "auth.resetPassword",
+    "args": ["body.token", "body.password"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/phone-verification",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.signupPhone",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/confirm",
+    "access": "public",
+    "params": [
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.confirmPhone",
+    "args": ["body.code"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/resend",
+    "access": "public",
+    "params": [
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.resendPhone",
+    "args": ["body.phone"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/session",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "Session | null",
+    "call": "auth.me",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/signup",
+    "access": "public",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "passwordConfirm",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "birthYear",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "agreeTerms",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreeMarketing",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "birthDate",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "SignupPhoneState",
+    "call": "auth.signup",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SocialDraft",
+    "call": "auth.socialDraft",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "birthDate",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreeTerms",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreeMarketing",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "SignupPhoneState",
+    "call": "auth.saveSocialProfile",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/clubs",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "Club[]",
+    "call": "clubs.list",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/clubs/:id",
+    "access": "public",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Club",
+    "call": "clubs.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/clubs/:id/applications",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "motivation",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "ClubApplication",
+    "call": "clubs.apply",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/clubs/:id/members",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubMember[]",
+    "call": "clubs.members",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/clubs/:id/posts",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubPost[]",
+    "call": "clubs.posts",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/faqs",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "Faq[]",
+    "call": "faqs.list",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/health",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "{ status: string }",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/inquiries",
+    "access": "session",
+    "params": [
+      {
+        "name": "category",
+        "kind": "body",
+        "type": "\"program\" | \"club\" | \"space\" | \"account\" | \"etc\"",
+        "required": true
+      },
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "Inquiry",
+    "call": "inquiries.create",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/manage/clubs",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "Club[]",
+    "call": "manage.clubs",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/manage/clubs/:clubId/applications",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubApplication[]",
+    "call": "manage.applications",
+    "args": ["param.clubId"]
+  },
+  {
+    "method": "POST",
+    "path": "/manage/clubs/:clubId/applications/:id/decision",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "decision",
+        "kind": "body",
+        "type": "\"approved\" | \"rejected\"",
+        "required": true
+      },
+      {
+        "name": "reason",
+        "kind": "body",
+        "type": "string | null",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "ClubApplication",
+    "call": "manage.decideApplication",
+    "args": ["param.clubId", "param.id", "body.decision", "body.reason"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/manage/clubs/:clubId/intro",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "summary",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "meetingInfo",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "recruiting",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Club",
+    "call": "manage.updateIntro",
+    "args": ["param.clubId", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/manage/clubs/:clubId/members",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubRosterEntry[]",
+    "call": "manage.roster",
+    "args": ["param.clubId"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/manage/clubs/:clubId/members/:userId",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "manage.removeMember",
+    "args": ["param.clubId", "param.userId"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/manage/clubs/:clubId/members/:userId",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "role",
+        "kind": "body",
+        "type": "\"member\" | \"leader\"",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ClubRosterEntry",
+    "call": "manage.setMemberRole",
+    "args": ["param.clubId", "param.userId", "body.role"]
+  },
+  {
+    "method": "POST",
+    "path": "/manage/clubs/:clubId/posts",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "kind",
+        "kind": "body",
+        "type": "\"notice\" | \"schedule\" | \"activity\"",
+        "required": true
+      },
+      {
+        "name": "title",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "body",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "ClubPost",
+    "call": "manage.createPost",
+    "args": ["param.clubId", "body"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/manage/clubs/:clubId/posts/:postId",
+    "access": "session",
+    "params": [
+      {
+        "name": "clubId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "postId",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "manage.removePost",
+    "args": ["param.clubId", "param.postId"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/me",
+    "access": "session",
+    "params": [],
+    "status": 204,
+    "result": "void",
+    "call": "me.withdraw",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/me/applications",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "ProgramApplication[]",
+    "call": "me.applications",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/me/applications/:id",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "ProgramApplication",
+    "call": "me.application",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/me/applications/:id/cancel",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "ProgramApplication",
+    "call": "me.cancelApplication",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/me/attendance",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "MyAttendance[]",
+    "call": "me.attendance",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/me/attendance/check-in",
+    "access": "session",
+    "params": [
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "MyAttendance",
+    "call": "me.checkIn",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/me/club-applications",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "ClubApplication[]",
+    "call": "me.clubApplications",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/me/clubs",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "MyClub[]",
+    "call": "me.clubs",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/me/inquiries",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "Inquiry[]",
+    "call": "me.inquiries",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/me/inquiries/:id",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Inquiry",
+    "call": "me.inquiry",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/me/notifications",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "Notification[]",
+    "call": "me.notifications",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/me/notifications/read",
+    "access": "session",
+    "params": [
+      {
+        "name": "ids",
+        "kind": "body",
+        "type": "string[]",
+        "required": false
+      }
+    ],
+    "status": 204,
+    "result": "void",
+    "call": "me.markNotificationsRead",
+    "args": ["body.ids"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/me/profile",
+    "access": "session",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreeMarketing",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "User",
+    "call": "me.updateProfile",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/me/reservations",
+    "access": "session",
+    "params": [],
+    "status": 200,
+    "result": "SpaceReservation[]",
+    "call": "me.reservations",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/me/reservations/:id/cancel",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "SpaceReservation",
+    "call": "me.cancelReservation",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/media",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "MediaItem[]",
+    "call": "media.list",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/notices",
+    "access": "public",
+    "params": [
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "category",
+        "kind": "query",
+        "type": "NoticeCategory",
+        "required": false
+      },
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<Notice>",
+    "call": "notices.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/notices/:id",
+    "access": "public",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Notice",
+    "call": "notices.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/policies/:key",
+    "access": "public",
+    "params": [
+      {
+        "name": "key",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "PolicyDoc",
+    "call": "policies.get",
+    "args": ["param.key"]
+  },
+  {
+    "method": "GET",
+    "path": "/program-categories",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "ProgramCategory[]",
+    "call": "programs.categories",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/programs",
+    "access": "public",
+    "params": [
+      {
+        "name": "q",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "categoryId",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "recruitStatus",
+        "kind": "query",
+        "type": "RecruitStatus",
+        "required": false
+      },
+      {
+        "name": "page",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "pageSize",
+        "kind": "query",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "Page<Program>",
+    "call": "programs.list",
+    "args": ["query"]
+  },
+  {
+    "method": "GET",
+    "path": "/programs/:id",
+    "access": "public",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Program",
+    "call": "programs.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "POST",
+    "path": "/programs/:id/applications",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "note",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "ProgramApplication",
+    "call": "programs.apply",
+    "args": ["param.id", "body"]
+  },
+  {
+    "method": "GET",
+    "path": "/site/settings",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "{ version: number; values: { name?: string | undefined; formalName?: string | undefined; englishName?: string | undefined; slogan?: string | undefined; address?: string | undefined; postalCode?: string | undefined; ... 34 more ...; seoDescription?: string | undefined; }; }",
+    "call": "site.settings",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/spaces",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "Space[]",
+    "call": "spaces.list",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/spaces/:id",
+    "access": "public",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "Space",
+    "call": "spaces.get",
+    "args": ["param.id"]
+  },
+  {
+    "method": "GET",
+    "path": "/spaces/:id/availability",
+    "access": "public",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "date",
+        "kind": "query",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "TimeSlot[]",
+    "call": "spaces.availability",
+    "args": ["param.id", "query.date"]
+  },
+  {
+    "method": "POST",
+    "path": "/spaces/:id/reservations",
+    "access": "session",
+    "params": [
+      {
+        "name": "id",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "date",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "startTime",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "endTime",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "headcount",
+        "kind": "body",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "purpose",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "SpaceReservation",
+    "call": "spaces.reserve",
+    "args": ["param.id", "body"]
+  }
+]

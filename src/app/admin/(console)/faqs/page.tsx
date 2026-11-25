@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, errorMessage } from '@/api';
 import { AdminPage } from '@/components/admin/admin-page';
-import { DataList, type Column } from '@/components/admin/data-list';
+import { ChevronDown } from 'lucide-react';
 import { FaqDialog } from '@/components/admin/faq-dialog';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
@@ -45,55 +45,6 @@ function FaqList() {
     },
   });
 
-  const columns: Column<Faq>[] = [
-    {
-      key: 'question',
-      header: '질문',
-      primary: true,
-      cell: (f) => (
-        <button
-          type="button"
-          onClick={() => open(f)}
-          className="text-left font-semibold text-ink-900 hover:text-brand-700 hover:underline"
-        >
-          {f.question}
-        </button>
-      ),
-    },
-    {
-      key: 'category',
-      header: '분류',
-      cell: (f) => INQUIRY_CATEGORY_LABEL[f.category],
-      className: 'whitespace-nowrap',
-    },
-    { key: 'order', header: '순서', cell: (f) => f.order, className: 'tabular-nums' },
-    {
-      key: 'published',
-      header: '게시',
-      status: true,
-      cell: (f) => (f.published ? <Badge tone="success">게시</Badge> : <Badge tone="neutral">숨김</Badge>),
-    },
-    {
-      key: 'actions',
-      header: '관리',
-      cell: (f) => (
-        <span className="flex gap-2">
-          <Button size="sm" variant="secondary" className="min-h-11" onClick={() => open(f)}>
-            수정
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            className="min-h-11 text-danger-700"
-            onClick={() => setDeleting(f)}
-          >
-            삭제
-          </Button>
-        </span>
-      ),
-    },
-  ];
-
   return (
     <>
       <div className="mb-4 flex justify-end">
@@ -105,12 +56,36 @@ function FaqList() {
         empty={<EmptyState title="등록된 FAQ가 없습니다" />}
       >
         {(d) => (
-          <DataList
-            caption="FAQ 목록 (표시 순서대로)"
-            rows={d}
-            columns={columns}
-            rowLabel={(f) => f.question}
-          />
+          <ol className="faq-library" aria-label="FAQ 목록 (표시 순서대로)">
+            {d.map((f) => (
+              <li key={f.id}>
+                <details>
+                  <summary>
+                    <span className="faq-order" aria-label={'표시 순서 ' + f.order}>
+                      {f.order}
+                    </span>
+                    <div>
+                      <small>{INQUIRY_CATEGORY_LABEL[f.category]}</small>
+                      <strong>{f.question}</strong>
+                    </div>
+                    <Badge tone={f.published ? 'success' : 'neutral'}>{f.published ? '게시' : '숨김'}</Badge>
+                    <ChevronDown aria-hidden size={16} />
+                  </summary>
+                  <div className="faq-answer">
+                    <p>{f.answer}</p>
+                    <div>
+                      <Button size="sm" variant="secondary" onClick={() => open(f)}>
+                        수정
+                      </Button>
+                      <Button size="sm" variant="tertiary" onClick={() => setDeleting(f)}>
+                        삭제
+                      </Button>
+                    </div>
+                  </div>
+                </details>
+              </li>
+            ))}
+          </ol>
         )}
       </QueryState>
 
@@ -143,6 +118,7 @@ function FaqList() {
 export default function AdminFaqsPage() {
   return (
     <AdminPage
+      view="library"
       title="FAQ"
       permission="inquiry.answer"
       docTitle="FAQ 관리"

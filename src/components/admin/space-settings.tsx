@@ -57,7 +57,7 @@ function SpaceForm({ space }: { space: Space }) {
         </h3>
         {space.reservable ? <Badge tone="success">예약 받음</Badge> : <Badge tone="warning">예약 중지</Badge>}
       </div>
-      <div className="grid gap-4 md:grid-cols-[1fr_160px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[minmax(0,1fr)_160px]">
         <TextAreaField
           label="설명"
           name="description"

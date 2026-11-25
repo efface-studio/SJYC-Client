@@ -27,15 +27,14 @@ const COLUMNS: Column<ProgramApplication>[] = [
     key: 'name',
     header: '신청자',
     primary: true,
-    cell: (a) => <RowLink href={`/admin/applications/${a.id}`}>{a.applicantName}</RowLink>,
+    cell: (a) => (
+      <div className="list-subject">
+        <RowLink href={`/admin/applications/${a.id}`}>{a.applicantName}</RowLink>
+        <small>접수 번호 {a.receiptNo ?? '미발급'}</small>
+      </div>
+    ),
   },
   { key: 'program', header: '프로그램', sort: 'title', cell: (a) => a.programTitle },
-  {
-    key: 'receipt',
-    header: '접수 번호',
-    cell: (a) => a.receiptNo ?? '미발급',
-    className: 'tabular-nums whitespace-nowrap',
-  },
   {
     key: 'createdAt',
     header: '신청 일시',
@@ -194,7 +193,12 @@ function ApplicationList() {
 
 export default function AdminApplicationsPage() {
   return (
-    <AdminPage title="프로그램 신청" permission="application.decide" docTitle="프로그램 신청 관리">
+    <AdminPage
+      view="list"
+      title="프로그램 신청"
+      permission="application.decide"
+      docTitle="프로그램 신청 관리"
+    >
       <ApplicationList />
     </AdminPage>
   );

@@ -22,7 +22,12 @@ const COLUMNS: Column<Inquiry>[] = [
     header: '제목',
     sort: 'title',
     primary: true,
-    cell: (x) => <RowLink href={`/admin/inquiries/${x.id}`}>{x.title}</RowLink>,
+    cell: (x) => (
+      <div className="list-subject">
+        <RowLink href={`/admin/inquiries/${x.id}`}>{x.title}</RowLink>
+        <small>{x.body}</small>
+      </div>
+    ),
   },
   {
     key: 'category',
@@ -100,6 +105,7 @@ function InquiryList() {
 export default function AdminInquiriesPage() {
   return (
     <AdminPage
+      view="list"
       title="문의"
       permission="inquiry.answer"
       docTitle="문의 관리"

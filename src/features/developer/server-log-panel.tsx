@@ -32,7 +32,17 @@ export function ServerLogPanel() {
       <header>
         <Terminal size={20} />
         <h2>서버 요청 로그</h2>
-        <span>{q.data?.source === 'mock' ? 'MOCK' : q.isError ? 'OFFLINE' : live ? 'LIVE' : 'PAUSED'}</span>
+        <span className="terminal-connection" data-live={live && q.isSuccess && q.data.source === 'server'}>
+          {q.isError
+            ? '연결 오류'
+            : q.isPending
+              ? '연결 중'
+              : q.data.source === 'mock'
+                ? '모의 환경'
+                : live
+                  ? '수신 중'
+                  : '일시정지'}
+        </span>
       </header>
       <div className="terminal-controls">
         <label>
@@ -60,6 +70,13 @@ export function ServerLogPanel() {
           <RotateCw size={15} />
           새로고침
         </button>
+      </div>
+      <div className="terminal-columns" aria-hidden>
+        <span>시각 · KST</span>
+        <span>레벨</span>
+        <span>메서드</span>
+        <span>요청 경로</span>
+        <span>상태 · 소요 시간</span>
       </div>
       <div className="terminal-output" tabIndex={0} aria-label="서버 로그 출력">
         {q.isPending ? (

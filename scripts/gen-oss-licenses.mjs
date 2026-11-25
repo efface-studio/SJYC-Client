@@ -1,7 +1,7 @@
 // 오픈소스 라이선스 고지 목록 생성 — 웹(루트)·앱(mobile)의 직접 의존 패키지에서 읽는다.
 // 사용: pnpm oss:licenses (의존성을 바꾼 뒤 다시 실행)
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 const root = join(import.meta.dirname, '..');
 
@@ -16,7 +16,8 @@ function repoUrl(pkg) {
     .replace(/^git\+/, '')
     .replace(/^git:\/\//, 'https://')
     .replace(/\.git$/, '')
-    .replace(/^github:/, 'https://github.com/');
+    .replace(/^github:/, 'https://github.com/')
+    .replace(/^([\w.-]+\/[\w.-]+)$/, 'https://github.com/$1');
 }
 
 function collect(projectDir) {
@@ -31,7 +32,7 @@ function collect(projectDir) {
 }
 
 const web = collect(root);
-const mobile = collect(join(root, 'mobile'));
+const mobile = collect(resolve(process.env.SJYC_MOBILE_DIR ?? join(root, '..', 'Mobile')));
 
 const out = `// 자동 생성 — scripts/gen-oss-licenses.mjs (pnpm oss:licenses). 직접 수정하지 않는다.
 export interface OssPackage {
