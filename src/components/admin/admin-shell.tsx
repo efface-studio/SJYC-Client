@@ -83,6 +83,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: '설정',
     items: [
+      { href: '/admin/app-updates', label: '앱 업데이트', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/settings', label: '사이트 설정', icon: Settings2, permission: 'site.manage' },
       { href: '/admin/policies', label: '정책 문서', icon: FileText, permission: 'policy.manage' },
     ],

@@ -1,4 +1,6 @@
+import type { MemberCommand, MemberActivityOptions } from '@/domain/member-actions';
 import type { AttendancePosition, AttendanceScan } from '@/domain/check-in-location';
+import type { AppUpdate, UpdateControl } from '@/domain/app-update';
 import type { SignupPhoneState } from '@/domain/signup-phone';
 import type { SocialDraft, SocialDetails } from '@/domain/social-profile';
 import type { SettingsRecord, ServerLogSnapshot } from '../domain/site-settings';
@@ -221,6 +223,8 @@ export interface ApiClient {
   site: { settings(): Promise<SettingsRecord> };
   admin: {
     updateSettings(input: SettingsRecord): Promise<SettingsRecord>;
+    changeAppUpdate(id:string,input:import('@/domain/app-update').UpdateControl):Promise<{ok:boolean}>;
+    appUpdates(): Promise<AppUpdate[]>;
     serverLogs(): Promise<ServerLogSnapshot>;
     dashboard(periodDays: number): Promise<DashboardSummary>;
     notices: {
@@ -243,6 +247,8 @@ export interface ApiClient {
       decide(ids: string[], decision: Decision, reason: string | null): Promise<BulkResult>;
     };
     members: {
+      activityOptions(id: string): Promise<MemberActivityOptions>;
+      act(id: string, command: MemberCommand): Promise<{resetUrl?: string}>;
       list(query: AdminListQuery): Promise<Page<User>>;
       get(id: string): Promise<User>;
       update(id: string, patch: { roles?: Role[]; status?: UserStatus }): Promise<User>;
