@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from 'lucide-react';
+import { can } from '@/domain/permissions';
 import { api, errorMessage } from '@/api';
 import {
   developerSections,
@@ -139,12 +140,13 @@ export function CenterConsole() {
     toast = useToast(),
     session = useSession(),
     logout = useLogout();
+  const writable = can(session.data?.user, 'developer.access');
   const section = sections.find((s) => s === params.get('section')) ?? 'permissions';
   const item = params.get('item') ?? '',
     search = params.get('q') ?? '';
   const page = Math.min(10000, Math.max(0, Number.parseInt(params.get('page') ?? '0') || 0));
   const query = useQuery({
-    queryKey: ['admin', 'dev-console', section, item, search, page],
+    queryKey: ['admin', 'dev-console', session.data?.user.id, writable, section, item, search, page],
     queryFn: () => api.admin.developerView({ section, item, search, page }),
     refetchInterval: (q) => q.state.data?.interval ?? false,
   });
@@ -160,9 +162,11 @@ export function CenterConsole() {
             </Link>
           );
         })}
-        <Link className="dev-center-device" href="/admin/developer?tab=env">
-          이 브라우저 진단 <ArrowRight size={14} />
-        </Link>
+        {writable && (
+          <Link className="dev-center-device" href="/admin/developer?tab=env">
+            이 브라우저 진단 <ArrowRight size={14} />
+          </Link>
+        )}
       </nav>
       <section className="dev-center-content">
         <QueryState query={query}>
@@ -231,26 +235,27 @@ export function CenterConsole() {
                   </ul>
                 </section>
               ))}
-              {view.forms?.map((f) => (
-                <ActionForm
-                  key={[section, item, f.command, f.version].join('/')}
-                  form={f}
-                  done={() => {
-                    if (f.command === 'revoke' && session.data?.user.id === f.id) {
-                      logout.mutate();
-                      return;
-                    }
-                    if (
-                      f.command === 'delete-role' ||
-                      f.command === 'revoke' ||
-                      (f.command === 'save-role' && !f.id)
-                    )
-                      router.replace(url({ section }));
-                    void cache.invalidateQueries({ queryKey: ['admin', 'dev-console'] });
-                    toast.success('적용했습니다.');
-                  }}
-                />
-              ))}
+              {writable &&
+                view.forms?.map((f) => (
+                  <ActionForm
+                    key={[section, item, f.command, f.version].join('/')}
+                    form={f}
+                    done={() => {
+                      if (f.command === 'revoke' && session.data?.user.id === f.id) {
+                        logout.mutate();
+                        return;
+                      }
+                      if (
+                        f.command === 'delete-role' ||
+                        f.command === 'revoke' ||
+                        (f.command === 'save-role' && !f.id)
+                      )
+                        router.replace(url({ section }));
+                      void cache.invalidateQueries({ queryKey: ['admin', 'dev-console'] });
+                      toast.success('적용했습니다.');
+                    }}
+                  />
+                ))}
               {(page > 0 || view.hasMore) && (
                 <nav aria-label="목록 페이지" className="dev-center-pager">
                   {page > 0 && <Link href={url({ section, item, search, page: page - 1 })}>이전</Link>}

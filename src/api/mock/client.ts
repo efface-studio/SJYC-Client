@@ -1188,7 +1188,7 @@ export const mockClient: ApiClient = {
       }),
     developerView: () =>
       respond((db) => {
-        requirePermission(db, 'developer.access');
+        requirePermission(db, 'developer.view');
         throw new ApiError('NOT_CONFIGURED', '운영 콘솔은 서버 연결 모드에서 사용할 수 있습니다.');
       }),
     developerAction: () =>

@@ -59,10 +59,12 @@ describe('권한(RBAC)', () => {
   it('정지된 관리자는 아무 권한도 없다', () => {
     expect(can({ roles: ['admin'], status: 'suspended' }, 'admin.access')).toBe(false);
   });
-  it('개발자는 모든 권한을 가진 최상위 역할이고, 개발자 도구는 개발자만 쓴다', () => {
+  it('최고 관리자와 개발자는 운영 콘솔을 조회하고 개발자만 변경한다', () => {
     const developer = { roles: ['developer' as const], status: 'active' as const };
     const admin = { roles: ['admin' as const], status: 'active' as const };
     for (const p of PERMISSIONS) expect(can(developer, p)).toBe(true);
+    expect(can(admin, 'developer.view')).toBe(true);
+    expect(can({ roles: ['staff'], status: 'active' }, 'developer.view')).toBe(false);
     expect(can(admin, 'developer.access')).toBe(false);
     expect(can(admin, 'member.manage')).toBe(true);
   });

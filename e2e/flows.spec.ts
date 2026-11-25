@@ -292,10 +292,14 @@ test('320px에서 회원 메뉴와 관리자 일정 입력란이 화면 안에 �
   }
 });
 
-test('개발자 도구 탭은 개발자만 쓸 수 있다', async ({ page }) => {
-  await adminLoginAs(page, '최고 관리자', '/admin/developer');
+test('개발자 콘솔은 최고 관리자도 조회하고 브라우저 진단은 개발자만 쓴다', async ({ page }) => {
+  await adminLoginAs(page, '센터 직원', '/admin/developer');
   await expect(page.getByText('접근 권한이 없습니다')).toBeVisible();
 
+  await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
+  await adminLoginAs(page, '최고 관리자', '/admin/developer?tab=env');
+  await expect(page.getByRole('link', { name: '시스템', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: '이 브라우저 진단' })).toHaveCount(0);
   await page.evaluate(() => sessionStorage.removeItem('sjyc.mock.session.v1'));
   await adminLoginAs(page, '개발자', '/admin/developer');
   await expect(page.getByRole('heading', { level: 1, name: '개발자 도구' })).toBeVisible();

@@ -99,7 +99,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
         permission: 'admin.access',
       },
       { href: '/admin/specifications/api', label: 'API 명세서', icon: Braces, permission: 'admin.access' },
-      { href: '/admin/developer', label: '개발자 도구', icon: Terminal, permission: 'developer.access' },
+      { href: '/admin/developer', label: '개발자 도구', icon: Terminal, permission: 'developer.view' },
     ],
   },
 ];
