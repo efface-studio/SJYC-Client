@@ -110,7 +110,7 @@ for (const file of program.getSourceFiles().filter((f) => f.fileName.endsWith('.
         throw Error('어댑터 인자 확인 필요 ' + path + ' ' + n);
       });
       const status =
-        ['confirm', 'oauthStart'].includes(method.name.getText()) && path.startsWith('/auth/')
+        ['confirm', 'oauthStart', 'adminStartWeb'].includes(method.name.getText()) && path.startsWith('/auth/')
           ? 302
           : Number(d.HttpCode ?? (http === 'POST' ? 201 : 200));
       routes.push({

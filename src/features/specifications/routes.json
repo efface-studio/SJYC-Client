@@ -1546,6 +1546,102 @@
     "args": []
   },
   {
+    "method": "POST",
+    "path": "/auth/admin-social/:provider/start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/:provider/web-start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "redirect",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 302,
+    "result": "Location",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/complete",
+    "access": "public",
+    "params": [
+      {
+        "name": "receipt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "claim",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "{ provider: OAuthProvider; }",
+    "call": "auth.adminSocialLink",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.linkAdminSocial",
+    "args": ["body"]
+  },
+  {
     "method": "GET",
     "path": "/auth/email-verification/confirm",
     "access": "public",
@@ -1671,6 +1767,50 @@
   },
   {
     "method": "GET",
+    "path": "/auth/phone-verification",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.signupPhone",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/confirm",
+    "access": "public",
+    "params": [
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.confirmPhone",
+    "args": ["body.code"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/resend",
+    "access": "public",
+    "params": [
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.resendPhone",
+    "args": ["body.phone"]
+  },
+  {
+    "method": "GET",
     "path": "/auth/session",
     "access": "session",
     "params": [],
@@ -1692,6 +1832,12 @@
       },
       {
         "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
         "kind": "body",
         "type": "string",
         "required": true
@@ -1733,15 +1879,84 @@
         "required": false
       },
       {
-        "name": "phone",
+        "name": "birthDate",
         "kind": "body",
         "type": "string",
         "required": false
       }
     ],
     "status": 201,
-    "result": "{ requiresEmailVerification: boolean; }",
+    "result": "SignupPhoneState",
     "call": "auth.signup",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SocialDraft",
+    "call": "auth.socialDraft",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "birthDate",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreeTerms",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreeMarketing",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "SignupPhoneState",
+    "call": "auth.saveSocialProfile",
     "args": ["body"]
   },
   {

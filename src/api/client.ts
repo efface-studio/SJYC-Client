@@ -1,3 +1,6 @@
+import type { AttendancePosition, AttendanceScan } from '@/domain/check-in-location';
+import type { SignupPhoneState } from '@/domain/signup-phone';
+import type { SocialDraft, SocialDetails } from '@/domain/social-profile';
 import type { SettingsRecord, ServerLogSnapshot } from '../domain/site-settings';
 import type {
   AttendanceSessionInput,
@@ -98,11 +101,18 @@ export interface ApiClient {
   auth: {
     /** 세션이 없거나 만료면 null */
     me(): Promise<Session | null>;
+    adminSocialLink(): Promise<{ provider: OAuthProvider }>;
+    linkAdminSocial(input: LoginInput): Promise<{ signedIn: boolean }>;
+    socialDraft(): Promise<SocialDraft>;
+    saveSocialProfile(input: SocialDetails): Promise<SignupPhoneState>;
     socialProviders(): Promise<OAuthProvider[]>;
     startWebLink(provider: OAuthProvider): Promise<{ url: string }>;
     login(input: LoginInput): Promise<Session>;
     logout(): Promise<void>;
-    signup(input: SignupInput): Promise<{ requiresEmailVerification: boolean }>;
+    signup(input: SignupInput): Promise<SignupPhoneState>;
+    signupPhone(): Promise<SignupPhoneState>;
+    resendPhone(phone?: string): Promise<SignupPhoneState>;
+    confirmPhone(code: string): Promise<{ signedIn: boolean }>;
     resendVerification(email: string): Promise<void>;
     requestPasswordReset(email: string): Promise<void>;
     resetPassword(token: string, password: string): Promise<void>;
@@ -128,6 +138,7 @@ export interface ApiClient {
     /** 본인이 명단에 있는 출석부 기록, 최신순 */
     attendance(): Promise<MyAttendance[]>;
     /** 담당자가 연 출석 코드로 본인 출석 — 틀린 입력이 반복되면 RATE_LIMITED */
+    scanAttendance(input: AttendanceScan): Promise<MyAttendance>;
     checkIn(input: CheckInInput): Promise<MyAttendance>;
   };
   /** 동아리 운영 — 센터 직원 이상(club.manage) 또는 그 동아리 담당자. 서버가 동아리별로 검사한다. */
@@ -165,7 +176,7 @@ export interface ApiClient {
     /** 여러 명을 한 번에 체크 — 명단에 없는 회원이 있으면 VALIDATION */
     mark(id: string, marks: AttendanceMark[]): Promise<AttendanceSession>;
     /** 본인 출석 체크 열기(서버가 4자리 코드 발급, 10분 후 자동 마감)·닫기 */
-    setCheckIn(id: string, open: boolean): Promise<AttendanceSession>;
+    setCheckIn(id: string, open: boolean, position?: AttendancePosition): Promise<AttendanceSession>;
     /** 회원별 누적 출석 */
     stats(target: AttendanceTarget): Promise<AttendanceMemberStat[]>;
   };

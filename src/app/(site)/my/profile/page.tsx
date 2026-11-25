@@ -30,6 +30,11 @@ export default function ProfilePage() {
   const toast = useToast();
   const [errors, setErrors] = useState<FieldErrors>({});
   const available = useSocialProviders();
+  const verifyEmail = useMutation({
+    mutationFn: api.auth.resendVerification,
+    onSuccess: () => toast.success('받은 메일에서 인증 링크를 눌러 주세요.'),
+    onError: (e) => toast.error(errorMessage(e)),
+  });
   const connect = useMutation({
     mutationFn: api.auth.startWebLink,
     onSuccess: ({ url }) => window.location.assign(url),
@@ -81,7 +86,18 @@ export default function ProfilePage() {
           <p className="mb-1.5 text-[15px] font-semibold">이메일</p>
           <p className="flex min-h-12 items-center gap-2 rounded-md bg-surface-muted px-3 text-base break-all">
             {user.email}
-            {user.emailVerified && <Badge tone="success">인증됨</Badge>}
+            {user.emailVerified ? (
+              <Badge tone="success">인증됨</Badge>
+            ) : (
+              <button
+                type="button"
+                className="font-semibold text-brand-700"
+                disabled={verifyEmail.isPending}
+                onClick={() => verifyEmail.mutate(user.email)}
+              >
+                인증 메일 받기
+              </button>
+            )}
           </p>
         </div>
         <TextField
@@ -93,7 +109,8 @@ export default function ProfilePage() {
           error={errors.name}
         />
         <TextField
-          label="휴대전화 (선택)"
+          label="휴대전화"
+          required
           name="phone"
           type="tel"
           inputMode="tel"

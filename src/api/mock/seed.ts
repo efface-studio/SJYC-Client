@@ -46,6 +46,7 @@ export interface MockMembership {
 }
 
 export interface MockDb {
+  pendingSignup?: { email: string; phone: string; sentAt: number; attempts: number; expiresAt: number };
   profilePhotos?: Record<string, string>;
   siteSettings?: SettingsRecord;
   version: 8;
@@ -58,7 +59,7 @@ export interface MockDb {
   policies: PolicyDoc[];
   seq: number;
   /** managedClubIds 는 clubManagers 에서 계산해 내려준다 */
-  users: (Omit<User, 'managedClubIds'> & { password: string })[];
+  users: (Omit<User, 'managedClubIds'> & { password: string; signupPhoneVerifiedAt?: string })[];
   clubManagers: { clubId: string; userId: string; assignedAt: string }[];
   categories: ProgramCategory[];
   programs: Program[];

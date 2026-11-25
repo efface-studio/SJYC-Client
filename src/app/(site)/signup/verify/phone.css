@@ -1,0 +1,178 @@
+.phone-verify {
+  width: min(calc(100% - 40px), 420px);
+  margin: clamp(44px, 9vh, 100px) auto;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  color: var(--color-ink-900);
+}
+.phone-verify h1 {
+  font-size: clamp(25px, 4vw, 32px);
+  font-weight: 750;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.phone-verify form {
+  display: grid;
+  gap: 16px;
+}
+.phone-verify button {
+  cursor: pointer;
+}
+.phone-verify button:disabled {
+  cursor: default;
+}
+.phone-verify label {
+  font-weight: 600;
+}
+.phone-edit,
+.phone-resend button {
+  font-weight: 650;
+  color: var(--color-brand-700);
+  min-height: 44px;
+}
+.phone-edit {
+  margin-left: 16px;
+}
+.phone-resend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-line);
+  gap: 8px;
+  font-size: 14px;
+}
+.phone-resend button:disabled {
+  color: var(--color-ink-600);
+}
+.phone-otp {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+.phone-otp input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  opacity: 0;
+  cursor: text;
+  font-size: 16px;
+}
+.phone-otp span {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 8px;
+  font-weight: 650;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface);
+  color: var(--color-ink-900);
+}
+.phone-otp:focus-within span[data-current='true'] {
+  outline: 2px solid #bd0031;
+  outline-offset: -2px;
+}
+.phone-feedback {
+  min-height: 1.5em;
+  font-size: 14px;
+}
+.phone-check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #bd0031;
+  color: white;
+}
+.phone-check.final {
+  position: static;
+  transform: none;
+}
+.phone-otp[data-phase='error'] span {
+  border-color: #bd0031;
+}
+@keyframes phone-sweep {
+  0%,
+  60%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-3px);
+    border-color: #bd0031;
+    color: #bd0031;
+  }
+}
+@keyframes phone-collapse {
+  0% {
+    transform: none;
+  }
+  24%,
+  54% {
+    background: #bd0031;
+    border-color: #bd0031;
+    color: white;
+    transform: scale(1.04);
+  }
+  100% {
+    background: #bd0031;
+    color: white;
+    opacity: 0;
+    transform: translateX(calc(var(--travel) + var(--gap-travel))) scale(0.25);
+  }
+}
+@keyframes phone-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  45% {
+    transform: translateX(5px);
+  }
+  70% {
+    transform: translateX(-3px);
+  }
+}
+@keyframes phone-badge {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .phone-otp[data-phase='verifying'] span {
+    animation: phone-sweep 900ms infinite;
+    animation-delay: calc(var(--index) * 90ms);
+  }
+  .phone-otp[data-phase='success'] span {
+    animation: phone-collapse 900ms calc(var(--index) * 45ms) both;
+  }
+  .phone-otp[data-phase='error'] {
+    animation: phone-shake 0.4s;
+  }
+  .phone-otp .phone-check {
+    animation: phone-badge 0.2s 900ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone-otp[data-phase='success'] span {
+    visibility: hidden;
+  }
+}

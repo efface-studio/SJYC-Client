@@ -1,94 +1,182 @@
 'use client';
-
-import { useMutation } from '@tanstack/react-query';
-import { MailCheck } from 'lucide-react';
+import { useId, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { Check } from 'lucide-react';
 import { api, errorMessage } from '@/api';
-import { mockDev } from '@/api/mock/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { Button, buttonClass } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toast';
-import { IS_MOCK } from '@/config/env';
-import { PENDING_VERIFY_KEY } from '@/features/auth/session';
+import { TextField } from '@/components/ui/field';
+import { useSignupPhone } from '@/features/auth/use-signup-phone';
+import { SESSION_KEY } from '@/features/auth/session';
+import { memberRedirect } from '@/lib/safe-redirect';
+import './phone.css';
 
-const RESEND_COOLDOWN_SEC = 60;
-const noop = () => () => undefined;
-
-export default function VerifyEmailPage() {
-  const toast = useToast();
-  const email = useSyncExternalStore(
-    noop,
-    () => sessionStorage.getItem(PENDING_VERIFY_KEY),
-    () => null,
-  );
-  const [cooldown, setCooldown] = useState(0);
-  const [devVerified, setDevVerified] = useState(false);
-
+export default function VerifyPhonePage() {
+  const f = useSignupPhone(
+      typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    ),
+    id = useId(),
+    ref = useRef<HTMLInputElement>(null),
+    cache = useQueryClient(),
+    router = useRouter();
+  const [done, setDone] = useState(false);
+  const success = f.verify.isSuccess;
   useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [cooldown]);
-
-  const resend = useMutation({
-    mutationFn: () => api.auth.resendVerification(email ?? ''),
-    onSuccess: () => {
-      toast.success('인증 메일을 다시 보냈습니다.');
-      setCooldown(RESEND_COOLDOWN_SEC);
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
-
+    if (!success) return;
+    const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1250;
+    const timer = setTimeout(() => setDone(true), delay);
+    return () => clearTimeout(timer);
+  }, [success]);
+  const data = f.state.data;
+  const phase = success ? 'success' : f.verify.isPending ? 'verifying' : f.verify.isError ? 'error' : 'idle';
   return (
-    <div className="container-page py-10 md:py-16">
-      <title>이메일 인증 | 중구청소년센터</title>
-      <div className="mx-auto max-w-md text-center">
-        <MailCheck aria-hidden className="mx-auto size-12 text-brand-700" />
-        <h1 className="mt-4 text-2xl font-bold">이메일 인증이 필요합니다</h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-ink-700">
-          {email ? (
-            <>
-              <strong className="break-all">{email}</strong>(으)로 보낸 인증 메일의 링크를 눌러 가입을 완료해
-              주세요.
-            </>
-          ) : (
-            '가입할 때 입력한 이메일로 보낸 인증 메일의 링크를 눌러 가입을 완료해 주세요.'
-          )}
-        </p>
-        <p className="mt-2 text-sm text-ink-600">메일이 보이지 않으면 스팸함을 확인해 주세요.</p>
-
-        <div className="mt-8 grid gap-2">
-          <Button
-            variant="secondary"
-            size="lg"
-            disabled={!email || cooldown > 0}
-            loading={resend.isPending}
-            onClick={() => resend.mutate()}
-          >
-            {cooldown > 0 ? `인증 메일 다시 보내기 (${cooldown}초 후)` : '인증 메일 다시 보내기'}
-          </Button>
-          <Link href="/login" className={buttonClass({ size: 'lg' })}>
-            로그인 화면으로
-          </Link>
-        </div>
-
-        {IS_MOCK && email && (
-          <div className="mt-8 rounded-md border border-dashed border-warning-800/40 bg-warning-50 p-3 text-left text-sm text-warning-800">
-            <p className="font-bold">개발용 · 실제 메일은 발송되지 않습니다</p>
-            {devVerified ? (
-              <p className="mt-1">인증 완료로 처리했습니다. 로그인할 수 있습니다.</p>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setDevVerified(mockDev.verifyEmail(email))}
-                className="mt-2 min-h-11 font-semibold underline"
-              >
-                인증 링크를 누른 것으로 처리하기
-              </button>
-            )}
+    <main className="phone-verify">
+      <title>휴대전화 인증 | 중구청소년센터</title>
+      {done ? (
+        <>
+          <div className="phone-check final">
+            <Check aria-hidden />
           </div>
-        )}
-      </div>
-    </div>
+          <h1>가입이 완료되었습니다</h1>
+          {f.verify.data?.signedIn ? (
+            <Button
+              block
+              onClick={async () => {
+                const session = await api.auth.me();
+                if (session) cache.setQueryData(SESSION_KEY, session);
+                router.replace(memberRedirect(new URLSearchParams(window.location.search).get('next')));
+              }}
+            >
+              계속하기
+            </Button>
+          ) : (
+            <Link className={buttonClass({ size: 'lg' })} href="/login">
+              로그인하기
+            </Link>
+          )}
+        </>
+      ) : (
+        <>
+          <h1>휴대전화 인증</h1>
+          {f.state.isPending ? (
+            <p role="status">인증 요청을 확인하고 있어요.</p>
+          ) : f.state.isError || !data ? (
+            <>
+              <p role="alert">{errorMessage(f.state.error)}</p>
+              <Link href="/signup">회원가입으로 돌아가기</Link>
+            </>
+          ) : f.editing ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                f.resend(true);
+              }}
+            >
+              <TextField
+                type="tel"
+                label="새 휴대전화 번호"
+                value={f.number}
+                autoComplete="tel-national"
+                onChange={(e) => f.setNumber(e.target.value)}
+                required
+                autoFocus
+              />
+              <p role="alert">{f.error}</p>
+              <Button
+                block
+                type="submit"
+                disabled={!f.canChange || f.send.isPending}
+                loading={f.send.isPending}
+              >
+                새 번호로 코드 받기
+              </Button>
+              <button type="button" disabled={f.send.isPending} onClick={f.cancel}>
+                취소
+              </button>
+            </form>
+          ) : (
+            <>
+              <div>
+                <strong>{data.phone}</strong>
+                <button
+                  className="phone-edit"
+                  onClick={f.edit}
+                  disabled={success || f.verify.isPending || f.send.isPending}
+                >
+                  번호 변경
+                </button>
+              </div>
+              <p id={id + '-hint'}>
+                {data.verificationMode === 'preview'
+                  ? '테스트 코드 284600을 입력해 주세요.'
+                  : '문자로 받은 6자리 코드를 입력해 주세요.'}
+              </p>
+              <label htmlFor={id}>인증 코드</label>
+              <div className="phone-otp" data-phase={phase} aria-busy={f.verify.isPending}>
+                <input
+                  ref={ref}
+                  id={id}
+                  value={f.code}
+                  onChange={(e) => f.input(e.target.value)}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    f.input(e.clipboardData.getData('text'));
+                  }}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  aria-describedby={id + '-hint'}
+                  aria-invalid={f.verify.isError}
+                  readOnly={success || f.verify.isPending || f.send.isPending}
+                />
+                {Array.from({ length: 6 }, (_, i) => (
+                  <span
+                    aria-hidden
+                    key={i}
+                    data-current={i === Math.min(f.code.length, 5)}
+                    style={
+                      {
+                        '--index': i,
+                        '--travel': (2.5 - i) * 100 + '%',
+                        '--gap-travel': (2.5 - i) * 6 + 'px',
+                      } as CSSProperties
+                    }
+                  >
+                    {f.code[i]}
+                  </span>
+                ))}
+                {success && (
+                  <div className="phone-check">
+                    <Check />
+                  </div>
+                )}
+              </div>
+              <p role="status" className="phone-feedback">
+                {f.error ??
+                  (success
+                    ? '인증됐어요.'
+                    : f.verify.isPending
+                      ? '코드 확인 중…'
+                      : f.expired
+                        ? '입력 시간이 지났어요. 새 코드를 받아 주세요.'
+                        : f.send.isSuccess
+                          ? '새 코드를 요청했어요.'
+                          : '')}
+              </p>
+              <div className="phone-resend">
+                <span>코드가 오지 않았나요?</span>
+                <button
+                  type="button"
+                  onClick={() => f.resend(false)}
+                  disabled={!!f.remaining || f.send.isPending || f.verify.isPending || success}
+                >
+                  {f.send.isPending ? '요청 중…' : f.remaining ? f.remaining + '초 후 재발송' : '코드 재발송'}
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </main>
   );
 }

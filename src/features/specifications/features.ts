@@ -13,25 +13,49 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
+    key: 'admin-social',
+    title: '관리자 소셜 로그인과 계정 연결',
+    area: '계정',
+    role: '운영자·지정 동아리 담당자',
+    entry: '/admin/login · 관리자 앱 로그인',
+    purpose: '소셜 계정으로 기존 운영 계정에 로그인한다.',
+    inputs: '카카오·네이버 인증. 최초 연결 시 기존 관리자 계정의 이메일 및 비밀번호.',
+    steps: [
+      '소셜 인증이 끝나면 서버에서 연결된 계정과 현재 운영 권한을 확인한다.',
+      '처음 연결하는 경우 5분 이내에 기존 운영 계정의 이메일과 비밀번호를 입력한다.',
+      '서버에서 권한과 비밀번호를 확인하고 계정 연결을 기록한 뒤 세션을 발급한다.',
+    ],
+    exceptions:
+      '정지·미인증 계정, 운영 권한이 없는 회원, 다른 회원에 이미 연결된 소셜 계정은 연결할 수 없다. 인증 만료 시 소셜 로그인을 다시 시작한다.',
+    api: [
+      'GET /auth/admin-social/:provider/web-start',
+      'POST /auth/admin-social/:provider/start',
+      'POST /auth/admin-social/complete',
+      'GET /auth/admin-social/link',
+      'POST /auth/admin-social/link',
+    ],
+  },
+  {
     key: 'signup',
-    title: '회원가입과 이메일 인증',
+    title: '회원가입과 휴대전화 인증',
     area: '계정',
     role: '방문자',
     entry: '/signup',
-    purpose: '이메일 계정을 만들고 메일함의 일회용 링크로 본인 소유를 확인한다.',
+    purpose: '휴대전화로 받은 코드를 확인하고 회원 계정을 만든다.',
     inputs:
-      '이름 2~20자, 이메일, 영문과 숫자를 포함한 8~64자 비밀번호, 비밀번호 확인, 생년월일, 필수 약관 2종. 휴대전화와 소식 수신 동의는 선택이다. 서버에는 출생 연도를 전송한다.',
+      '이름 2~20자, 이메일, 영문과 숫자를 포함한 8~64자 비밀번호, 비밀번호 확인, 생년월일, 필수 약관 2종. 휴대전화는 필수이며, 소식 수신 동의는 선택이다. 생년월일과 출생 연도를 함께 저장한다.',
     steps: [
       '입력 중 비밀번호 세 조건과 확인란의 일치 여부를 표시한다.',
-      '가입 요청을 검증하고 이메일 인증 대기 계정을 만든다.',
-      '받은 메일에서 24시간 이내에 링크를 연 뒤 로그인한다.',
+      '휴대전화로 여섯 자리 코드를 요청한다. 번호를 잘못 입력하면 인증 화면에서 바로 수정할 수 있다.',
+      '5분 이내에 코드를 입력한다. 30초가 지나면 다시 받을 수 있고, 인증에 성공하면 가입을 완료한다.',
     ],
     exceptions:
       '형식 오류는 해당 필드에 표시한다. 미인증 계정은 로그인할 수 없다. 인증 완료 계정의 주소를 다시 사용하면 중복 오류를 반환한다.',
     api: [
       'POST /auth/signup',
-      'POST /auth/email-verification/resend',
-      'GET /auth/email-verification/confirm',
+      'GET /auth/phone-verification',
+      'POST /auth/phone-verification/resend',
+      'POST /auth/phone-verification/confirm',
     ],
   },
   {
@@ -179,7 +203,7 @@ export const features: Feature[] = [
     role: '로그인 회원',
     entry: '/my · /my/profile · /notifications',
     purpose: '본인 연락처와 동의 상태를 관리하고 활동 알림을 확인한다.',
-    inputs: '변경할 이름, 선택 휴대전화 및 수신 동의. 탈퇴 화면은 명시적인 확인 문구와 동의를 받는다.',
+    inputs: '이름, 필수 휴대전화 및 수신 동의. 탈퇴 화면은 명시적인 확인 문구와 동의를 받는다.',
     steps: [
       '프로필을 열어 저장된 정보를 확인한다.',
       '정보를 저장하거나 지정한 알림을 읽음으로 표시한다.',

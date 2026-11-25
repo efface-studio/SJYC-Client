@@ -24,3 +24,11 @@ export function memberRedirect(target: string | null | undefined): string {
   const path = safeRedirect(target, '/my');
   return path === '/admin' || path.startsWith('/admin/') ? '/my' : path;
 }
+
+/** next 는 /admin 하위 경로만 허용한다 (/admin/login 자체 제외) */
+export function adminRedirect(target: string | null): string {
+  const path = safeRedirect(target, '/admin');
+  const pathname = path.split(/[?#]/)[0] ?? '';
+  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
+  return isAdmin && !pathname.startsWith('/admin/login') ? path : '/admin';
+}
