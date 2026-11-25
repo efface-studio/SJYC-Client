@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useSession } from '@/features/auth/session';
+import { can } from '@/domain/permissions';
 import { CenterConsole } from '@/features/developer/center-console';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useRef, type KeyboardEvent } from 'react';
@@ -28,6 +30,7 @@ const TABS = [
 ] as const;
 
 function DeveloperTabs() {
+  const diagnostics = can(useSession().data?.user, 'developer.access');
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -52,7 +55,7 @@ function DeveloperTabs() {
     listRef.current?.querySelector<HTMLButtonElement>(`#dev-tab-${next.key}`)?.focus();
   };
 
-  if (!TABS.some((t) => t.key === params.get('tab'))) return <CenterConsole />;
+  if (!diagnostics || !TABS.some((t) => t.key === params.get('tab'))) return <CenterConsole />;
   const Panel = active.panel;
   return (
     <>
@@ -103,7 +106,7 @@ function DeveloperTabs() {
 
 export default function DeveloperPage() {
   return (
-    <AdminPage view="tools" title="개발자 도구" permission="developer.access">
+    <AdminPage view="tools" title="개발자 도구" permission="developer.view">
       <DeveloperTabs />
     </AdminPage>
   );
