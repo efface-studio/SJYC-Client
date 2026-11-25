@@ -1,5 +1,7 @@
 'use client';
 
+import { ProfilePhoto } from '@/features/profile/profile-photo';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -111,9 +113,12 @@ export default function MyPage() {
   return (
     <>
       <title>마이페이지 | 중구청소년센터</title>
-      <p className="text-base">
-        <strong>{session?.user.name}</strong>님, 안녕하세요.
-      </p>
+      <div className="flex items-center gap-3">
+        {session && <ProfilePhoto userId={session.user.id} />}
+        <p className="text-base">
+          <strong>{session?.user.name}</strong>님, 안녕하세요.
+        </p>
+      </div>
       <Link
         href="/notifications"
         className="mt-3 mb-6 flex items-center gap-3 border-y border-line py-3 hover:bg-surface-muted"

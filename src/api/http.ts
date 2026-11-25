@@ -92,6 +92,8 @@ const enc = encodeURIComponent;
 
 export const httpClient: ApiClient = {
   auth: {
+    socialProviders: () => request('GET', '/auth/social/providers'),
+    startWebLink: (provider) => request('POST', '/me/social/' + provider + '/web-start'),
     async me() {
       try {
         return await request('GET', '/auth/session');
@@ -109,6 +111,8 @@ export const httpClient: ApiClient = {
       request('POST', '/auth/password-reset/confirm', { body: { token, password } }),
   },
   me: {
+    profilePhoto: () => request('GET', '/me/profile/photo'),
+    setProfilePhoto: (image) => request('PUT', '/me/profile/photo', { body: { image } }),
     updateProfile: (input) => request('PATCH', '/me/profile', { body: input }),
     withdraw: () => request('DELETE', '/me'),
     applications: () => request('GET', '/me/applications'),

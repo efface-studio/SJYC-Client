@@ -112,6 +112,7 @@ function NoticeList() {
 export default function AdminNoticesPage() {
   return (
     <AdminPage
+      view="list"
       title="공지 관리"
       permission="notice.write"
       actions={

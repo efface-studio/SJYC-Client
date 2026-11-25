@@ -267,6 +267,10 @@ let lastResetToken: { token: string; userId: string } | null = null;
 
 export const mockClient: ApiClient = {
   auth: {
+    socialProviders: async () => [],
+    startWebLink: async () => {
+      throw new ApiError('NOT_CONFIGURED', '소셜 로그인을 사용할 수 없습니다.');
+    },
     me: () => respond((db) => (currentUser(db) ? toSession(db, currentUser(db)!) : null)),
     login: (input) =>
       respond((db) => {
@@ -287,7 +291,14 @@ export const mockClient: ApiClient = {
       }),
     signup: (input) =>
       respond((db) => {
-        if (db.users.some((x) => x.email.toLowerCase() === input.email.toLowerCase())) {
+        const registered = db.users.find((x) => x.email.toLowerCase() === input.email.toLowerCase());
+        if (registered) {
+          if (
+            registered.status === 'active' &&
+            !registered.emailVerified &&
+            registered.password === input.password
+          )
+            return { requiresEmailVerification: true };
           throw new ApiError('CONFLICT', '이미 가입된 이메일입니다.', {
             reason: 'EMAIL_TAKEN',
             fieldErrors: { email: '이미 가입된 이메일입니다.' },
@@ -298,7 +309,7 @@ export const mockClient: ApiClient = {
           id: nextId(db, 'u'),
           email: input.email,
           name: input.name,
-          phone: null,
+          phone: input.phone || null,
           birthYear: input.birthYear,
           roles: ['member'],
           status: 'active',
@@ -342,6 +353,15 @@ export const mockClient: ApiClient = {
   },
 
   me: {
+    profilePhoto: () => respond((db) => ({ image: db.profilePhotos?.[requireUser(db).id] ?? null })),
+    setProfilePhoto: (image) =>
+      respond((db) => {
+        const id = requireUser(db).id;
+        const photos = (db.profilePhotos ??= {});
+        if (image === null) delete photos[id];
+        else photos[id] = image;
+        return { image };
+      }),
     updateProfile: (input) =>
       respond((db) => {
         const u = requireUser(db);

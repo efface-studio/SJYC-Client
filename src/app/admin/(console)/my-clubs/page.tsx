@@ -16,7 +16,7 @@ function MyClubs() {
         list.length === 0 ? (
           <EmptyState title="운영하는 동아리가 없습니다" />
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="managed-clubs">
             {list.map((c) => (
               <li key={c.id}>
                 <Link
@@ -44,6 +44,7 @@ function MyClubs() {
 export default function MyClubsPage() {
   return (
     <AdminPage
+      view="directory"
       title="동아리 운영"
       permission={managesAnyClub}
       description="담당 동아리의 회원·가입 신청·출석·소식·소개를 관리합니다."

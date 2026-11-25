@@ -197,6 +197,7 @@ function ClubApplicationList() {
 export default function AdminClubApplicationsPage() {
   return (
     <AdminPage
+      view="list"
       title="동아리 가입 신청"
       permission="club.manage"
       breadcrumbs={[{ label: '동아리 관리', href: '/admin/clubs' }, { label: '가입 신청' }]}

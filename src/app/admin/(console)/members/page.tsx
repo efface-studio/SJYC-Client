@@ -27,9 +27,17 @@ const COLUMNS: Column<User>[] = [
     header: '이름',
     sort: 'title',
     primary: true,
-    cell: (u) => <RowLink href={`/admin/members/${u.id}`}>{u.name}</RowLink>,
+    cell: (u) => (
+      <div className="member-identity">
+        <span aria-hidden>{Array.from(u.name)[0]}</span>
+        <div className="list-subject">
+          <RowLink href={`/admin/members/${u.id}`}>{u.name}</RowLink>
+          <small>{u.email}</small>
+        </div>
+      </div>
+    ),
   },
-  { key: 'email', header: '이메일', cell: (u) => u.email, className: 'break-all' },
+
   {
     key: 'roles',
     header: '역할',
@@ -107,6 +115,7 @@ function MemberList() {
 export default function AdminMembersPage() {
   return (
     <AdminPage
+      view="list"
       title="회원"
       permission="member.read"
       docTitle="회원 관리"

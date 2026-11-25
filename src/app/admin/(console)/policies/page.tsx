@@ -119,7 +119,7 @@ function Policies() {
       {(d) => {
         const doc = d.find((x) => x.key === selected);
         return (
-          <>
+          <div className="policy-library" data-editing={!!doc}>
             <ul className="console-surface max-w-4xl divide-y divide-line">
               {d.map((x) => (
                 <li
@@ -153,7 +153,7 @@ function Policies() {
               ))}
             </ul>
             {doc && <PolicyEditor key={`${doc.key}-${doc.updatedAt}`} doc={doc} />}
-          </>
+          </div>
         );
       }}
     </QueryState>
@@ -163,6 +163,7 @@ function Policies() {
 export default function AdminPoliciesPage() {
   return (
     <AdminPage
+      view="policy"
       title="정책 문서"
       permission="policy.manage"
       docTitle="정책 문서 관리"

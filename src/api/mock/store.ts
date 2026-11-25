@@ -33,7 +33,7 @@ const memoryStore: KeyValueStore = (() => {
 
 function storage(): KeyValueStore | null {
   try {
-    if (typeof window === 'undefined') return null; // 서버 렌더링 중에는 저장하지 않는다
+    if (typeof window === 'undefined') return typeof self === 'undefined' ? null : memoryStore;
     return window.sessionStorage ?? memoryStore;
   } catch {
     return memoryStore;

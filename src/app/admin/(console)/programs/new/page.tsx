@@ -41,6 +41,7 @@ function NewProgram() {
 export default function AdminProgramNewPage() {
   return (
     <AdminPage
+      view="editor"
       title="프로그램 등록"
       permission="program.write"
       breadcrumbs={[{ label: '프로그램 관리', href: '/admin/programs' }, { label: '등록' }]}

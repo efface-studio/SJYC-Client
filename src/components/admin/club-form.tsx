@@ -1,5 +1,7 @@
 'use client';
 
+import { EditorIndex } from './editor-index';
+
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,7 +41,7 @@ function RowList<T>({
   const [rows, setRows] = useState(() => initial.map((value, id) => ({ id, value })));
   const [nextId, setNextId] = useState(initial.length);
   return (
-    <fieldset className="border-t border-line pt-5">
+    <fieldset id={'edit-' + legend.replaceAll(' ', '-')} className="editor-section">
       <legend className="text-[15px] font-bold">{legend}</legend>
       {hint && <p className="mt-1 text-sm text-ink-600">{hint}</p>}
       {rows.length > 0 && (
@@ -121,7 +123,7 @@ export function ClubForm({
   return (
     <form
       noValidate
-      className="console-surface console-form max-w-3xl space-y-5"
+      className="editor-sheet console-form space-y-5"
       onSubmit={(e) => {
         e.preventDefault();
         if (pending) return;
@@ -134,59 +136,65 @@ export function ClubForm({
         onSubmit(parsed.data);
       }}
     >
-      <div className="grid gap-5 sm:grid-cols-2">
+      <EditorIndex sections={['동아리 소개', '활동 안내', '사진', '활동', '정보 출처', '모집 설정']} />
+      <fieldset id="edit-동아리-소개" className="editor-section space-y-5">
+        <legend>동아리 소개</legend>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <TextField
+            label="동아리명"
+            name="name"
+            required
+            maxLength={40}
+            defaultValue={initial?.name}
+            error={shown.name}
+          />
+          <TextField
+            label="활동 분야"
+            name="field"
+            required
+            maxLength={40}
+            defaultValue={initial?.field}
+            error={shown.field}
+          />
+        </div>
         <TextField
-          label="동아리명"
-          name="name"
+          label="한 줄 소개"
+          name="summary"
           required
-          maxLength={40}
-          defaultValue={initial?.name}
-          error={shown.name}
+          maxLength={120}
+          defaultValue={initial?.summary}
+          error={shown.summary}
+        />
+        <TextAreaField
+          label="소개"
+          name="description"
+          required
+          rows={8}
+          maxLength={5000}
+          defaultValue={initial?.description}
+          error={shown.description}
+        />
+      </fieldset>
+      <fieldset id="edit-활동-안내" className="editor-section space-y-5">
+        <legend>활동 안내</legend>
+        <TextField
+          label="모임 안내"
+          name="meetingInfo"
+          required
+          maxLength={200}
+          defaultValue={initial?.meetingInfo}
+          error={shown.meetingInfo}
+          hint="예) 매주 토요일 오후 2시, 2층 미디어실"
         />
         <TextField
-          label="활동 분야"
-          name="field"
-          required
-          maxLength={40}
-          defaultValue={initial?.field}
-          error={shown.field}
+          label="대상"
+          name="target"
+          maxLength={100}
+          defaultValue={initial?.target ?? ''}
+          error={shown.target}
+          hint="예) 중구 거주 또는 관내 학교 재학 14~24세 청소년. 확인되지 않았으면 비워 두세요."
         />
-      </div>
-      <TextField
-        label="한 줄 소개"
-        name="summary"
-        required
-        maxLength={120}
-        defaultValue={initial?.summary}
-        error={shown.summary}
-      />
-      <TextAreaField
-        label="소개"
-        name="description"
-        required
-        rows={8}
-        maxLength={5000}
-        defaultValue={initial?.description}
-        error={shown.description}
-      />
-      <TextField
-        label="모임 안내"
-        name="meetingInfo"
-        required
-        maxLength={200}
-        defaultValue={initial?.meetingInfo}
-        error={shown.meetingInfo}
-        hint="예) 매주 토요일 오후 2시, 2층 미디어실"
-      />
-      <TextField
-        label="대상"
-        name="target"
-        maxLength={100}
-        defaultValue={initial?.target ?? ''}
-        error={shown.target}
-        hint="예) 중구 거주 또는 관내 학교 재학 14~24세 청소년. 확인되지 않았으면 비워 두세요."
-      />
-
+      </fieldset>
       <RowList<MediaPhoto>
         legend="사진"
         hint="센터 공식 채널에 올린 사진만 등록하고 출처(게시물 주소)를 함께 적습니다. 청소년 얼굴이 식별되는 사진은 보호자 동의를 확인한 뒤 등록하세요."
@@ -296,29 +304,32 @@ export function ClubForm({
         )}
       </RowList>
 
-      <div className="grid gap-5 border-t border-line pt-5 sm:grid-cols-2">
-        <SelectField
-          label="운영 상태"
-          name="status"
-          required
-          defaultValue={initial?.status ?? 'active'}
-          error={shown.status}
-          options={[
-            { value: 'active', label: '운영 중' },
-            { value: 'inactive', label: '운영 중지' },
-          ]}
-        />
-        <div className="sm:pt-8">
-          <CheckboxField
-            label="신규 회원 모집 중"
-            name="recruiting"
-            defaultChecked={initial?.recruiting ?? true}
-            error={shown.recruiting}
+      <fieldset className="editor-section" id="edit-모집-설정">
+        <legend>모집 설정</legend>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <SelectField
+            label="운영 상태"
+            name="status"
+            required
+            defaultValue={initial?.status ?? 'active'}
+            error={shown.status}
+            options={[
+              { value: 'active', label: '운영 중' },
+              { value: 'inactive', label: '운영 중지' },
+            ]}
           />
+          <div className="sm:pt-8">
+            <CheckboxField
+              label="신규 회원 모집 중"
+              name="recruiting"
+              defaultChecked={initial?.recruiting ?? true}
+              error={shown.recruiting}
+            />
+          </div>
         </div>
-      </div>
+      </fieldset>
       <FormError message={formError} />
-      <div className="flex justify-end border-t border-line pt-5">
+      <div className="editor-actions flex justify-end">
         <Button type="submit" loading={pending}>
           {submitLabel}
         </Button>

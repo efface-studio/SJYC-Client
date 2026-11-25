@@ -31,6 +31,10 @@
   justify-content: center;
   gap: 8px;
 }
+.login-submit[data-phase='success'] .login-result {
+  display: flex;
+  gap: 6px;
+}
 .login-dots {
   gap: 3px;
 }
@@ -47,15 +51,11 @@
   .auth-form > :nth-child(2) {
     animation-delay: 70ms;
   }
-  .login-result {
+  .login-submit:not([data-phase='success']) .login-result {
     animation: auth-enter 200ms ease-out;
   }
   .login-submit[data-phase='error'] .login-result {
     animation: auth-shake 450ms ease-out;
-  }
-  .login-submit[data-phase='success'] path {
-    stroke-dasharray: 1;
-    animation: auth-check 360ms ease-out;
   }
   .login-sweep {
     position: absolute;
@@ -109,13 +109,5 @@
   50% {
     transform: translateY(-3px);
     opacity: 0.55;
-  }
-}
-@keyframes auth-check {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
   }
 }

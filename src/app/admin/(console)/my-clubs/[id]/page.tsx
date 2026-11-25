@@ -43,7 +43,7 @@ function ClubOps({ club }: { club: Club }) {
 
   return (
     <>
-      <p className="-mt-3 mb-5 text-[15px] text-ink-600">
+      <p className="club-profile">
         <strong className="text-ink-900">{club.name}</strong> · {club.field} · 회원 {club.memberCount}명 ·{' '}
         {club.meetingInfo}
       </p>
@@ -103,6 +103,7 @@ export default function ClubOpsPage() {
   const { id } = useParams<{ id: string }>();
   return (
     <AdminPage
+      view="directory"
       title="동아리 운영"
       permission={managesAnyClub}
       breadcrumbs={[{ label: '동아리 운영', href: '/admin/my-clubs' }, { label: '상세' }]}

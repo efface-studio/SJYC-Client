@@ -41,6 +41,7 @@ import type {
   MyAttendance,
   MyClub,
   Notification,
+  OAuthProvider,
   PolicyDoc,
   PolicyKey,
   Space,
@@ -97,6 +98,8 @@ export interface ApiClient {
   auth: {
     /** 세션이 없거나 만료면 null */
     me(): Promise<Session | null>;
+    socialProviders(): Promise<OAuthProvider[]>;
+    startWebLink(provider: OAuthProvider): Promise<{ url: string }>;
     login(input: LoginInput): Promise<Session>;
     logout(): Promise<void>;
     signup(input: SignupInput): Promise<{ requiresEmailVerification: boolean }>;
@@ -105,6 +108,8 @@ export interface ApiClient {
     resetPassword(token: string, password: string): Promise<void>;
   };
   me: {
+    profilePhoto(): Promise<{ image: string | null }>;
+    setProfilePhoto(image: string | null): Promise<{ image: string | null }>;
     updateProfile(input: ProfileInput): Promise<User>;
     withdraw(): Promise<void>;
     applications(): Promise<ProgramApplication[]>;

@@ -66,6 +66,7 @@ function LoginForm() {
       )}
 
       <form
+        method="post"
         noValidate
         onChange={feedback.edit}
         onSubmit={(e) => {
