@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { CenterConsole } from '@/features/developer/center-console';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useRef, type KeyboardEvent } from 'react';
 import { AdminPage } from '@/components/admin/admin-page';
@@ -50,10 +52,14 @@ function DeveloperTabs() {
     listRef.current?.querySelector<HTMLButtonElement>(`#dev-tab-${next.key}`)?.focus();
   };
 
+  if (!TABS.some((t) => t.key === params.get('tab'))) return <CenterConsole />;
   const Panel = active.panel;
   return (
     <>
       <div className="developer-workspace">
+        <Link href="/admin/developer" className="dev-center-back">
+          ← 개발자 도구
+        </Link>
         <div
           ref={listRef}
           role="tablist"
