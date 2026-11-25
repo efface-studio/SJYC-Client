@@ -1,5 +1,5 @@
 'use client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -7,37 +7,26 @@ import { api, errorMessage } from '@/api';
 import { Button } from '@/components/ui/button';
 import { CheckboxField, FormError, TextField } from '@/components/ui/field';
 import type { SocialDraft } from '@/domain/social-profile';
-import { SESSION_KEY } from '@/features/auth/session';
 import { memberRedirect } from '@/lib/safe-redirect';
 import { todayKst } from '@/lib/format';
 
 function ProfileForm({ draft }: { draft: SocialDraft }) {
-  const router = useRouter(),
-    cache = useQueryClient();
+  const router = useRouter();
   const [name, setName] = useState(draft.name),
     [email, setEmail] = useState(draft.email),
     [phone, setPhone] = useState(draft.phone),
     [birthDate, setBirthDate] = useState(draft.birthDate);
-  const [sent, setSent] = useState(''),
-    [code, setCode] = useState('');
   const [terms, setTerms] = useState(false),
     [privacy, setPrivacy] = useState(false),
     [marketing, setMarketing] = useState(false);
-  const address = email.trim().toLowerCase(),
-    needsCode = address !== draft.verifiedEmail;
-  const send = useMutation({
-    mutationFn: api.auth.requestSocialCode,
-    onSuccess: (_, requested) => {
-      setSent(requested);
-      setCode('');
-    },
-  });
+  const address = email.trim().toLowerCase();
   const save = useMutation({
     mutationFn: api.auth.saveSocialProfile,
-    onSuccess: async () => {
-      await cache.invalidateQueries({ queryKey: SESSION_KEY });
-      router.replace(memberRedirect(new URLSearchParams(window.location.search).get('next')));
-    },
+    onSuccess: () =>
+      router.replace(
+        '/signup/verify?next=' +
+          encodeURIComponent(memberRedirect(new URLSearchParams(window.location.search).get('next'))),
+      ),
   });
   return (
     <form
@@ -50,7 +39,6 @@ function ProfileForm({ draft }: { draft: SocialDraft }) {
             email: address,
             phone,
             birthDate,
-            code: needsCode ? code : undefined,
             agreeTerms: terms,
             agreePrivacy: privacy,
             agreeMarketing: marketing,
@@ -92,39 +80,8 @@ function ProfileForm({ draft }: { draft: SocialDraft }) {
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
-          setSent('');
-          setCode('');
         }}
       />
-      {needsCode && (
-        <>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={!address || send.isPending}
-            onClick={() => send.mutate(address)}
-          >
-            {sent === address && sent ? '코드 다시 요청' : '이메일 코드 요청'}
-          </Button>
-          {sent === address && sent && (
-            <TextField
-              label="이메일 확인 코드"
-              required
-              value={code}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              hint={
-                draft.previewCode
-                  ? '테스트 코드 284600을 입력해 주세요.'
-                  : '메일에서 받은 여섯 자리 코드를 입력해 주세요.'
-              }
-            />
-          )}
-        </>
-      )}
       {draft.needsConsent && (
         <fieldset className="border-t border-line pt-3">
           <legend className="font-bold">약관 동의</legend>
@@ -163,15 +120,8 @@ function ProfileForm({ draft }: { draft: SocialDraft }) {
           />
         </fieldset>
       )}
-      <FormError
-        message={save.isError ? errorMessage(save.error) : send.isError ? errorMessage(send.error) : null}
-      />
-      <Button
-        type="submit"
-        size="lg"
-        loading={save.isPending}
-        disabled={needsCode && (!sent || sent !== address || code.length !== 6)}
-      >
+      <FormError message={save.isError ? errorMessage(save.error) : null} />
+      <Button type="submit" size="lg" loading={save.isPending}>
         확인하고 계속하기
       </Button>
     </form>

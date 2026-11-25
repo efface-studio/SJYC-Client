@@ -1767,6 +1767,50 @@
   },
   {
     "method": "GET",
+    "path": "/auth/phone-verification",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.signupPhone",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/confirm",
+    "access": "public",
+    "params": [
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 200,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.confirmPhone",
+    "args": ["body.code"]
+  },
+  {
+    "method": "POST",
+    "path": "/auth/phone-verification/resend",
+    "access": "public",
+    "params": [
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 200,
+    "result": "SignupPhoneState",
+    "call": "auth.resendPhone",
+    "args": ["body.phone"]
+  },
+  {
+    "method": "GET",
     "path": "/auth/session",
     "access": "session",
     "params": [],
@@ -1788,6 +1832,12 @@
       },
       {
         "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
         "kind": "body",
         "type": "string",
         "required": true
@@ -1829,15 +1879,84 @@
         "required": false
       },
       {
-        "name": "phone",
+        "name": "birthDate",
         "kind": "body",
         "type": "string",
         "required": false
       }
     ],
     "status": 201,
-    "result": "{ requiresEmailVerification: boolean; }",
+    "result": "SignupPhoneState",
     "call": "auth.signup",
+    "args": ["body"]
+  },
+  {
+    "method": "GET",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "SocialDraft",
+    "call": "auth.socialDraft",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/social/onboarding",
+    "access": "public",
+    "params": [
+      {
+        "name": "name",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "birthDate",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agreeTerms",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreePrivacy",
+        "kind": "body",
+        "type": "boolean",
+        "required": true
+      },
+      {
+        "name": "agreeMarketing",
+        "kind": "body",
+        "type": "boolean",
+        "required": false
+      },
+      {
+        "name": "code",
+        "kind": "body",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 201,
+    "result": "SignupPhoneState",
+    "call": "auth.saveSocialProfile",
     "args": ["body"]
   },
   {

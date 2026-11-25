@@ -12,7 +12,6 @@ import { SignupEmailField } from '@/features/auth/signup-email-field';
 import { SignupPasswordRules } from '@/features/auth/signup-password-rules';
 import { todayKst } from '@/lib/format';
 import { parseForm, signupSchema, type FieldErrors } from '@/domain/schemas';
-import { PENDING_VERIFY_KEY } from '@/features/auth/session';
 
 /** 가입 중 입력값을 잃지 않도록 정책 문서는 새 탭으로 연다 */
 function PolicyLink({ href, children }: { href: string; children: string }) {
@@ -37,11 +36,7 @@ export default function SignupPage() {
 
   const signup = useMutation({
     mutationFn: api.auth.signup,
-    onSuccess: (result, input) => {
-      sessionStorage.setItem(PENDING_VERIFY_KEY + '.mode', result.verificationMode ?? 'link');
-      sessionStorage.setItem(PENDING_VERIFY_KEY, input.email);
-      router.push('/signup/verify');
-    },
+    onSuccess: () => router.push('/signup/verify'),
     onError: (error) => {
       if (isApiError(error) && error.fieldErrors) setErrors(error.fieldErrors);
       setFormError(errorMessage(error));
