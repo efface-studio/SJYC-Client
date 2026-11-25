@@ -4,7 +4,8 @@ import { useQueries } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '@/api';
-import { BookOpenText } from 'lucide-react';
+import Image from 'next/image';
+import { BookOpenText, Package } from 'lucide-react';
 import './policy-reader.css';
 import { ErrorState, ListSkeleton } from '@/components/ui/states';
 import { OSS_WEB } from '@/config/oss-licenses';
@@ -47,6 +48,35 @@ function PolicySection({ doc }: { doc: PolicyDoc }) {
   );
 }
 
+const marks: Record<string, string> = {
+  '@tanstack/react-query': 'tanstack.svg',
+  'lucide-react': 'lucide.svg',
+  next: 'nextdotjs.svg',
+  react: 'react.svg',
+  'react-dom': 'react.svg',
+  'simple-icons': 'simpleicons.svg',
+  zod: 'zod.svg',
+  'tailwind-merge': 'tailwind-merge.png',
+  pretendard: 'pretendard.png',
+};
+
+function PackageMark({ name }: { name: string }) {
+  const mark = marks[name];
+  return mark ? (
+    <Image
+      aria-hidden
+      alt=""
+      src={'/oss/' + mark}
+      width={24}
+      height={24}
+      unoptimized
+      className="size-6 shrink-0 object-contain"
+    />
+  ) : (
+    <Package aria-hidden size={22} className="shrink-0 text-ink-600" />
+  );
+}
+
 /** 설치된 패키지에서 생성한 목록 (scripts/gen-oss-licenses.mjs) */
 function OpenSourceLicenses() {
   return (
@@ -75,19 +105,22 @@ function OpenSourceLicenses() {
           {OSS_WEB.map((p) => (
             <tr key={p.name} className="border-b border-line">
               <td className="py-2.5 pr-3">
-                {p.url ? (
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold hover:underline"
-                  >
-                    {p.name}
-                    <span className="sr-only">(새 창)</span>
-                  </a>
-                ) : (
-                  <span className="font-semibold">{p.name}</span>
-                )}
+                <div className="flex items-center gap-2">
+                  <PackageMark name={p.name} />
+                  {p.url ? (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold hover:underline"
+                    >
+                      {p.name}
+                      <span className="sr-only">(새 창)</span>
+                    </a>
+                  ) : (
+                    <span className="font-semibold">{p.name}</span>
+                  )}
+                </div>
               </td>
               <td className="py-2.5 pr-3 text-ink-600 tabular-nums">{p.version}</td>
               <td className="py-2.5">{p.license}</td>
