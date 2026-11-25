@@ -1,4 +1,5 @@
-import type { AppUpdate } from '@/domain/app-update';
+import type { MemberCommand, MemberActivityOptions } from '@/domain/member-actions';
+import type { AppUpdate, UpdateControl } from '@/domain/app-update';
 import type { SignupPhoneState } from '@/domain/signup-phone';
 import type { SocialDraft, SocialDetails } from '@/domain/social-profile';
 import type { SettingsRecord, ServerLogSnapshot } from '../domain/site-settings';
@@ -221,7 +222,7 @@ export interface ApiClient {
   admin: {
     updateSettings(input: SettingsRecord): Promise<SettingsRecord>;
     appUpdates(): Promise<AppUpdate[]>;
-    changeAppUpdate(id:string,input:import('@/domain/app-update').UpdateControl):Promise<{ok:boolean}>;
+    changeAppUpdate(id: string, input: UpdateControl): Promise<{ ok: boolean }>;
     serverLogs(): Promise<ServerLogSnapshot>;
     dashboard(periodDays: number): Promise<DashboardSummary>;
     notices: {
@@ -244,6 +245,8 @@ export interface ApiClient {
       decide(ids: string[], decision: Decision, reason: string | null): Promise<BulkResult>;
     };
     members: {
+      activityOptions(id: string): Promise<MemberActivityOptions>;
+      act(id: string, command: MemberCommand): Promise<{ resetUrl?: string }>;
       list(query: AdminListQuery): Promise<Page<User>>;
       get(id: string): Promise<User>;
       update(id: string, patch: { roles?: Role[]; status?: UserStatus }): Promise<User>;

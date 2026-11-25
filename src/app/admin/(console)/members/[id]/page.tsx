@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { api, errorMessage } from '@/api';
+import { MemberCommands } from '@/components/admin/member-commands';
 import { AdminPage } from '@/components/admin/admin-page';
 import { QueryState } from '@/components/admin/query-state';
 import { Badge } from '@/components/ui/badge';
@@ -147,9 +148,7 @@ function MemberDetail() {
               <dt className="text-ink-600">가입일</dt>
               <dd className="tabular-nums">{formatDate(u.createdAt)}</dd>
             </dl>
-            <p className="mt-2 text-sm text-ink-600">
-              연락처 등 그 밖의 개인정보는 업무상 필요한 화면(신청 상세 등)에서만 확인할 수 있습니다.
-            </p>
+            <p className="mt-2 text-sm text-ink-600">연락처는 회원 관리 권한이 있는 관리자에게 표시됩니다.</p>
           </article>
           <div className="review-side">
             {can(me, 'member.manage') &&
@@ -161,8 +160,13 @@ function MemberDetail() {
                 <Callout tone="info" className="mt-8 max-w-2xl">
                   개발자 계정의 역할·상태는 개발자만 변경할 수 있습니다.
                 </Callout>
+              ) : u.status === 'withdrawn' ? (
+                <Callout tone="info">탈퇴한 회원입니다.</Callout>
               ) : (
-                <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
+                <>
+                  <MemberCommands key={u.id} user={u} />
+                  <ManageForm key={`${u.status}-${u.roles.join()}`} user={u} roles={assignableRoles(me)} />
+                </>
               ))}
           </div>
         </div>
