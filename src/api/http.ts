@@ -92,6 +92,8 @@ const enc = encodeURIComponent;
 
 export const httpClient: ApiClient = {
   auth: {
+    adminSocialLink: () => request('GET', '/auth/admin-social/link'),
+    linkAdminSocial: (input) => request('POST', '/auth/admin-social/link', { body: input }),
     socialDraft: () => request('GET', '/auth/social/onboarding'),
     requestSocialCode: (email) => request('POST', '/auth/social/onboarding/email', { body: { email } }),
     saveSocialProfile: (input) => request('POST', '/auth/social/onboarding', { body: input }),

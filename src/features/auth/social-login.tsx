@@ -1,5 +1,6 @@
 'use client';
 
+import './social-login.css';
 import { useSocialProviders } from './use-social-providers';
 import Image from 'next/image';
 import { siNaver, siApple } from 'simple-icons';
@@ -32,7 +33,7 @@ const STYLE: Record<OAuthProvider, { className: string; text: string }> = {
   google: { className: 'border border-[#747775] bg-white text-[#1F1F1F]', text: 'Google 계정으로 로그인' },
 };
 
-export function SocialLoginButtons({ next }: { next: string | null }) {
+export function SocialLoginButtons({ next, admin = false }: { next: string | null; admin?: boolean }) {
   const providers = providerStates(useSocialProviders());
   const anyEnabled = providers.some((p) => p.enabled);
 
@@ -44,7 +45,7 @@ export function SocialLoginButtons({ next }: { next: string | null }) {
             <button
               type="button"
               disabled={!enabled}
-              onClick={() => window.location.assign(oauthStartUrl(provider, next))}
+              onClick={() => window.location.assign(oauthStartUrl(provider, next, admin))}
               className={cn(
                 'min-h-12 w-full rounded-md text-[15px] font-semibold',
                 STYLE[provider].className,

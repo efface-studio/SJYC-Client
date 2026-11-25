@@ -267,6 +267,12 @@ let lastResetToken: { token: string; userId: string } | null = null;
 
 export const mockClient: ApiClient = {
   auth: {
+    adminSocialLink: async () => {
+      throw new ApiError('VALIDATION', '관리자 소셜 로그인을 다시 시작해 주세요.');
+    },
+    linkAdminSocial: async () => {
+      throw new ApiError('NOT_CONFIGURED', '관리자 소셜 로그인을 다시 시작해 주세요.');
+    },
     socialDraft: async () => {
       throw new ApiError('VALIDATION', '소셜 로그인을 다시 시작해 주세요.');
     },

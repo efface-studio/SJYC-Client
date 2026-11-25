@@ -13,6 +13,29 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
+    key: 'admin-social',
+    title: '관리자 소셜 로그인과 계정 연결',
+    area: '계정',
+    role: '운영자·지정 동아리 담당자',
+    entry: '/admin/login · 관리자 앱 로그인',
+    purpose: '소셜 계정으로 기존 운영 계정에 로그인한다.',
+    inputs: '카카오·네이버 인증. 최초 연결 시 기존 관리자 계정의 이메일 및 비밀번호.',
+    steps: [
+      '소셜 인증이 끝나면 서버에서 연결된 계정과 현재 운영 권한을 확인한다.',
+      '처음 연결하는 경우 5분 이내에 기존 운영 계정의 이메일과 비밀번호를 입력한다.',
+      '서버에서 권한과 비밀번호를 확인하고 계정 연결을 기록한 뒤 세션을 발급한다.',
+    ],
+    exceptions:
+      '정지·미인증 계정, 운영 권한이 없는 회원, 다른 회원에 이미 연결된 소셜 계정은 연결할 수 없다. 인증 만료 시 소셜 로그인을 다시 시작한다.',
+    api: [
+      'GET /auth/admin-social/:provider/web-start',
+      'POST /auth/admin-social/:provider/start',
+      'POST /auth/admin-social/complete',
+      'GET /auth/admin-social/link',
+      'POST /auth/admin-social/link',
+    ],
+  },
+  {
     key: 'signup',
     title: '회원가입과 이메일 인증',
     area: '계정',

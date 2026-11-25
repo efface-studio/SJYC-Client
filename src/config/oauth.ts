@@ -27,8 +27,9 @@ export function providerStates(available: readonly OAuthProvider[]): ProviderSta
   }));
 }
 
-export function oauthStartUrl(provider: OAuthProvider, next: string | null): string {
-  const redirect = encodeURIComponent(safeRedirect(next, '/my'));
+export function oauthStartUrl(provider: OAuthProvider, next: string | null, admin = false): string {
+  const redirect = encodeURIComponent(safeRedirect(next, admin ? '/admin' : '/my'));
+  if (admin) return `${API_BASE_URL}/auth/admin-social/${provider}/web-start?redirect=${redirect}`;
   return `${API_BASE_URL}/auth/oauth/${provider}/start?redirect=${redirect}`;
 }
 

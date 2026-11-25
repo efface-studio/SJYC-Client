@@ -20,19 +20,12 @@ import { canEnterConsole } from '@/domain/permissions';
 import { LoginSubmit, useLoginFeedback } from '@/features/auth/login-feedback';
 import { loginSchema, parseForm, type FieldErrors } from '@/domain/schemas';
 import { SESSION_KEY, useLogout, useSession } from '@/features/auth/session';
-import { safeRedirect } from '@/lib/safe-redirect';
+import { SocialLoginButtons } from '@/features/auth/social-login';
+import { adminRedirect } from '@/lib/safe-redirect';
 
 const ADMIN_DEMO = DEMO_ACCOUNTS.filter((a) =>
   ['leader@demo.test', 'staff@demo.test', 'admin@demo.test', 'developer@demo.test'].includes(a.email),
 );
-
-/** next 는 /admin 하위 경로만 허용한다 (/admin/login 자체 제외) */
-function adminRedirect(target: string | null): string {
-  const path = safeRedirect(target, '/admin');
-  const pathname = path.split(/[?#]/)[0] ?? '';
-  const isAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
-  return isAdmin && !pathname.startsWith('/admin/login') ? path : '/admin';
-}
 
 function AdminLoginForm() {
   const feedback = useLoginFeedback();
@@ -140,6 +133,9 @@ function AdminLoginForm() {
           disabled={logout.isPending}
         />
       </form>
+      <div className="mt-6">
+        <SocialLoginButtons admin next={next} />
+      </div>
 
       {DEMO_DATA && (
         <div className="mt-6 border-t border-dashed border-line-strong pt-4">
