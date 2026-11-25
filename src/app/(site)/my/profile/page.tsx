@@ -93,7 +93,8 @@ export default function ProfilePage() {
           error={errors.name}
         />
         <TextField
-          label="휴대전화 (선택)"
+          label="휴대전화"
+          required
           name="phone"
           type="tel"
           inputMode="tel"
