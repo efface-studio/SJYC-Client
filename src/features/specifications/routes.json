@@ -1546,6 +1546,102 @@
     "args": []
   },
   {
+    "method": "POST",
+    "path": "/auth/admin-social/:provider/start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/:provider/web-start",
+    "access": "public",
+    "params": [
+      {
+        "name": "provider",
+        "kind": "param",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "redirect",
+        "kind": "query",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "status": 302,
+    "result": "Location",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/complete",
+    "access": "public",
+    "params": [
+      {
+        "name": "receipt",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "claim",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "unknown",
+    "call": "",
+    "args": []
+  },
+  {
+    "method": "GET",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [],
+    "status": 200,
+    "result": "{ provider: OAuthProvider; }",
+    "call": "auth.adminSocialLink",
+    "args": []
+  },
+  {
+    "method": "POST",
+    "path": "/auth/admin-social/link",
+    "access": "public",
+    "params": [
+      {
+        "name": "email",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "password",
+        "kind": "body",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "status": 201,
+    "result": "{ signedIn: boolean; }",
+    "call": "auth.linkAdminSocial",
+    "args": ["body"]
+  },
+  {
     "method": "GET",
     "path": "/auth/email-verification/confirm",
     "access": "public",

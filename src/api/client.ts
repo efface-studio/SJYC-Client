@@ -99,6 +99,8 @@ export interface ApiClient {
   auth: {
     /** 세션이 없거나 만료면 null */
     me(): Promise<Session | null>;
+    adminSocialLink(): Promise<{ provider: OAuthProvider }>;
+    linkAdminSocial(input: LoginInput): Promise<{ signedIn: boolean }>;
     socialDraft(): Promise<SocialDraft>;
     requestSocialCode(email: string): Promise<void>;
     saveSocialProfile(input: SocialDetails): Promise<{ signedIn: boolean }>;
