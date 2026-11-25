@@ -101,10 +101,11 @@ test('잘못된 로그인 입력은 오류를 표시한다', async ({ page }) =>
 
 test('지원 전인 Google과 미설정 공급자는 로그인을 시작할 수 없다', async ({ page }) => {
   await page.goto('/login');
-  for (const provider of ['카카오', '네이버', 'Apple']) {
+  for (const provider of ['카카오', '네이버']) {
     const button = page.getByRole('button', { name: new RegExp(provider + '.*설정 필요') });
     await expect(button).toBeDisabled();
   }
+  await expect(page.getByRole('button', { name: /Apple.*준비 중/ })).toBeDisabled();
   const google = page.getByRole('button', { name: /Google.*준비 중/ });
   await expect(google).toBeDisabled();
   await google.click({ force: true });
