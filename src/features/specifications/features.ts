@@ -37,24 +37,25 @@ export const features: Feature[] = [
   },
   {
     key: 'signup',
-    title: '회원가입과 이메일 인증',
+    title: '회원가입과 휴대전화 인증',
     area: '계정',
     role: '방문자',
     entry: '/signup',
-    purpose: '이메일 계정을 만들고 메일함의 일회용 링크로 본인 소유를 확인한다.',
+    purpose: '휴대전화로 받은 코드를 확인하고 회원 계정을 만든다.',
     inputs:
       '이름 2~20자, 이메일, 영문과 숫자를 포함한 8~64자 비밀번호, 비밀번호 확인, 생년월일, 필수 약관 2종. 휴대전화는 필수이며, 소식 수신 동의는 선택이다. 생년월일과 출생 연도를 함께 저장한다.',
     steps: [
       '입력 중 비밀번호 세 조건과 확인란의 일치 여부를 표시한다.',
-      '가입 요청을 검증하고 이메일 인증 대기 계정을 만든다.',
-      '받은 메일에서 24시간 이내에 링크를 연 뒤 로그인한다.',
+      '휴대전화로 여섯 자리 코드를 요청한다. 번호를 잘못 입력하면 인증 화면에서 바로 수정할 수 있다.',
+      '5분 이내에 코드를 입력한다. 30초가 지나면 다시 받을 수 있고, 인증에 성공하면 가입을 완료한다.',
     ],
     exceptions:
       '형식 오류는 해당 필드에 표시한다. 미인증 계정은 로그인할 수 없다. 인증 완료 계정의 주소를 다시 사용하면 중복 오류를 반환한다.',
     api: [
       'POST /auth/signup',
-      'POST /auth/email-verification/resend',
-      'GET /auth/email-verification/confirm',
+      'GET /auth/phone-verification',
+      'POST /auth/phone-verification/resend',
+      'POST /auth/phone-verification/confirm',
     ],
   },
   {
