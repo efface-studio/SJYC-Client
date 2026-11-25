@@ -271,7 +271,7 @@ async function adminLoginAs(
   await page.goto(`/admin/login?next=${encodeURIComponent(next)}`);
   await page.getByRole('button', { name: label, exact: true }).click();
   await page.getByRole('button', { name: '관리자 로그인' }).click();
-  await page.waitForURL((url) => url.pathname === next);
+  await page.waitForURL((url) => url.pathname + url.search === next);
 }
 
 test('320px에서 회원 메뉴와 관리자 일정 입력란이 화면 안에 들어온다', async ({ page }) => {
