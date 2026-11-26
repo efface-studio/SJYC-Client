@@ -1,5 +1,6 @@
 'use client';
 
+import { ContentHistory } from '@/features/applications/content';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, errorMessage } from '@/api';
@@ -66,10 +67,11 @@ function ClubApplicationList() {
       key: 'motivation',
       header: '가입 동기',
       cell: (a) => (
-        <span className="line-clamp-3 whitespace-pre-line md:max-w-sm" title={a.motivation}>
+        <div className="whitespace-pre-line md:max-w-sm" title={a.motivation}>
           {a.motivation}
           {a.reason && <span className="mt-1 block text-ink-600">반려 사유: {a.reason}</span>}
-        </span>
+          <ContentHistory edits={a.contentEdits} />
+        </div>
       ),
     },
     {

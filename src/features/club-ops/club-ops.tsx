@@ -1,5 +1,6 @@
 'use client';
 
+import { ContentHistory } from '@/features/applications/content';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -171,6 +172,7 @@ export function ApplicationsTab({ clubId }: { clubId: string }) {
                     </Badge>
                   </div>
                   <p className="mt-1 text-[15px] whitespace-pre-line text-ink-700">{a.motivation}</p>
+                  <ContentHistory edits={a.contentEdits} />
                   <p className="mt-1 text-sm text-ink-600 tabular-nums">
                     신청 {formatDateTime(a.createdAt)}
                     {a.reason && ` · 사유: ${a.reason}`}

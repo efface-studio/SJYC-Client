@@ -1,5 +1,6 @@
 'use client';
 
+import { ApplicationEditor } from '@/features/applications/content';
 import { ProfilePhoto } from '@/features/profile/profile-photo';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -106,7 +107,7 @@ export default function MyPage() {
   const applications = useQuery({ queryKey: ['my-applications'], queryFn: () => api.me.applications() });
   const clubs = useQuery({ queryKey: ['my-clubs'], queryFn: () => api.me.clubs() });
   const clubApps = useQuery({ queryKey: ['my-club-applications'], queryFn: () => api.me.clubApplications() });
-  const openClubApps = clubApps.data?.filter((a) => a.status !== 'approved') ?? [];
+  const openClubApps = clubApps.data ?? [];
   const notifications = useQuery({ queryKey: NOTIFICATIONS_KEY, queryFn: () => api.me.notifications() });
   const unread = notifications.data?.filter((n) => n.readAt === null).length ?? 0;
 
@@ -237,6 +238,13 @@ export default function MyPage() {
                       <span className="text-sm text-ink-600">{formatDate(a.createdAt)} 신청</span>
                     </div>
                     <p className="mt-1 font-semibold">{a.clubName}</p>
+                    <p className="my-2 whitespace-pre-line">{a.motivation}</p>
+                    <ApplicationEditor
+                      kind="club"
+                      id={a.id}
+                      value={a.motivation}
+                      revision={a.contentEdits?.length ?? 0}
+                    />
                     {a.reason && <p className="mt-1 text-sm text-ink-700">사유: {a.reason}</p>}
                   </li>
                 );

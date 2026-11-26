@@ -1,5 +1,6 @@
 'use client';
 
+import { ApplicationEditor } from '@/features/applications/content';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -81,7 +82,10 @@ function ApplicationDetail() {
         <dt className="font-semibold text-ink-600">연락처</dt>
         <dd>{a.phone}</dd>
         <dt className="font-semibold text-ink-600">요청 사항</dt>
-        <dd className="whitespace-pre-line">{a.note || '없음'}</dd>
+        <dd className="whitespace-pre-line">
+          {a.note || '없음'}
+          <ApplicationEditor kind="program" id={id} value={a.note} revision={a.contentEdits?.length ?? 0} />
+        </dd>
       </dl>
 
       <section aria-labelledby="history-title" className="mt-6">
