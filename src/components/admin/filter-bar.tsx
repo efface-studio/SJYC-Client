@@ -121,7 +121,7 @@ export function FilterBar({ searchLabel, placeholder, primary, secondary, total 
           <div className="list-search-input">
             <SearchInput
               id={searchId}
-              key={q}
+
               name="q"
               defaultValue={q}
               placeholder={placeholder}

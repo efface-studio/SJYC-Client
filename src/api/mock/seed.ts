@@ -1,3 +1,4 @@
+import type { ContactSettings } from '@/domain/login-contact';
 import type { SettingsRecord } from '@/domain/site-settings';
 /**
  * 개발용 데이터.
@@ -49,6 +50,7 @@ export interface MockDb {
   pendingSignup?: { email: string; phone: string; sentAt: number; attempts: number; expiresAt: number };
   profilePhotos?: Record<string, string>;
   siteSettings?: SettingsRecord;
+  loginContact?: ContactSettings;
   version: 8;
   notifications: Notification[];
   media: MediaItem[];

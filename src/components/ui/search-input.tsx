@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useRef, useState, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { cn } from '@/lib/cn';
 
 type SearchInputProps = Omit<ComponentProps<'input'>, 'type' | 'defaultValue'> & {
@@ -14,13 +14,49 @@ type SearchInputProps = Omit<ComponentProps<'input'>, 'type' | 'defaultValue'> &
 export function SearchInput({ defaultValue, className, wrapperClassName, ...props }: SearchInputProps) {
   const ref = useRef<HTMLInputElement>(null);
   const [filled, setFilled] = useState(!!defaultValue);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const composing = useRef(false);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (ref.current && ref.current.value.trim() !== (defaultValue ?? '')) {
+      clearTimeout(timer.current);
+      ref.current.value = defaultValue ?? '';
+      setFilled(Boolean(defaultValue));
+    }
+  }, [defaultValue]);
+
+  function search(value: string) {
+    clearTimeout(timer.current);
+    if (composing.current) return;
+    const pathname = window.location.pathname;
+    timer.current = setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.pathname !== pathname || (url.searchParams.get('q') ?? '') === value.trim()) return;
+      if (value.trim()) url.searchParams.set('q', value.trim());
+      else url.searchParams.delete('q');
+      url.searchParams.delete('page');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }, 220);
+  }
+
   return (
     <div className={cn('relative min-w-0 flex-1', wrapperClassName)}>
       <input
         ref={ref}
         type="search"
         defaultValue={defaultValue}
-        onInput={(e) => setFilled(!!e.currentTarget.value)}
+        onCompositionStart={() => {
+          composing.current = true;
+          clearTimeout(timer.current);
+        }}
+        onCompositionEnd={(e) => {
+          composing.current = false;
+          search(e.currentTarget.value);
+        }}
+        onInput={(e) => {
+          setFilled(Boolean(e.currentTarget.value));
+          search(e.currentTarget.value);
+        }}
         className={cn('w-full pr-11', className)}
         {...props}
       />
@@ -32,6 +68,7 @@ export function SearchInput({ defaultValue, className, wrapperClassName, ...prop
             if (!ref.current) return;
             ref.current.value = '';
             setFilled(false);
+            search('');
             ref.current.focus();
           }}
           className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-600 hover:text-ink-900"
