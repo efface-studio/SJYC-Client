@@ -21,6 +21,7 @@ import {
   type DevSection,
 } from '@/domain/developer-console';
 import { useLogout, useSession } from '@/features/auth/session';
+import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
@@ -71,6 +72,25 @@ function ActionForm({ form, done }: { form: DevForm; done: () => void }) {
     >
       {form.fields?.map((f) => {
         const value = values[f.key] ?? '';
+        if (f.key === 'maintenance')
+          return (
+            <label className="dev-center-check" key={f.key}>
+              <input
+                type="checkbox"
+                role="switch"
+                checked={value === 'true'}
+                onChange={(e) => set(f.key, String(e.target.checked))}
+              />
+              {f.label}
+            </label>
+          );
+        if (f.key === 'message')
+          return (
+            <label className="dev-center-field" key={f.key}>
+              {f.label}
+              <textarea rows={3} maxLength={160} value={value} onChange={(e) => set(f.key, e.target.value)} />
+            </label>
+          );
         if (f.options && f.multiple)
           return (
             <fieldset key={f.key}>
@@ -147,6 +167,10 @@ export function CenterConsole() {
   const page = Math.min(10000, Math.max(0, Number.parseInt(params.get('page') ?? '0') || 0));
   const query = useQuery({
     queryKey: ['admin', 'dev-console', session.data?.user.id, writable, section, item, search, page],
+    placeholderData: (previous, query) =>
+      query?.queryKey.slice(2, 6).join('/') === [session.data?.user.id, writable, section, item].join('/')
+        ? previous
+        : undefined,
     queryFn: () => api.admin.developerView({ section, item, search, page }),
     refetchInterval: (q) => q.state.data?.interval ?? false,
   });
@@ -178,9 +202,14 @@ export function CenterConsole() {
                 </Link>
               )}
               <h2>{view.title}</h2>
+              {writable && section === 'operations' && !item && (
+                <Link className="dev-center-device" href={url({ section, item: 'settings' })}>
+                  운영 설정 편집 <ArrowRight size={15} />
+                </Link>
+              )}
               {view.searchLabel && (
                 <form
-                  key={section + item + search}
+                  key={section + item}
                   className="dev-center-search"
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -193,7 +222,7 @@ export function CenterConsole() {
                     );
                   }}
                 >
-                  <input
+                  <SearchInput
                     aria-label={view.searchLabel}
                     placeholder={view.searchLabel}
                     name="query"

@@ -91,7 +91,7 @@ function NoticeList() {
         <SearchInput
           id="notice-q"
           name="q"
-          key={q}
+
           defaultValue={q}
           placeholder="제목·내용 검색"
           enterKeyHint="search"
