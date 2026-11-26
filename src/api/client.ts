@@ -1,7 +1,9 @@
+import type { ContactSettings, ContactPatch } from '@/domain/login-contact';
+import type { ApplicationEditInput } from '@/domain/types';
 import type { DevLocation, DevView, DevCommand } from '@/domain/developer-console';
 import type { MemberCommand, MemberActivityOptions } from '@/domain/member-actions';
 import type { AttendancePosition, AttendanceScan } from '@/domain/check-in-location';
-import type { AppUpdate, UpdateControl } from '@/domain/app-update';
+import type { AppUpdate, UpdateControl, PublicationSettings, WaveAction } from '@/domain/app-update';
 import type { SignupPhoneState } from '@/domain/signup-phone';
 import type { SocialDraft, SocialDetails } from '@/domain/social-profile';
 import type { SettingsRecord, ServerLogSnapshot } from '../domain/site-settings';
@@ -127,6 +129,8 @@ export interface ApiClient {
     withdraw(): Promise<void>;
     applications(): Promise<ProgramApplication[]>;
     application(id: string): Promise<ProgramApplication>;
+    editApplication(id: string, input: ApplicationEditInput): Promise<ProgramApplication>;
+    editClubApplication(id: string, input: ApplicationEditInput): Promise<ClubApplication>;
     cancelApplication(id: string): Promise<ProgramApplication>;
     clubs(): Promise<MyClub[]>;
     clubApplications(): Promise<ClubApplication[]>;
@@ -223,8 +227,15 @@ export interface ApiClient {
   };
   site: { settings(): Promise<SettingsRecord> };
   admin: {
+    loginContact(): Promise<ContactSettings>;
+    setLoginContact(input: ContactPatch): Promise<ContactSettings>;
     updateSettings(input: SettingsRecord): Promise<SettingsRecord>;
     changeAppUpdate(id: string, input: UpdateControl): Promise<{ ok: boolean }>;
+    publicationSettings(): Promise<PublicationSettings>;
+    configurePublication(
+      input: Partial<Pick<PublicationSettings, 'automatic' | 'splash'>> & { version: number },
+    ): Promise<PublicationSettings>;
+    changeWave(id: string, input: WaveAction): Promise<{ ok: boolean }>;
     appUpdates(): Promise<AppUpdate[]>;
     developerView(location: DevLocation): Promise<DevView>;
     developerAction(input: DevCommand): Promise<void>;
@@ -262,7 +273,7 @@ export interface ApiClient {
       create(input: ClubFormInput): Promise<Club>;
       update(id: string, input: ClubFormInput): Promise<Club>;
       applications(
-        query: AdminListQuery & { status?: ClubApplicationStatus | '' },
+        query: AdminListQuery & { status?: ClubApplicationStatus | ''; clubId?: string },
       ): Promise<Page<ClubApplication>>;
       decideApplication(id: string, decision: Decision, reason: string | null): Promise<ClubApplication>;
       /** 동아리별 담당자 — club.manage */

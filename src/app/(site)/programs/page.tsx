@@ -89,7 +89,7 @@ function ProgramList() {
             id="program-q"
             name="q"
             defaultValue={q}
-            key={q}
+
             placeholder="프로그램명, 대상으로 검색"
             enterKeyHint="search"
             className="h-12 rounded-md border border-line-strong bg-surface px-3 text-base focus:border-brand-700 focus:outline-none"

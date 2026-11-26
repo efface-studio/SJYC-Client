@@ -1,4 +1,7 @@
 'use client';
+import { PublicationOptions, ReleasePanel } from './distribution';
+import { useSession } from '@/features/auth/session';
+import { can } from '@/domain/permissions';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, errorMessage } from '@/api';
@@ -7,6 +10,7 @@ import { ListSkeleton } from '@/components/ui/states';
 import { formatDateTime } from '@/lib/format';
 
 function Releases() {
+  const developer = can(useSession().data?.user, 'developer.access');
   const [platform, setPlatform] = useState('ios');
   const q = useQuery({
     queryKey: ['admin', 'app-updates'],
@@ -16,6 +20,7 @@ function Releases() {
   const rows = (q.data ?? []).filter((r) => r.platform === platform);
   return (
     <section>
+      {developer && <PublicationOptions />}
       <div className="flex flex-wrap items-center gap-3">
         {['ios', 'android'].map((p) => (
           <button
@@ -44,7 +49,14 @@ function Releases() {
             <li key={r.id} className="space-y-1 border-b border-line py-5">
               <small>
                 {r.flavor === 'admin' ? '관리자앱' : '유저앱'} ·{' '}
-                {r.channel === 'production' ? '운영' : '검수'} · {r.live ? '배포 중' : '이전 배포'}
+                {r.channel === 'production' ? '운영' : '검수'} ·{' '}
+                {r.manual
+                  ? r.waves?.length
+                    ? '차수별 배포'
+                    : '발행 대기'
+                  : r.live
+                    ? '배포 중'
+                    : '이전 배포'}
               </small>
               <h2 className="font-bold">{r.message}</h2>
               <p>
@@ -53,6 +65,7 @@ function Releases() {
               <p>
                 확인한 기기 약 {r.seen}대 · 적용 확인 약 {r.running}대
               </p>
+              <ReleasePanel r={r} refresh={q.refetch} />
             </li>
           ))}
         </ul>

@@ -1,5 +1,6 @@
 'use client';
 
+import { ContentHistory } from '@/features/applications/content';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -72,7 +73,10 @@ function ApplicationDetail() {
               <dt className="text-ink-600">신청 일시</dt>
               <dd className="tabular-nums">{formatDateTime(a.createdAt)}</dd>
               <dt className="text-ink-600">요청 사항</dt>
-              <dd className="whitespace-pre-line">{a.note || '없음'}</dd>
+              <dd className="whitespace-pre-line">
+                {a.note || '없음'}
+                <ContentHistory edits={a.contentEdits} />
+              </dd>
             </dl>
 
             {a.status === 'submitted' && (
