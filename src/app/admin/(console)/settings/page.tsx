@@ -19,6 +19,7 @@ import {
 import { SETTINGS_KEY } from '@/features/settings/use-settings';
 import './settings.css';
 import { readBanners } from '@/domain/mobile-banners';
+import { LoginContactSettings } from './login-contact';
 import { MobileBannersEditor } from './mobile-banners';
 
 function OrderedOptions({
@@ -208,6 +209,7 @@ export default function Page() {
       permission="site.manage"
       description="공개 웹사이트의 기관 정보, 메뉴와 콘텐츠를 관리합니다."
     >
+      <LoginContactSettings />
       <Settings />
     </AdminPage>
   );
