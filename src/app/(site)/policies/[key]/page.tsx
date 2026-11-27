@@ -20,7 +20,12 @@ const LAST: SectionKey = POLICY_NAV[POLICY_NAV.length - 1]!.key;
 const DOC_KEYS = POLICY_NAV.map((p) => p.key).filter((k): k is PolicyKey => k in POLICY_TITLE);
 const sectionId = (key: string) => `policy-${key}`;
 /** 고정 헤더(+모바일 가로 목차) 아래로 이만큼 지나간 문서를 현재 문서로 본다 */
-const spyOffset = () => (window.matchMedia('(min-width: 48rem)').matches ? 110 : 150);
+function spyOffset() {
+  const section = document.getElementById(sectionId(FIRST));
+  const margin = section ? Number.parseFloat(getComputedStyle(section).scrollMarginTop) : 0;
+  const padding = Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop);
+  return (margin || 0) + (padding || 0) + 1;
+}
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function SectionHeading({ id, title, sub }: { id: string; title: string; sub?: string }) {
@@ -202,10 +207,10 @@ export default function PolicyPage() {
     ready.current = true;
 
     let frame = 0;
+    let offset = spyOffset();
     const spy = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const offset = spyOffset();
         let current = FIRST;
         for (const p of POLICY_NAV) {
           const el = document.getElementById(sectionId(p.key));
@@ -215,10 +220,16 @@ export default function PolicyPage() {
         setActive(atBottom ? LAST : current);
       });
     };
+    const resize = () => {
+      offset = spyOffset();
+      spy();
+    };
     spy();
+    window.addEventListener('resize', resize);
     window.addEventListener('scroll', spy, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
+      window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', spy);
     };
   }, [loaded, initial]);
