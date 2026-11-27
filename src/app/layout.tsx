@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { connection } from 'next/server';
 import { API_BASE_URL, IS_MOCK } from '@/config/env';
 import { DEFAULT_SETTINGS } from '@/config/site-settings';
 import { settingsSchema } from '@/domain/site-settings';
@@ -36,7 +37,8 @@ export const viewport: Viewport = {
   themeColor: '#ffffff',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  await connection();
   return (
     <html lang="ko">
       <body>

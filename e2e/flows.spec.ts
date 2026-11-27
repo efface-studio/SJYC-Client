@@ -510,3 +510,26 @@ test('센터 안내에서 카페 라라의 사진, 운영시간과 메뉴판을 
   await menu.click();
   await expect(page.locator('img')).toHaveJSProperty('naturalWidth', 608);
 });
+
+test('웹 응답은 HTTPS 정책과 응답마다 다른 스크립트 nonce를 제공한다 @desktop', async ({ page, request }) => {
+  await page.addInitScript(() => {
+    document.addEventListener('securitypolicyviolation', (event) => {
+      document.documentElement.dataset.cspViolation = event.effectiveDirective;
+    });
+  });
+  const response = await page.goto('/login');
+  const policy = response?.headers()['content-security-policy'] ?? '';
+  const nonce = policy.match(/'nonce-([^']+)'/)?.[1];
+  expect(nonce).toBeTruthy();
+  expect(response?.headers()['strict-transport-security']).toContain('max-age=31536000');
+  const scripts = await page
+    .locator('script:not([type]), script[type="module"]')
+    .evaluateAll((nodes) => nodes.map((node) => (node as HTMLScriptElement).nonce));
+  expect(scripts.length).toBeGreaterThan(0);
+  expect(scripts).toContain(nonce);
+  const next = await request.get('/login');
+  const nextNonce = next.headers()['content-security-policy']?.match(/'nonce-([^']+)'/)?.[1];
+  expect(nextNonce).toBeTruthy();
+  expect(nextNonce).not.toBe(nonce);
+  await expect(page.locator('html')).not.toHaveAttribute('data-csp-violation', /.+/);
+});
